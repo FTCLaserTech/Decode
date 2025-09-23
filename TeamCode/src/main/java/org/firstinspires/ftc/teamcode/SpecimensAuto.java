@@ -66,9 +66,9 @@ public class SpecimensAuto extends LinearOpMode
         extras.tailUp();
 
         telemetry.addLine("Initialized");
-        telemetry.addData("x", drive.pose.position.x);
-        telemetry.addData("y", drive.pose.position.y);
-        telemetry.addData("heading", drive.pose.heading);
+        //telemetry.addData("x", drive.pose.position.x);
+        //telemetry.addData("y", drive.pose.position.y);
+        //telemetry.addData("heading", drive.pose.heading);
         telemetry.update();
 
         while (!isStopRequested() && !opModeIsActive())
@@ -77,7 +77,7 @@ public class SpecimensAuto extends LinearOpMode
         }
 
         // hang pre-loaded sample in the high chamber
-        Action DriveToNearSubmursibleAction = drive.actionBuilder(drive.pose)
+        Action DriveToNearSubmursibleAction = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toSubmursible.position, toSubmursible.heading, new TranslationalVelConstraint(50.0), new ProfileAccelConstraint(-50,50))
                 // move to submersible
                 //.strafeToLinearHeading(new Vector2d(-15,29), Rotation2d.exp(270), new TranslationalVelConstraint(15.0))
@@ -97,7 +97,7 @@ public class SpecimensAuto extends LinearOpMode
         safeWaitSeconds(0.25);
 
         Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
+                drive.actionBuilder(drive.localizer.getPose())
                         .strafeToLinearHeading(backUpFromSubmursible.position, backUpFromSubmursible.heading, new TranslationalVelConstraint(50.0))
                         //.strafeToLinearHeading(lineUpForSweep.position, lineUpForSweep.heading, new TranslationalVelConstraint(50.0))
                         .strafeToLinearHeading(slideOver1.position, slideOver1.heading, new TranslationalVelConstraint(50.0))
@@ -113,20 +113,20 @@ public class SpecimensAuto extends LinearOpMode
 
 
         Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
+                drive.actionBuilder(drive.localizer.getPose())
                         .strafeToLinearHeading(lineUpForWallSlide.position, lineUpForWallSlide.heading, new TranslationalVelConstraint(50.0))
                         .build());
 
         safeWaitSeconds(0.5);
 
         Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
+                drive.actionBuilder(drive.localizer.getPose())
                         .strafeToLinearHeading(wallSlide.position, wallSlide.heading, new TranslationalVelConstraint(50.0))
                         .build());
 
-        drive.pose = new Pose2d(0,0,Math.toRadians(180));
+        drive.localizer.setPose(new Pose2d(0,0,Math.toRadians(180)));
 
-        Action DriveToNearSubmursibleAction2 = drive.actionBuilder(drive.pose)
+        Action DriveToNearSubmursibleAction2 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toSubmursible2.position, toSubmursible2.heading, new TranslationalVelConstraint(50.0))
                 // move to submersible
                 .build();
@@ -145,18 +145,18 @@ public class SpecimensAuto extends LinearOpMode
 
 
         Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
+                drive.actionBuilder(drive.localizer.getPose())
                         .strafeToLinearHeading(lineUpForWallSlide2.position, lineUpForWallSlide2.heading, new TranslationalVelConstraint(50.0))
                         .build());
 
         Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
+                drive.actionBuilder(drive.localizer.getPose())
                         .strafeToLinearHeading(wallSlide2.position, wallSlide2.heading, new TranslationalVelConstraint(50.0))
                         .build());
 
-        drive.pose = new Pose2d(0,0,Math.toRadians(180));
+        drive.localizer.setPose(new Pose2d(0,0,Math.toRadians(180)));
 
-        Action DriveToNearSubmursibleAction3 = drive.actionBuilder(drive.pose)
+        Action DriveToNearSubmursibleAction3 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toSubmursible3.position, toSubmursible3.heading, new TranslationalVelConstraint(50.0))
                 // move to submersible
                 .build();
@@ -174,18 +174,18 @@ public class SpecimensAuto extends LinearOpMode
         ));
 
         Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
+                drive.actionBuilder(drive.localizer.getPose())
                         .strafeToLinearHeading(lineUpForWallSlide3.position, lineUpForWallSlide3.heading, new TranslationalVelConstraint(50.0))
                         .build());
 
         Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
+                drive.actionBuilder(drive.localizer.getPose())
                         .strafeToLinearHeading(wallSlide3.position, wallSlide3.heading, new TranslationalVelConstraint(50.0))
                         .build());
 
-        drive.pose = new Pose2d(0,0,Math.toRadians(180));
+        drive.localizer.setPose( new Pose2d(0,0,Math.toRadians(180)));
 
-        Action DriveToNearSubmursibleAction4 = drive.actionBuilder(drive.pose)
+        Action DriveToNearSubmursibleAction4 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toSubmursible4.position, toSubmursible4.heading, new TranslationalVelConstraint(50.0))
                 // move to submersible
                 .build();
@@ -202,7 +202,7 @@ public class SpecimensAuto extends LinearOpMode
                 )
         ));
 
-        Action parkAction = drive.actionBuilder(drive.pose)
+        Action parkAction = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(park.position, park.heading, new TranslationalVelConstraint(50.0))
                 // move to submersible
                 .build();
@@ -235,7 +235,7 @@ public class SpecimensAuto extends LinearOpMode
         // Hang #5
 
         // Save the ending location
-        extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);
+        //extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);
     }
 
     public void safeWaitSeconds(double time)

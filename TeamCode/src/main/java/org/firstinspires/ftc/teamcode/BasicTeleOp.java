@@ -23,7 +23,7 @@ public class BasicTeleOp extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0), this);
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
         //TrajectoryBook book = new TrajectoryBook(drive, extras);
 
@@ -107,7 +107,7 @@ public class BasicTeleOp extends LinearOpMode
 
 
         telemetry.addData("Previous Orientation: ", previousOrientation);
-        telemetry.addData("Odo Orientation: ", drive.odo.getHeading());
+        //telemetry.addData("Odo Orientation: ", drive.odo.getHeading());
         telemetry.addData("Init Complete", initArmAtStart);
         telemetry.update();
 
@@ -170,9 +170,11 @@ public class BasicTeleOp extends LinearOpMode
 
             //adjustedAngle = 0;
             //adjustedAngle = extras.adjustAngleForDriverPosition(drive.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS), ExtraOpModeFunctions.RobotStartPosition.STRAIGHT);
-            drive.odo.update();
+            //drive.odo.update();
             //adjustedAngle = drive.odo.getHeading() + (Math.PI / 2);
-            adjustedAngle = drive.odo.getHeading() + previousOrientation;
+            //adjustedAngle = drive.odo.getHeading() + previousOrientation;
+            adjustedAngle = previousOrientation;
+
             stickSideways = gamepad1.left_stick_x * speedMultiplier;
             stickForward = -gamepad1.left_stick_y * speedMultiplier;
             stickSidewaysRotated = (stickSideways * Math.cos(-adjustedAngle)) - (stickForward * Math.sin(-adjustedAngle));
@@ -376,8 +378,8 @@ public class BasicTeleOp extends LinearOpMode
                 telemetry.update();
 
                 //drive.imu.initialize(imuParameters);
-                drive.odo.resetPosAndIMU();
-                previousOrientation = drive.odo.getHeading()+ PI/2;
+                //drive.odo.resetPosAndIMU();
+                //previousOrientation = drive.odo.getHeading()+ PI/2;
                 extras.saveAutoStartRotation(previousOrientation);
                 sleep(500);
             }
@@ -512,7 +514,7 @@ public class BasicTeleOp extends LinearOpMode
             //telemetry.addData("y", drive.pose.position.y);
             //telemetry.addData("heading", drive.pose.heading.real);
 
-            telemetry.addData("ODO heading", drive.odo.getHeading());
+            //telemetry.addData("ODO heading", drive.odo.getHeading());
             telemetry.addData("ODO adjusted angle", adjustedAngle);
             //telemetry.addData("IMU angle", drive.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
 
