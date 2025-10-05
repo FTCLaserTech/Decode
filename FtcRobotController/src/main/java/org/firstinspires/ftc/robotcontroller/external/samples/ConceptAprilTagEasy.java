@@ -70,12 +70,14 @@ public class ConceptAprilTagEasy extends LinearOpMode {
     /**
      * The variable to store our instance of the AprilTag processor.
      */
-    private AprilTagProcessor aprilTag;
+    private AprilTagProcessor aprilTag1;
+    private AprilTagProcessor aprilTag2;
 
     /**
      * The variable to store our instance of the vision portal.
      */
-    private VisionPortal visionPortal;
+    private VisionPortal visionPortal1;
+    private VisionPortal visionPortal2;
 
     @Override
     public void runOpMode() {
@@ -98,9 +100,11 @@ public class ConceptAprilTagEasy extends LinearOpMode {
 
                 // Save CPU resources; can resume streaming when needed.
                 if (gamepad1.dpad_down) {
-                    visionPortal.stopStreaming();
+                    visionPortal1.stopStreaming();
+                    visionPortal2.stopStreaming();
                 } else if (gamepad1.dpad_up) {
-                    visionPortal.resumeStreaming();
+                    visionPortal1.resumeStreaming();
+                    visionPortal2.resumeStreaming();
                 }
 
                 // Share the CPU.
@@ -109,7 +113,8 @@ public class ConceptAprilTagEasy extends LinearOpMode {
         }
 
         // Save more CPU resources when camera is no longer needed.
-        visionPortal.close();
+        visionPortal1.close();
+        visionPortal2.close();
 
     }   // end method runOpMode()
 
@@ -119,15 +124,18 @@ public class ConceptAprilTagEasy extends LinearOpMode {
     private void initAprilTag() {
 
         // Create the AprilTag processor the easy way.
-        aprilTag = AprilTagProcessor.easyCreateWithDefaults();
+        aprilTag1 = AprilTagProcessor.easyCreateWithDefaults();
+        aprilTag2 = AprilTagProcessor.easyCreateWithDefaults();
 
         // Create the vision portal the easy way.
         if (USE_WEBCAM) {
-            visionPortal = VisionPortal.easyCreateWithDefaults(
-                hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag);
+            visionPortal1 = VisionPortal.easyCreateWithDefaults(
+                    hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag1);
+            visionPortal2 = VisionPortal.easyCreateWithDefaults(
+                    hardwareMap.get(WebcamName.class, "Webcam 2"), aprilTag2);
         } else {
-            visionPortal = VisionPortal.easyCreateWithDefaults(
-                BuiltinCameraDirection.BACK, aprilTag);
+            visionPortal1 = VisionPortal.easyCreateWithDefaults(
+                BuiltinCameraDirection.BACK, aprilTag1);
         }
 
     }   // end method initAprilTag()
@@ -137,7 +145,8 @@ public class ConceptAprilTagEasy extends LinearOpMode {
      */
     private void telemetryAprilTag() {
 
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        List<AprilTagDetection> currentDetections = aprilTag1.getDetections();
+        currentDetections.addAll(aprilTag2.getDetections());
         telemetry.addData("# AprilTags Detected", currentDetections.size());
 
         // Step through the list of detections and display info for each one.

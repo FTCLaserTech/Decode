@@ -64,7 +64,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @TeleOp(name="Optimize AprilTag Exposure", group = "Concept")
-@Disabled
+//@Disabled
 public class ConceptAprilTagOptimizeExposure extends LinearOpMode
 {
     private VisionPortal visionPortal = null;        // Used to manage the video source.
@@ -92,8 +92,8 @@ public class ConceptAprilTagOptimizeExposure extends LinearOpMode
 
         // Establish Min and Max Gains and Exposure.  Then set a low exposure with high gain
         getCameraSetting();
-        myExposure = Math.min(5, minExposure);
-        myGain = maxGain;
+        //myExposure = Math.min(5, minExposure);
+        //myGain = maxGain;
         setManualExposure(myExposure, myGain);
 
         // Wait for the match to begin.
@@ -237,10 +237,12 @@ public class ConceptAprilTagOptimizeExposure extends LinearOpMode
             ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
             minExposure = (int)exposureControl.getMinExposure(TimeUnit.MILLISECONDS) + 1;
             maxExposure = (int)exposureControl.getMaxExposure(TimeUnit.MILLISECONDS);
+            myExposure = (int)exposureControl.getExposure(TimeUnit.MILLISECONDS);
 
             GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
             minGain = gainControl.getMinGain();
             maxGain = gainControl.getMaxGain();
+            myGain = gainControl.getGain();
         }
     }
 }

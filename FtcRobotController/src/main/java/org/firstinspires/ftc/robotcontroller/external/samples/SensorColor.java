@@ -207,7 +207,7 @@ public class SensorColor extends LinearOpMode {
       // Update the hsvValues array by passing it to Color.colorToHSV()
       Color.colorToHSV(colors1.toColor(), hsvValues1);
       Color.colorToHSV(colors2.toColor(), hsvValues2);
-      double threshold = 0.02;
+      double threshold = 0.019;
       if((colors1.red>threshold) && (colors1.green>threshold) && (colors1.blue>threshold))
       {
         telemetry.addLine("Purple");

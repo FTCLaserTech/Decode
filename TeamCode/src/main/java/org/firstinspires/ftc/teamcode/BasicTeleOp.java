@@ -353,9 +353,10 @@ public class BasicTeleOp extends LinearOpMode
             else if(!gamepad2.dpad_up && gp2_dpad_up_pressed)
             {
                 gp2_dpad_up_pressed = false;
-                extras.specimenPickupState = ExtraOpModeFunctions.SpecimenPickupStates.PICKUP;
+                //extras.specimenPickupState = ExtraOpModeFunctions.SpecimenPickupStates.PICKUP;
+
             }
-            extras.specimenPickupStateMachine();;
+            //extras.specimenPickupStateMachine();;
 
             if (gamepad2.dpad_down)
             {
