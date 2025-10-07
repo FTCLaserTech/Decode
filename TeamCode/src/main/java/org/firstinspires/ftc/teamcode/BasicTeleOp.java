@@ -99,11 +99,30 @@ public class BasicTeleOp extends LinearOpMode
         double previousOrientation = extras.readAutoStartRotation();
 
         boolean initArmAtStart = false;
-        if(gamepad2.x)
+        if(gamepad2.xWasReleased())
         {
-            initArmAtStart = true;
+          extras.s1.setPosition(0);
         }
-
+        if(gamepad2.xWasPressed())
+        {
+            extras.s1.setPosition(1);
+        }
+        if(gamepad2.yWasReleased())
+        {
+            extras.s2.setPosition(0);
+        }
+        if(gamepad2.yWasPressed())
+        {
+            extras.s2.setPosition(1);
+        }
+        if(gamepad2.aWasReleased())
+        {
+            extras.s3.setPosition(0);
+        }
+        if(gamepad2.aWasPressed())
+        {
+            extras.s3.setPosition(1);
+        }
 
 
         telemetry.addData("Previous Orientation: ", previousOrientation);
@@ -116,53 +135,6 @@ public class BasicTeleOp extends LinearOpMode
 
         while (!isStopRequested())
         {
-            if(initArmAtStart == true)
-            {
-                extras.initArm();
-                initArmAtStart = false;
-            }
-
-            elevatorCurrent = extras.elevator.getCurrent(CurrentUnit.AMPS);
-            if (elevatorCurrent > elevatorMaxCurrent)
-            {
-                elevatorMaxCurrent = elevatorCurrent;
-            }
-
-            if (elevatorCurrent >= 7)
-            {
-                numDangerElevatorAmps += 1;
-                telemetry.addLine("WARNING: HIGH ELEVATOR AMPS");
-                if(numDangerElevatorAmps >= 10)
-                {
-                    // in future, ONLY stop elevator motion
-                    stop();
-                }
-            }
-            else
-            {
-                numDangerElevatorAmps = 0;
-            }
-
-            armCurrent = extras.arm.getCurrent(CurrentUnit.AMPS);
-            if (armCurrent > armMaxCurrent)
-            {
-                armMaxCurrent = armCurrent;
-            }
-            if (armCurrent >= 7)
-            {
-                numDangerArmAmps += 1;
-                telemetry.addLine("WARNING: HIGH AMPS");
-                if(numDangerArmAmps >= 10)
-                {
-                    // in future, ONLY stop arm motion
-                    stop();
-                }
-            }
-            else
-            {
-                numDangerArmAmps = 0;
-            }
-
             if (gamepad1.left_bumper)
                 speedMultiplier = 0.85;
             else
@@ -230,36 +202,6 @@ public class BasicTeleOp extends LinearOpMode
             }
 
 
-            //extend lift
-            if (gamepad2.right_trigger > 0 && !gamepad2.start && !gamepad2.back)
-            {
-                extras.liftRetract();
-
-            }
-            //extend lift
-            if (gamepad2.right_bumper && !gamepad2.back)
-            {
-                extras.liftExtend();
-                extras.elevatorDown();
-                extras.armRetract();
-            }
-
-            if(gamepad2.left_bumper) {
-                extras.liftRetractManual();
-                manualLiftStop = true;
-            }
-            else if(gamepad2.left_trigger > 0) {
-                extras.liftExtendManual();
-                manualLiftStop = true;
-            }
-            else
-            {
-                if(manualLiftStop == true)
-                {
-                extras.liftStop();
-                manualLiftStop = false;
-                }
-            }
 
 
             /*
@@ -343,7 +285,6 @@ public class BasicTeleOp extends LinearOpMode
             */
             drive.updatePoseEstimate();
 
-            extras.elevatorMonitor();
 
 
             if (gamepad2.dpad_up)
@@ -355,16 +296,6 @@ public class BasicTeleOp extends LinearOpMode
                 gp2_dpad_up_pressed = false;
                 //extras.specimenPickupState = ExtraOpModeFunctions.SpecimenPickupStates.PICKUP;
 
-            }
-            //extras.specimenPickupStateMachine();;
-
-            if (gamepad2.dpad_down)
-            {
-                extras.armVertical();
-                extras.elevatorDown();
-                extras.tailUp();
-                telemetry.addData("Dpad down", extras.elevator.getTargetPosition());
-                telemetry.addData("Dpad down", extras.elevator.getPower());
             }
 
             // RESET IMU
@@ -385,38 +316,7 @@ public class BasicTeleOp extends LinearOpMode
                 sleep(500);
             }
 
-            // Init Elevator
-            if ((gamepad2.back) && (gamepad2.y))
-            {
-                gp2_by_pressed = true;
-            }
-            else if (!gamepad2.y && gp2_by_pressed)
-            {
-                extras.initElevator();
-                gp2_by_pressed = false;
-            }
-
-            // Init Arm
-            if ((gamepad1.back) && (gamepad1.x))
-            {
-                gp1_bx_pressed = true;
-            }
-            else if (!gamepad1.x && gp1_bx_pressed)
-            {
-                extras.initArm();
-                gp1_bx_pressed = false;
-            }
-            if ((gamepad2.back) && (gamepad2.x))
-            {
-                gp2_bx_pressed = true;
-            }
-            else if (!gamepad2.x && gp2_bx_pressed)
-            {
-                extras.initArm();
-                gp2_bx_pressed = false;
-            }
-
-            if (gamepad1.left_trigger > 0)
+            /*if (gamepad1.left_trigger > 0)
             {
                 extras.intakeOut();
                 intakeOn = true;
@@ -431,86 +331,8 @@ public class BasicTeleOp extends LinearOpMode
                 extras.intakeOff();
             }
 
-            /*
-            if (gamepad2.left_bumper)
-            {
-                gp2_left_bumper_pressed = true;
-            }
-            else if (!gamepad2.left_bumper && gp2_left_bumper_pressed) {
-                gp2_left_bumper_pressed = false;
-                extras.tailUp();
-            }
+             */
 
-            if (gamepad2.left_trigger > 0)
-            {
-                gp2_left_trigger_pressed = true;
-            }
-            else if ((gamepad2.left_trigger == 0) && gp2_left_trigger_pressed) {
-                gp2_left_trigger_pressed = false;
-                extras.tailDown();
-            }
-            */
-            if(gamepad2.a && !gamepad2.back)
-            {
-                extras.armBack();
-            }
-
-            if(gamepad2.b && !gamepad2.back)
-            {
-                extras.armPark();
-            }
-
-
-
-            extras.basketDeliveryStateMachine();
-
-            if ((!gamepad2.back) && (gamepad2.y))
-            {
-                extras.armVertical();
-            }
-
-            if ((!gamepad2.back) && (gamepad2.x))
-            {
-                extras.armHang2();
-            }
-
-
-            extras.collectStateMachine();
-
-            if(gamepad1.a)
-            {
-                gp1_a_pressed = true;
-            }
-            else if (!gamepad1.a && gp1_a_pressed) {
-                gp1_a_pressed = false;
-                if (extras.armPosition == ExtraOpModeFunctions.ArmPosition.HORIZONTAL)
-                {
-                    extras.armExtend();
-                }
-                else
-                {
-                    extras.armHorizontal();
-                }
-            }
-
-            // Arm to Zero
-            if ( gamepad1.y )
-            {
-                gp1_y_pressed = true;
-            }
-            else if (!gamepad1.y && gp1_y_pressed)
-            {
-                gp1_y_pressed = false;
-                if (extras.armPosition == ExtraOpModeFunctions.ArmPosition.HORIZONTAL)
-                {
-                    extras.armBack();
-                }
-                else
-                {
-                    extras.armHorizontal();
-                }
-
-            }
             //telemetry.addData("x", drive.pose.position.x);
             //telemetry.addData("y", drive.pose.position.y);
             //telemetry.addData("heading", drive.pose.heading.real);
@@ -524,19 +346,6 @@ public class BasicTeleOp extends LinearOpMode
             //telemetry.addData("Position", data);
 
             //telemetry.addLine();
-
-            telemetry.addData("Lift Counts: ", extras.lift.getCurrentPosition());
-            telemetry.addData("Lift Current: ", extras.lift.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("Arm Encoder Counts: ", extras.arm.getCurrentPosition());
-            telemetry.addData("Arm Target Counts: ", extras.arm.getTargetPosition());
-            telemetry.addData("Arm Current: ", armCurrent);
-            telemetry.addData("Arm Max Current: ", armMaxCurrent);
-            telemetry.addData("Elevator Encoder Counts: ", extras.elevator.getCurrentPosition());
-            telemetry.addData("Elevator Target Counts: ", extras.elevator.getTargetPosition());
-            telemetry.addData("Elevator Current: ", elevatorCurrent);
-            telemetry.addData("Elevator Max Current: ", elevatorMaxCurrent);
-            telemetry.addData("Elevator limit: ", extras.elevatorLimit.isPressed());
-            telemetry.addData("Elevator Resets: ", extras.elevatorResetCounter);
 
             telemetry.addData("Elapsed time: ", getRuntime());
 
