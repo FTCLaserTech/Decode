@@ -62,9 +62,6 @@ public class SpecimensAuto extends LinearOpMode
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
 
-        extras.initArm();
-        extras.tailUp();
-
         telemetry.addLine("Initialized");
         //telemetry.addData("x", drive.pose.position.x);
         //telemetry.addData("y", drive.pose.position.y);
@@ -82,17 +79,6 @@ public class SpecimensAuto extends LinearOpMode
                 // move to submersible
                 //.strafeToLinearHeading(new Vector2d(-15,29), Rotation2d.exp(270), new TranslationalVelConstraint(15.0))
                 .build();
-
-        Actions.runBlocking(new ParallelAction(
-                DriveToNearSubmursibleAction,
-                new SequentialAction(
-                        new SleepAction(0),
-                        new InstantAction(() -> extras.armVertical()),
-                        new InstantAction(() -> extras.elevatorHighChamber()),
-                        new SleepAction(1.5),
-                        new InstantAction(() -> extras.elevatorDown())
-                )
-        ));
 
         safeWaitSeconds(0.25);
 
@@ -131,19 +117,6 @@ public class SpecimensAuto extends LinearOpMode
                 // move to submersible
                 .build();
 
-        Actions.runBlocking(new ParallelAction(
-                DriveToNearSubmursibleAction2,
-                new SequentialAction(
-                        new SleepAction(0),
-                        new InstantAction(() -> extras.armVertical()),
-                        new InstantAction(() -> extras.elevatorHighChamber()),
-                        new SleepAction(2.5),
-                        new InstantAction(() -> extras.elevatorDown()),
-                        new SleepAction(0.25)
-                )
-        ));
-
-
         Actions.runBlocking(
                 drive.actionBuilder(drive.localizer.getPose())
                         .strafeToLinearHeading(lineUpForWallSlide2.position, lineUpForWallSlide2.heading, new TranslationalVelConstraint(50.0))
@@ -160,18 +133,6 @@ public class SpecimensAuto extends LinearOpMode
                 .strafeToLinearHeading(toSubmursible3.position, toSubmursible3.heading, new TranslationalVelConstraint(50.0))
                 // move to submersible
                 .build();
-
-        Actions.runBlocking(new ParallelAction(
-                DriveToNearSubmursibleAction3,
-                new SequentialAction(
-                        new SleepAction(0),
-                        new InstantAction(() -> extras.armVertical()),
-                        new InstantAction(() -> extras.elevatorHighChamber()),
-                        new SleepAction(2.5),
-                        new InstantAction(() -> extras.elevatorDown()),
-                        new SleepAction(0.25)
-                )
-        ));
 
         Actions.runBlocking(
                 drive.actionBuilder(drive.localizer.getPose())
@@ -190,30 +151,11 @@ public class SpecimensAuto extends LinearOpMode
                 // move to submersible
                 .build();
 
-        Actions.runBlocking(new ParallelAction(
-                DriveToNearSubmursibleAction4,
-                new SequentialAction(
-                        new SleepAction(0),
-                        new InstantAction(() -> extras.armVertical()),
-                        new InstantAction(() -> extras.elevatorHighChamber()),
-                        new SleepAction(2.5),
-                        new InstantAction(() -> extras.elevatorDown()),
-                        new SleepAction(0.25)
-                )
-        ));
-
         Action parkAction = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(park.position, park.heading, new TranslationalVelConstraint(50.0))
                 // move to submersible
                 .build();
 
-        Actions.runBlocking(new ParallelAction(
-                parkAction,
-                new SequentialAction(
-                        new SleepAction(0),
-                        new InstantAction(() -> extras.armRetract())
-                )
-        ));
 
 
 
