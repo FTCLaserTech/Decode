@@ -99,29 +99,37 @@ public class BasicTeleOp extends LinearOpMode
         double previousOrientation = extras.readAutoStartRotation();
 
         boolean initArmAtStart = false;
-        if(gamepad2.xWasReleased())
-        {
-          extras.s1.setPosition(0);
-        }
+
         if(gamepad2.xWasPressed())
         {
-            extras.s1.setPosition(1);
+            telemetry.update();
+          extras.s1.setPosition(1);
+            telemetry.addData("X Pressed", "s1");
         }
-        if(gamepad2.yWasReleased())
+        if(gamepad2.bWasPressed())
+        {
+            extras.s1.setPosition(0);
+            telemetry.addData("B Pressed", "s1");
+        }
+        if(gamepad2.dpadUpWasPressed())
         {
             extras.s2.setPosition(0);
+            telemetry.addData("dpad up pressed", "s2");
         }
         if(gamepad2.yWasPressed())
         {
             extras.s2.setPosition(1);
+            telemetry.addData("y Pressed", "s2");
         }
-        if(gamepad2.aWasReleased())
+        if(gamepad2.dpadDownWasPressed())
         {
             extras.s3.setPosition(0);
+            telemetry.addData("dpad down pressed", "s3");
         }
         if(gamepad2.aWasPressed())
         {
             extras.s3.setPosition(1);
+            telemetry.addData("a Pressed", "s3");
         }
 
 
