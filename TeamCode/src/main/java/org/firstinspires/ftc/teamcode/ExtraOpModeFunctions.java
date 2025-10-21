@@ -93,6 +93,53 @@ public class ExtraOpModeFunctions
 
     }
 
+    public void s1up()
+    {
+        s1.setPosition(0);
+    }
+
+    public void s1down()
+    {
+        s1.setPosition(1);
+    }
+    public void s2up()
+    {
+        s2.setPosition(0);
+    }
+
+    public void s2down()
+    {
+        s2.setPosition(1);
+    }
+    public void s3up()
+    {
+        s3.setPosition(0);
+    }
+
+    public void s3down()
+    {
+        s3.setPosition(1);
+    }
+    /*
+    public void s2()
+    {
+        s2.setPosition(-1);
+    }
+
+    public void s2()
+    {
+        s2.setPosition(1);
+    }
+    public void s3()
+    {
+        s3.setPosition(-1);
+    }
+
+    public void s3()
+    {
+        s3.setPosition(1);
+    }
+*/
     public void intakeIn() {
         intake.setPower(1);
     }

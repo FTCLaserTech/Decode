@@ -62,7 +62,6 @@ public class BasicTeleOp extends LinearOpMode
 
         boolean elevatorStopped = true;
         boolean elevatorBottom = true;
-        boolean intakeOn = false;
         boolean manualStickMove = false;
         boolean intakeElevatorShouldMove = false;
         boolean elevatorResetOK= false;
@@ -102,11 +101,30 @@ public class BasicTeleOp extends LinearOpMode
 
         if(gamepad2.xWasPressed())
         {
-            telemetry.update();
-          extras.s1.setPosition(1);
-            telemetry.addData("X Pressed", "s1");
+          extras.s1up();
+        }
+        if(gamepad2.yWasPressed())
+        {
+            extras.s1down();
         }
         if(gamepad2.bWasPressed())
+        {
+            extras.s2down();
+        }
+        if(gamepad2.aWasPressed())
+        {
+            extras.s2down();
+        }
+        if(gamepad2.dpadUpWasPressed())
+        {
+            extras.s3down();
+        }
+        if(gamepad2.dpadDownWasPressed())
+        {
+            extras.s3down();
+        }
+
+        /*if(gamepad2.bWasPressed())
         {
             extras.s1.setPosition(0);
             telemetry.addData("B Pressed", "s1");
@@ -131,7 +149,7 @@ public class BasicTeleOp extends LinearOpMode
             extras.s3.setPosition(1);
             telemetry.addData("a Pressed", "s3");
         }
-
+        */
 
         telemetry.addData("Previous Orientation: ", previousOrientation);
         //telemetry.addData("Odo Orientation: ", drive.odo.getHeading());
