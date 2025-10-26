@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.PI;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 import android.graphics.Color;
 
@@ -93,6 +95,13 @@ public class BasicTeleOp extends LinearOpMode
         int numDangerElevatorAmps = 0;
         boolean manualLiftStop = false;
 
+        String slot1Detections = "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN";
+        String slot2Detections = "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN";
+        String slot3Detections = "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN";
+        String slot1Artifact = "N";
+        String slot2Artifact = "N";
+        String slot3Artifact = "N";
+
         //drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         //extras.wristMiddle();
@@ -109,33 +118,6 @@ public class BasicTeleOp extends LinearOpMode
         final float[] hsvValues2 = new float[3];
         final float[] hsvValues3 = new float[3];
 
-        /*if(gamepad2.bWasPressed())
-        {
-            extras.s1.setPosition(0);
-            telemetry.addData("B Pressed", "s1");
-        }
-        if(gamepad2.dpadUpWasPressed())
-        {
-            extras.s2.setPosition(0);
-            telemetry.addData("dpad up pressed", "s2");
-        }
-        if(gamepad2.yWasPressed())
-        {
-            extras.s2.setPosition(1);
-            telemetry.addData("y Pressed", "s2");
-        }
-        if(gamepad2.dpadDownWasPressed())
-        {
-            extras.s3.setPosition(0);
-            telemetry.addData("dpad down pressed", "s3");
-        }
-        if(gamepad2.aWasPressed())
-        {
-            extras.s3.setPosition(1);
-            telemetry.addData("a Pressed", "s3");
-        }
-        */
-
         telemetry.addData("Previous Orientation: ", previousOrientation);
         //telemetry.addData("Odo Orientation: ", drive.odo.getHeading());
         telemetry.addData("Init Complete", initArmAtStart);
@@ -151,7 +133,6 @@ public class BasicTeleOp extends LinearOpMode
             else
                 speedMultiplier = 1.0;
 
-
             //adjustedAngle = 0;
             //adjustedAngle = extras.adjustAngleForDriverPosition(drive.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS), ExtraOpModeFunctions.RobotStartPosition.STRAIGHT);
             //drive.odo.update();
@@ -164,54 +145,14 @@ public class BasicTeleOp extends LinearOpMode
             stickSidewaysRotated = (stickSideways * Math.cos(-adjustedAngle)) - (stickForward * Math.sin(-adjustedAngle));
             stickForwardRotated = (stickSideways * Math.sin(-adjustedAngle)) + (stickForward * Math.cos(-adjustedAngle));
 
-            switch (0) {
-                case 0:
-                    drive.setDrivePowers(new PoseVelocity2d(
-                            new Vector2d(
-                                    stickSidewaysRotated,
-                                    stickForwardRotated
-                            ),
-                            -gamepad1.right_stick_x
-                    ));
-                    break;
-                case 1:
-                    // Reading joystick imputs
-                    stickRotation = gamepad1.right_stick_x;
+            drive.setDrivePowers(new PoseVelocity2d(
+                    new Vector2d(
+                            stickSidewaysRotated,
+                            stickForwardRotated
+                    ),
+                    -gamepad1.right_stick_x
+            ));
 
-                    frontLeftPower = stickForwardRotated - stickSidewaysRotated + stickRotation;
-                    frontRightPower = stickForwardRotated + stickSidewaysRotated - stickRotation;
-                    backLeftPower = stickForwardRotated + stickSidewaysRotated + stickRotation;
-                    backRightPower = stickForwardRotated - stickSidewaysRotated - stickRotation;
-
-                    ArrayList<Double> motorList = new ArrayList<>(Arrays.asList(frontLeftPower, frontRightPower, backLeftPower, backRightPower));
-
-                    double highest = 0;
-
-                    // Find the highest value out of the 4 motor values
-                    for (double n : motorList)
-                    {
-                        if (Math.abs(n) > highest) {
-                            highest = Math.abs(n);
-                        }
-                    }
-
-                    if (highest < 1)
-                    {
-                        highest = 1;
-                    }
-
-                    // Normalize each of the values
-                    frontLeftPower = (frontLeftPower / highest) * (speedMultiplier / 10);
-                    frontRightPower = (frontRightPower / highest) * (speedMultiplier / 10);
-                    backLeftPower = (backLeftPower / highest) * (speedMultiplier / 10);
-                    backRightPower = (backRightPower / highest) * (speedMultiplier / 10);
-
-                    drive.leftFront.setPower(frontLeftPower);
-                    drive.rightFront.setPower(frontRightPower);
-                    drive.leftBack.setPower(backLeftPower);
-                    drive.rightBack.setPower(backRightPower);
-                    break;
-            }
             if(gamepad2.xWasPressed())
             {
                 extras.s1up();
@@ -253,19 +194,36 @@ public class BasicTeleOp extends LinearOpMode
             Color.colorToHSV(colors1.toColor(), hsvValues1);
             Color.colorToHSV(colors2.toColor(), hsvValues2);
             Color.colorToHSV(colors3.toColor(), hsvValues3);
-            double threshold = 0.012;
-            if((colors1.red>threshold) && (colors1.green>threshold) && (colors1.blue>threshold))
-            {
-                telemetry.addLine("Purple");
-            }
-            else if ((colors1.green>threshold) && (colors1.blue>threshold))
-            {
-                telemetry.addLine("Green");
-            }
+
+            slot1Detections = checkArtifact(colors1.green, colors1.blue) + slot1Detections.substring(0, slot1Detections.length() - 1);
+            slot2Detections = checkArtifact(colors2.green, colors2.blue) + slot2Detections.substring(0, slot2Detections.length() - 1);
+            slot3Detections = checkArtifact(colors3.green, colors3.blue) + slot3Detections.substring(0, slot3Detections.length() - 1);
+
+            telemetry.addLine(slot1Detections);
+            telemetry.addLine(slot2Detections);
+            telemetry.addLine(slot3Detections);
+            if(slot1Detections.indexOf("G") != -1)
+                slot1Artifact = "G";
+            else if(slot1Detections.indexOf("P") != -1)
+                slot1Artifact = "P";
             else
-            {
-                telemetry.addLine("No Ball");
-            }
+                slot1Artifact = "N";
+
+            if(slot2Detections.indexOf("G") != -1)
+                slot2Artifact = "G";
+            else if(slot2Detections.indexOf("P") != -1)
+                slot2Artifact = "P";
+            else
+                slot2Artifact = "N";
+
+            if(slot3Detections.indexOf("G") != -1)
+                slot3Artifact = "G";
+            else if(slot3Detections.indexOf("P") != -1)
+                slot3Artifact = "P";
+            else
+                slot3Artifact = "N";
+
+            telemetry.addLine(slot1Artifact + " " + slot2Artifact + " " + slot3Artifact);
 
             telemetry.addLine()
                     .addData("Red", "%.3f", colors1.red)
@@ -277,100 +235,7 @@ public class BasicTeleOp extends LinearOpMode
                     .addData("Value", "%.3f", hsvValues1[2]);
             telemetry.addData("Alpha", "%.3f", colors1.alpha);
 
-            /*
-            slope = -elevMultMin / elevHeightMax;
-            elevatorEncoderCounts = (extras.elevator.getCurrentPosition());
-            elevMult = slope * elevatorEncoderCounts + 1;
-            leftBackEncoderCounts = (drive.leftBack.getCurrentPosition());
-            leftFrontEnocoderCounts = (drive.leftFront.getCurrentPosition());
-            rightBackEncoderCounts = (drive.rightBack.getCurrentPosition());
-            rightFrontEncoderCounts = (drive.rightFront.getCurrentPosition());
-
-
-            // MANUAL ELEVATOR CONTROL- gamepad 2
-            // stop if the limit switch is pressed
-
-            float elevatorStick = gamepad2.left_stick_y;
-            if(extras.elevatorLimit.isPressed())
-            {
-                extras.elevator.setPower(0);
-                elevatorStopped = true;
-
-                // it's OK to move up if the limit switch is pressed
-                if(elevatorStick < 0)
-                {
-                    extras.elevator.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-                    extras.elevator.setPower(-elevatorStick);
-                    elevatorStopped = false;
-                }
-                else if (gamepad2.right_stick_y < 0)
-                {
-                    extras.elevatorHigh();
-                }
-
-            }
-            // don't go above the max height
-            else if((extras.elevator.getCurrentPosition() > elevHeightMax) && (elevatorStick < 0))
-            {
-                extras.elevator.setPower(0);
-                elevatorStopped = true;
-
-                int elevPos1 = extras.elevator.getCurrentPosition();
-                extras.elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-                extras.elevator.setTargetPosition(elevPos1);
-                extras.elevator.setPower(1.0);
-            }
-
-            else
-            {
-                // If stick is not moved, only set power to 0 once
-                if((elevatorStick == 0) && !elevatorStopped)
-                {
-                    extras.elevator.setPower(0);
-                    elevatorStopped = true;
-
-                    int elevPos1 = extras.elevator.getCurrentPosition();
-                    extras.elevator.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-                    extras.elevator.setTargetPosition(elevPos1);
-                    extras.elevator.setPower(1.0);
-
-                }
-                else if (elevatorStick != 0)
-                {
-                    extras.elevator.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-                    extras.elevator.setPower(-elevatorStick);
-                    elevatorStopped = false;
-                }
-            }
-            */
-            // Elevator to top with right stick up
-            /*
-            if (gamepad2.right_stick_y < 0)
-            {
-                extras.elevatorHigh();
-            }
-
-            // Elevator to bottom with right sitck down
-            if ((gamepad2.right_stick_y > 0))
-            {
-                extras.elevatorGround();
-            }
-            */
-            drive.updatePoseEstimate();
-
-
-
-            if (gamepad2.dpad_up)
-            {
-                gp2_dpad_up_pressed = true;
-            }
-            else if(!gamepad2.dpad_up && gp2_dpad_up_pressed)
-            {
-                gp2_dpad_up_pressed = false;
-                //extras.specimenPickupState = ExtraOpModeFunctions.SpecimenPickupStates.PICKUP;
-
-            }
-
+            
             // RESET IMU
             if ((gamepad1.back) && (gamepad1.b))
             {
@@ -389,22 +254,6 @@ public class BasicTeleOp extends LinearOpMode
                 sleep(500);
             }
 
-            /*if (gamepad1.left_trigger > 0)
-            {
-                extras.intakeOut();
-                intakeOn = true;
-            }
-            else if (gamepad1.right_trigger > 0)
-            {
-                extras.intakeIn();
-                intakeOn = true;
-            }
-            else if (extras.basketDeliveryState == ExtraOpModeFunctions.BasketDelivery.IDLE)
-            {
-                extras.intakeOff();
-            }
-
-             */
 
             //telemetry.addData("x", drive.pose.position.x);
             //telemetry.addData("y", drive.pose.position.y);
@@ -422,7 +271,32 @@ public class BasicTeleOp extends LinearOpMode
 
             telemetry.addData("Elapsed time: ", getRuntime());
 
+            drive.updatePoseEstimate();
             telemetry.update();
         }
     }
+
+    String checkArtifact(float green, float blue)
+    {
+        double threshold = 0.020;
+        if((green>threshold) && (blue>threshold))
+        {
+            if (green > blue)
+            {
+                //telemetry.addLine("Green");
+                return("G");
+            }
+            else
+            {
+                //telemetry.addLine("Purple");
+                return("P");
+            }
+        }
+        else
+        {
+            //telemetry.addLine("No Ball");
+            return("N");
+        }
+    }
+
 }
