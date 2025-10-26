@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.PI;
 
+import android.graphics.Color;
+
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -9,6 +11,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
@@ -99,30 +102,12 @@ public class BasicTeleOp extends LinearOpMode
 
         boolean initArmAtStart = false;
 
-        if(gamepad2.xWasPressed())
-        {
-          extras.s1up();
-        }
-        if(gamepad2.yWasPressed())
-        {
-            extras.s1down();
-        }
-        if(gamepad2.bWasPressed())
-        {
-            extras.s2down();
-        }
-        if(gamepad2.aWasPressed())
-        {
-            extras.s2down();
-        }
-        if(gamepad2.dpadUpWasPressed())
-        {
-            extras.s3down();
-        }
-        if(gamepad2.dpadDownWasPressed())
-        {
-            extras.s3down();
-        }
+        NormalizedRGBA colors1;
+        NormalizedRGBA colors2;
+        NormalizedRGBA colors3;
+        final float[] hsvValues1 = new float[3];
+        final float[] hsvValues2 = new float[3];
+        final float[] hsvValues3 = new float[3];
 
         /*if(gamepad2.bWasPressed())
         {
@@ -165,6 +150,7 @@ public class BasicTeleOp extends LinearOpMode
                 speedMultiplier = 0.85;
             else
                 speedMultiplier = 1.0;
+
 
             //adjustedAngle = 0;
             //adjustedAngle = extras.adjustAngleForDriverPosition(drive.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS), ExtraOpModeFunctions.RobotStartPosition.STRAIGHT);
@@ -226,9 +212,70 @@ public class BasicTeleOp extends LinearOpMode
                     drive.rightBack.setPower(backRightPower);
                     break;
             }
+            if(gamepad2.xWasPressed())
+            {
+                extras.s1up();
+                telemetry.addData("x Pressed", "s1up");
+            }
+            if(gamepad2.yWasPressed())
+            {
+                extras.s1down();
+                telemetry.addData("y Pressed", "s1down");
+            }
+            if(gamepad2.bWasPressed())
+            {
+                extras.s2up();
+                telemetry.addData("b Pressed", "s2up");
 
+            }
+            if(gamepad2.aWasPressed())
+            {
+                extras.s2down();
+                telemetry.addData("a Pressed", "s2down");
+            }
+            if(gamepad2.dpadUpWasPressed())
+            {
+                extras.s3up();
+                telemetry.addData("dpad up Pressed", "s3up");
 
+            }
+            if(gamepad2.dpadDownWasPressed())
+            {
+                extras.s3down();
+                telemetry.addData("dpad down Pressed", "s3down");
 
+            }
+
+            colors1 = extras.colorSensor1.getNormalizedColors();
+            colors2 = extras.colorSensor2.getNormalizedColors();
+            colors3 = extras.colorSensor3.getNormalizedColors();
+
+            Color.colorToHSV(colors1.toColor(), hsvValues1);
+            Color.colorToHSV(colors2.toColor(), hsvValues2);
+            Color.colorToHSV(colors3.toColor(), hsvValues3);
+            double threshold = 0.012;
+            if((colors1.red>threshold) && (colors1.green>threshold) && (colors1.blue>threshold))
+            {
+                telemetry.addLine("Purple");
+            }
+            else if ((colors1.green>threshold) && (colors1.blue>threshold))
+            {
+                telemetry.addLine("Green");
+            }
+            else
+            {
+                telemetry.addLine("No Ball");
+            }
+
+            telemetry.addLine()
+                    .addData("Red", "%.3f", colors1.red)
+                    .addData("Green", "%.3f", colors1.green)
+                    .addData("Blue", "%.3f", colors1.blue);
+            telemetry.addLine()
+                    .addData("Hue", "%.3f", hsvValues1[0])
+                    .addData("Saturation", "%.3f", hsvValues1[1])
+                    .addData("Value", "%.3f", hsvValues1[2]);
+            telemetry.addData("Alpha", "%.3f", colors1.alpha);
 
             /*
             slope = -elevMultMin / elevHeightMax;

@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
@@ -58,8 +59,9 @@ public class ExtraOpModeFunctions
 
     public boolean firstPressed = true;
 
-    public RevColorSensorV3 colorSensor;
-    public ColorRangeSensor testColorSensor;
+    public NormalizedColorSensor colorSensor1;
+    public NormalizedColorSensor colorSensor2;
+    public NormalizedColorSensor colorSensor3;
 
     public RevBlinkinLedDriver blinkinLedDriver;
     public RevBlinkinLedDriver.BlinkinPattern pattern;
@@ -91,7 +93,16 @@ public class ExtraOpModeFunctions
         s2 = hardwareMap.get(Servo.class, "s2");
         s3 = hardwareMap.get(Servo.class, "s3");
 
+        colorSensor1 = hardwareMap.get(NormalizedColorSensor.class, "cs0");
+        colorSensor2 = hardwareMap.get(NormalizedColorSensor.class, "cs1");
+        colorSensor3 = hardwareMap.get(NormalizedColorSensor.class, "cs2");
+        float gain = (float)1.0;
+        colorSensor1.setGain(gain);
+        colorSensor2.setGain(gain);
+        colorSensor3.setGain(gain);
     }
+
+
 
     public void s1up()
     {
@@ -120,26 +131,8 @@ public class ExtraOpModeFunctions
     {
         s3.setPosition(1);
     }
-    /*
-    public void s2()
-    {
-        s2.setPosition(-1);
-    }
 
-    public void s2()
-    {
-        s2.setPosition(1);
-    }
-    public void s3()
-    {
-        s3.setPosition(-1);
-    }
 
-    public void s3()
-    {
-        s3.setPosition(1);
-    }
-*/
     public void intakeIn() {
         intake.setPower(1);
     }
