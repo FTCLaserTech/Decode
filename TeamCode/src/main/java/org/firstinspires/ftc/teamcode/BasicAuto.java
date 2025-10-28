@@ -9,12 +9,12 @@ import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Config
-@Disabled
+//@Disabled
+
 @Autonomous(group = "a")
 
 public class BasicAuto extends LinearOpMode
@@ -45,9 +45,14 @@ public class BasicAuto extends LinearOpMode
         //telemetry.addData("heading", drive.pose.heading);
         telemetry.update();
 
+        ExtraOpModeFunctions.ObeliskPattern obelisk;
+
         while (!isStopRequested() && !opModeIsActive())
         {
             safeWaitSeconds(0.01);
+            obelisk = extras.readObelisk();
+            extras.readRedBearing();
+            telemetry.update();
         }
 
         // launch pre-loaded artifacts

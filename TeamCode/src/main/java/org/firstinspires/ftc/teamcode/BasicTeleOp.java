@@ -111,6 +111,7 @@ public class BasicTeleOp extends LinearOpMode
 
         boolean initArmAtStart = false;
 
+
         NormalizedRGBA colors1;
         NormalizedRGBA colors2;
         NormalizedRGBA colors3;
@@ -191,10 +192,6 @@ public class BasicTeleOp extends LinearOpMode
             colors2 = extras.colorSensor2.getNormalizedColors();
             colors3 = extras.colorSensor3.getNormalizedColors();
 
-            Color.colorToHSV(colors1.toColor(), hsvValues1);
-            Color.colorToHSV(colors2.toColor(), hsvValues2);
-            Color.colorToHSV(colors3.toColor(), hsvValues3);
-
             slot1Detections = checkArtifact(colors1.green, colors1.blue) + slot1Detections.substring(0, slot1Detections.length() - 1);
             slot2Detections = checkArtifact(colors2.green, colors2.blue) + slot2Detections.substring(0, slot2Detections.length() - 1);
             slot3Detections = checkArtifact(colors3.green, colors3.blue) + slot3Detections.substring(0, slot3Detections.length() - 1);
@@ -202,6 +199,7 @@ public class BasicTeleOp extends LinearOpMode
             telemetry.addLine(slot1Detections);
             telemetry.addLine(slot2Detections);
             telemetry.addLine(slot3Detections);
+
             if(slot1Detections.indexOf("G") != -1)
                 slot1Artifact = "G";
             else if(slot1Detections.indexOf("P") != -1)
