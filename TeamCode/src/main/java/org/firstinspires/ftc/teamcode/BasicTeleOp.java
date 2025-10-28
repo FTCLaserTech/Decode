@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 //imports from the Mecanum website
@@ -136,10 +137,11 @@ public class BasicTeleOp extends LinearOpMode
 
             //adjustedAngle = 0;
             //adjustedAngle = extras.adjustAngleForDriverPosition(drive.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS), ExtraOpModeFunctions.RobotStartPosition.STRAIGHT);
+            adjustedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
             //drive.odo.update();
             //adjustedAngle = drive.odo.getHeading() + (Math.PI / 2);
             //adjustedAngle = drive.odo.getHeading() + previousOrientation;
-            adjustedAngle = previousOrientation;
+            //adjustedAngle = previousOrientation;
 
             stickSideways = gamepad1.left_stick_x * speedMultiplier;
             stickForward = -gamepad1.left_stick_y * speedMultiplier;
@@ -245,7 +247,7 @@ public class BasicTeleOp extends LinearOpMode
                 telemetry.addLine("IMU Resetting...");
                 telemetry.update();
 
-                //drive.imu.initialize(imuParameters);
+                drive.lazyImu.get().initialize(imuParameters);
                 //drive.odo.resetPosAndIMU();
                 //previousOrientation = drive.odo.getHeading()+ PI/2;
                 extras.saveAutoStartRotation(previousOrientation);
@@ -255,10 +257,10 @@ public class BasicTeleOp extends LinearOpMode
 
             //telemetry.addData("x", drive.pose.position.x);
             //telemetry.addData("y", drive.pose.position.y);
-            //telemetry.addData("heading", drive.pose.heading.real);
+            telemetry.addData("heading", drive.localizer.getPose().heading);
 
-            //telemetry.addData("ODO heading", drive.odo.getHeading());
-            telemetry.addData("ODO adjusted angle", adjustedAngle);
+            telemetry.addData("IMU heading: ", adjustedAngle);
+            //telemetry.addData("ODO adjusted angle", adjustedAngle);
             //telemetry.addData("IMU angle", drive.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
 
             //Pose2D pos = drive.odo.getPosition();
