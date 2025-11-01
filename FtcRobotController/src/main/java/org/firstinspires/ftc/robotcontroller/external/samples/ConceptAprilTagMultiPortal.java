@@ -45,7 +45,7 @@ import java.util.List;
  * This OpMode demonstrates the basics of using multiple vision portals simultaneously
  */
 @TeleOp(name = "Concept: AprilTagMultiPortal", group = "Concept")
-//@Disabled
+@Disabled
 public class ConceptAprilTagMultiPortal extends LinearOpMode
 {
     VisionPortal portal1;

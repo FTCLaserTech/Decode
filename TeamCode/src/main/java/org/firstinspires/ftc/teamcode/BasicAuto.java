@@ -53,6 +53,11 @@ public class BasicAuto extends LinearOpMode
             obelisk = extras.readObelisk();
             extras.readRedBearing();
             telemetry.update();
+
+            safeWaitSeconds(0.01);
+            obelisk = extras.readObelisk();
+            extras.readBlueBearing();
+            telemetry.update();
         }
 
         // launch pre-loaded artifacts

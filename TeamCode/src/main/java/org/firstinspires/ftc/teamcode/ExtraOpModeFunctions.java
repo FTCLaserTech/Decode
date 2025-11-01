@@ -18,6 +18,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -29,6 +31,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @Config
@@ -49,6 +52,8 @@ public class ExtraOpModeFunctions
     public Servo s1;
     public Servo s2;
     public Servo s3;
+    public Servo s4;
+
     public LinearOpMode localLop = null;
 
     public CRServo intake;
@@ -93,6 +98,8 @@ public class ExtraOpModeFunctions
         s1 = hardwareMap.get(Servo.class, "s1");
         s2 = hardwareMap.get(Servo.class, "s2");
         s3 = hardwareMap.get(Servo.class, "s3");
+        s4 = hardwareMap.get(Servo.class, "s4");
+
 
         colorSensor1 = hardwareMap.get(NormalizedColorSensor.class, "cs0");
         colorSensor2 = hardwareMap.get(NormalizedColorSensor.class, "cs1");
@@ -135,6 +142,23 @@ public class ExtraOpModeFunctions
     {
         s3.setPosition(1);
     }
+    public double s4position = 0.5;
+    public void s4up()
+    {
+        if(s4position < 1) {
+            s4position += 0.001;
+        }
+        s4.setPosition(s4position);
+    }
+    public void s4Down()
+    {
+        if(s4position > 0) {
+            s4position -= 0.001;
+        }
+        s4.setPosition(s4position);
+    }
+
+
 
 
     public void intakeIn() {
@@ -258,8 +282,52 @@ public class ExtraOpModeFunctions
         // Disable or re-enable the aprilTag processor at any time.
         //visionPortal.setProcessorEnabled(aprilTag, true);
 
+        //setManualExposure(10,50);
     }   // end method initAprilTag()
 
+    /*
+         Manually set the camera gain and exposure.
+         Can only be called AFTER calling initAprilTag();
+         Returns true if controls are set.
+      */
+    private boolean    setManualExposure(int exposureMS, int gain) {
+        // Ensure Vision Portal has been setup.
+        if (visionPortal == null) {
+            return false;
+        }
+
+        // Wait for the camera to be open
+        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            localLop.telemetry.addData("Camera", "Waiting");
+            localLop.telemetry.update();
+            while (!localLop.isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+                localLop.sleep(20);
+            }
+            localLop.telemetry.addData("Camera", "Ready");
+            localLop.telemetry.update();
+        }
+
+        // Set camera controls unless we are stopping.
+        if (!localLop.isStopRequested())
+        {
+            // Set exposure.  Make sure we are in Manual Mode for these values to take effect.
+            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                localLop.sleep(50);
+            }
+            exposureControl.setExposure((long)exposureMS, TimeUnit.MILLISECONDS);
+            localLop.sleep(20);
+
+            // Set Gain.
+            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
+            gainControl.setGain(gain);
+            localLop.sleep(20);
+            return (true);
+        } else {
+            return (false);
+        }
+    }
 
     /**
      * Read the Obelisk
@@ -311,36 +379,37 @@ public class ExtraOpModeFunctions
      * Read the Obelisk
      */
     public double readRedBearing() {
-
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         localLop.telemetry.addData("# AprilTags Detected", currentDetections.size());
-        double bearing = -1.0;
+        double bearing = -5000.0;
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
-            /*if (detection.metadata != null) {
-                localLop.telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-                localLop.telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
-                localLop.telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
-                localLop.telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
-            } else {
-                localLop.telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
-                localLop.telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
-            }
-             */
-
             if(detection.id==24) {
                 bearing = detection.ftcPose.bearing;
                 localLop.telemetry.addData("Red Bearing: ", detection.ftcPose.bearing);
             }
+        }   // end for() loop
+        return bearing;
+
+    }   // end method telemetryAprilTag()/**
+
+    /**
+     * Read the Obelisk
+     */
+    public double readBlueBearing() {
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        localLop.telemetry.addData("# AprilTags Detected", currentDetections.size());
+        double bearing = -5000.0;
+
+        // Step through the list of detections and display info for each one.
+        for (AprilTagDetection detection : currentDetections) {
+            if(detection.id==20) {
+                bearing = detection.ftcPose.bearing;
+                localLop.telemetry.addData("Blue Bearing: ", detection.ftcPose.bearing);
+            }
 
         }   // end for() loop
-
-        // Add "key" information to telemetry
-        //localLop.telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
-        //localLop.telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
-        //localLop.telemetry.addLine("RBE = Range, Bearing & Elevation");
-
         return bearing;
 
     }   // end method telemetryAprilTag()

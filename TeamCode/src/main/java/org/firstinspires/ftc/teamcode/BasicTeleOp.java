@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.PI;
+import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.lang.Math.toDegrees;
 
 import android.graphics.Color;
 
@@ -26,6 +28,8 @@ import java.util.Arrays;
 @TeleOp(group = "A")
 public class BasicTeleOp extends LinearOpMode
 {
+    public enum SearchingDirection {LEFT,RIGHT};
+
     @Override
     public void runOpMode() throws InterruptedException
     {
@@ -45,36 +49,9 @@ public class BasicTeleOp extends LinearOpMode
         double adjustedAngle;
         double speedMultiplier;
 
-        boolean gp2_left_trigger_pressed = false;
-        boolean gp2_left_bumper_pressed = false;
-        boolean gp2_dpad_left_pressed = false;
-        boolean gp2_dpad_right_pressed = false;
-        boolean gp2_dpad_up_pressed = false;
-        boolean gp2_dpad_down_pressed = false;
-        boolean gp2_right_bumper_pressed = false;
-        boolean gp2_right_trigger_pressed = false;
-        boolean gp2_right_stick_y_neg_pressed = false;
-        boolean gp2_right_stick_y_pos_pressed = false;
-        boolean gp2_a_pressed = false;
-        boolean gp2_b_pressed = false;
-        boolean gp2_y_pressed = false;
-        boolean gp1_y_pressed = false;
-        boolean gp1_a_pressed = false;
-        boolean gp2_x_pressed = false;
-        boolean gp2_by_pressed = false;
-        boolean gp1_bx_pressed = false;
-        boolean gp2_bx_pressed = false;
 
-
-        boolean elevatorStopped = true;
-        boolean elevatorBottom = true;
         boolean manualStickMove = false;
-        boolean intakeElevatorShouldMove = false;
-        boolean elevatorResetOK= false;
 
-        double elevMultMin = 0.5;
-        double elevMult = 0;
-        double elevHeightMax = 800;
         double slope;
         double elevatorEncoderCounts;
         double rightBackEncoderCounts;;
@@ -112,6 +89,11 @@ public class BasicTeleOp extends LinearOpMode
 
         boolean initArmAtStart = false;
 
+        double cameratimer = 0.0;
+        double targetHeading = 0.0;
+        double cameraPosition = 0.5;
+        boolean targetSearchingMode = false;
+        SearchingDirection targetSearchingDirection = SearchingDirection.LEFT;
 
         NormalizedRGBA colors1;
         NormalizedRGBA colors2;
@@ -127,6 +109,8 @@ public class BasicTeleOp extends LinearOpMode
 
 
         waitForStart();
+
+        cameratimer = getRuntime();
 
         while (!isStopRequested())
         {
@@ -189,6 +173,85 @@ public class BasicTeleOp extends LinearOpMode
                 telemetry.addData("dpad down Pressed", "s3down");
 
             }
+            if(gamepad2.dpadLeftWasPressed())
+            {
+                extras.s4Down();
+                telemetry.addData("dpad Left Pressed", "s4down");
+
+            }
+            if(gamepad2.dpadRightWasPressed())
+            {
+                extras.s4up();
+                telemetry.addData("dpad Right Pressed", "s4up");
+
+            }
+
+            targetHeading = extras.readRedBearing();
+            //telemetry.addData("camera timer: ", cameratimer);
+            telemetry.addData("camera position: ", cameraPosition);
+            telemetry.addData("target heading: ", targetHeading);
+            if(cameratimer < getRuntime())
+            {
+                if(targetHeading == -5000.0) // AprilTag not found
+                {
+                    double adjustedAngleDeg = Math.toDegrees(adjustedAngle);
+                    if(targetSearchingMode == false) // first time
+                    {
+                        targetSearchingMode = true;
+                        if(adjustedAngleDeg < 0)
+                            targetSearchingDirection = SearchingDirection.LEFT;
+                        else
+                            targetSearchingDirection = SearchingDirection.RIGHT;
+                    }
+                    else // already in searching mode
+                    {
+                        if(targetSearchingDirection == SearchingDirection.RIGHT)
+                        {
+                            cameraPosition += 0.11;
+                            if (cameraPosition > 1)
+                            {
+                                cameraPosition = 1;
+                                targetSearchingDirection = SearchingDirection.LEFT;
+                            }
+                        }
+                        else
+                        {
+                            cameraPosition -= 0.11;
+                            if (cameraPosition < 0)
+                            {
+                                cameraPosition = 0;
+                                targetSearchingDirection = SearchingDirection.RIGHT;
+                            }
+                        }
+                    }
+                }
+                else // AprilTag found
+                {
+                    targetSearchingMode = false;
+                    if (abs(targetHeading) < 2.0)
+                    {
+                        ;
+                    }
+                    else if  (abs(targetHeading) < 20.0)
+                    {
+                        cameraPosition -= targetHeading / 2000.0;
+                    }
+                    else {
+                        cameraPosition -= targetHeading / 800.0;
+                    }
+                }
+                if(cameraPosition>1.0)
+                    cameraPosition=1.0;
+                if(cameraPosition<0.0)
+                    cameraPosition=0.0;
+                extras.s4.setPosition(cameraPosition);
+                if(targetSearchingMode)
+                    cameratimer += 0.25;
+                else
+                    cameratimer += 0.1;
+            }
+
+
 
             colors1 = extras.colorSensor1.getNormalizedColors();
             colors2 = extras.colorSensor2.getNormalizedColors();
@@ -198,9 +261,9 @@ public class BasicTeleOp extends LinearOpMode
             slot2Detections = checkArtifact(colors2.green, colors2.blue) + slot2Detections.substring(0, slot2Detections.length() - 1);
             slot3Detections = checkArtifact(colors3.green, colors3.blue) + slot3Detections.substring(0, slot3Detections.length() - 1);
 
-            telemetry.addLine(slot1Detections);
-            telemetry.addLine(slot2Detections);
-            telemetry.addLine(slot3Detections);
+            //telemetry.addLine(slot1Detections);
+           // telemetry.addLine(slot2Detections);
+            //telemetry.addLine(slot3Detections);
 
             if(slot1Detections.indexOf("G") != -1)
                 slot1Artifact = "G";
@@ -225,6 +288,7 @@ public class BasicTeleOp extends LinearOpMode
 
             telemetry.addLine(slot1Artifact + " " + slot2Artifact + " " + slot3Artifact);
 
+            /*
             telemetry.addLine()
                     .addData("Red", "%.3f", colors1.red)
                     .addData("Green", "%.3f", colors1.green)
@@ -234,8 +298,8 @@ public class BasicTeleOp extends LinearOpMode
                     .addData("Saturation", "%.3f", hsvValues1[1])
                     .addData("Value", "%.3f", hsvValues1[2]);
             telemetry.addData("Alpha", "%.3f", colors1.alpha);
+            */
 
-            
             // RESET IMU
             if ((gamepad1.back) && (gamepad1.b))
             {
@@ -259,7 +323,7 @@ public class BasicTeleOp extends LinearOpMode
             //telemetry.addData("y", drive.pose.position.y);
             telemetry.addData("heading", drive.localizer.getPose().heading);
 
-            telemetry.addData("IMU heading: ", adjustedAngle);
+            telemetry.addData("IMU heading: ", Math.toDegrees(adjustedAngle));
             //telemetry.addData("ODO adjusted angle", adjustedAngle);
             //telemetry.addData("IMU angle", drive.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
 
