@@ -245,7 +245,7 @@ public class ExtraOpModeFunctions
         // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second (default)
         // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second (default)
         // Note: Decimation can be changed on-the-fly to adapt during a match.
-        //aprilTag.setDecimation(3);
+        aprilTag.setDecimation(3);
 
         // Create the vision portal by using a builder.
         VisionPortal.Builder builder = new VisionPortal.Builder();
@@ -340,7 +340,8 @@ public class ExtraOpModeFunctions
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
-            /*if (detection.metadata != null) {
+            /*
+            if (detection.metadata != null) {
                 localLop.telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 localLop.telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
                 localLop.telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
@@ -349,8 +350,8 @@ public class ExtraOpModeFunctions
                 localLop.telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
                 localLop.telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
             }
+            */
 
-             */
             if(detection.id==21) {
                 obelisk = ObeliskPattern.GPP;
                 localLop.telemetry.addLine("GPP");
@@ -450,6 +451,52 @@ public class ExtraOpModeFunctions
             e.printStackTrace();
         }
         return(angle);
+    }
+
+    /*
+     * This class encapsulates all the fields that will go into the datalog.
+     */
+    public static class Datalog
+    {
+        // The underlying datalogger object - it cares only about an array of loggable fields
+        private final Datalogger datalogger;
+
+        // These are all of the fields that we want in the datalog.
+        // Note that order here is NOT important. The order is important in the setFields() call below
+        public Datalogger.GenericField loopCounter  = new Datalogger.GenericField("Loop Counter");
+        public Datalogger.GenericField cameraPosition = new Datalogger.GenericField("Camera Position");
+        public Datalogger.GenericField targetHeading = new Datalogger.GenericField("Target Heading");
+        public Datalogger.GenericField imuHeading         = new Datalogger.GenericField("IMU Heading");
+
+        public Datalog(String name)
+        {
+            // Build the underlying datalog object
+            datalogger = new Datalogger.Builder()
+
+                    // Pass through the filename
+                    .setFilename(name)
+
+                    // Request an automatic timestamp field
+                    .setAutoTimestamp(Datalogger.AutoTimestamp.DECIMAL_SECONDS)
+
+                    // Tell it about the fields we care to log.
+                    // Note that order *IS* important here! The order in which we list
+                    // the fields is the order in which they will appear in the log.
+                    .setFields(
+                            loopCounter,
+                            cameraPosition,
+                            targetHeading,
+                            imuHeading
+                    )
+                    .build();
+        }
+
+        // Tell the datalogger to gather the values of the fields
+        // and write a new line in the log.
+        public void writeLine()
+        {
+            datalogger.writeLine();
+        }
     }
 }
 

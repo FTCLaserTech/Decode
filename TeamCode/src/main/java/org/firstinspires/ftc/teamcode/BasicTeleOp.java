@@ -33,6 +33,9 @@ public class BasicTeleOp extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
+        ExtraOpModeFunctions.Datalog datalog;
+        datalog = new ExtraOpModeFunctions.Datalog("datalog_01");
+
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
         //TrajectoryBook book = new TrajectoryBook(drive, extras);
@@ -53,11 +56,6 @@ public class BasicTeleOp extends LinearOpMode
         boolean manualStickMove = false;
 
         double slope;
-        double elevatorEncoderCounts;
-        double rightBackEncoderCounts;;
-        double rightFrontEncoderCounts;;
-        double leftBackEncoderCounts;;
-        double leftFrontEnocoderCounts;;
 
         double frontLeftPower;
         double frontRightPower;
@@ -91,9 +89,13 @@ public class BasicTeleOp extends LinearOpMode
 
         double cameratimer = 0.0;
         double targetHeading = 0.0;
+        double lastTargetHeading = 0.0;
         double cameraPosition = 0.5;
         boolean targetSearchingMode = false;
         SearchingDirection targetSearchingDirection = SearchingDirection.LEFT;
+        long detectionCounter = 0;
+        long noDetectionCounter = 0;
+        long loopCounter = 0;
 
         NormalizedRGBA colors1;
         NormalizedRGBA colors2;
@@ -188,12 +190,19 @@ public class BasicTeleOp extends LinearOpMode
 
             targetHeading = extras.readRedBearing();
             //telemetry.addData("camera timer: ", cameratimer);
+            loopCounter += 1;
+            telemetry.addData("loop counter: ", loopCounter);
+            telemetry.addData("detection counter: ", detectionCounter);
+            telemetry.addData("no detection counter: ", noDetectionCounter);
             telemetry.addData("camera position: ", cameraPosition);
             telemetry.addData("target heading: ", targetHeading);
-            if(cameratimer < getRuntime())
+            //if(cameratimer < getRuntime())
+            if( (targetHeading != lastTargetHeading) || (targetSearchingMode == true) )
             {
+                lastTargetHeading = targetHeading;
                 if(targetHeading == -5000.0) // AprilTag not found
                 {
+                    noDetectionCounter += 1;
                     double adjustedAngleDeg = Math.toDegrees(adjustedAngle);
                     if(targetSearchingMode == false) // first time
                     {
@@ -205,39 +214,38 @@ public class BasicTeleOp extends LinearOpMode
                     }
                     else // already in searching mode
                     {
-                        if(targetSearchingDirection == SearchingDirection.RIGHT)
+                        if( (noDetectionCounter % 10) == 0)
                         {
-                            cameraPosition += 0.11;
-                            if (cameraPosition > 1)
-                            {
-                                cameraPosition = 1;
-                                targetSearchingDirection = SearchingDirection.LEFT;
-                            }
-                        }
-                        else
-                        {
-                            cameraPosition -= 0.11;
-                            if (cameraPosition < 0)
-                            {
-                                cameraPosition = 0;
-                                targetSearchingDirection = SearchingDirection.RIGHT;
+                            if (targetSearchingDirection == SearchingDirection.RIGHT) {
+                                cameraPosition += 0.11;
+                                if (cameraPosition > 1) {
+                                    cameraPosition = 1;
+                                    targetSearchingDirection = SearchingDirection.LEFT;
+                                }
+                            } else {
+                                cameraPosition -= 0.11;
+                                if (cameraPosition < 0) {
+                                    cameraPosition = 0;
+                                    targetSearchingDirection = SearchingDirection.RIGHT;
+                                }
                             }
                         }
                     }
                 }
                 else // AprilTag found
                 {
+                    detectionCounter += 1;
                     targetSearchingMode = false;
                     if (abs(targetHeading) < 2.0)
                     {
                         ;
                     }
-                    else if  (abs(targetHeading) < 20.0)
+                    else if  (abs(targetHeading) < 12.0)
                     {
-                        cameraPosition -= targetHeading / 2000.0;
+                        cameraPosition -= targetHeading / 4000.0;
                     }
                     else {
-                        cameraPosition -= targetHeading / 800.0;
+                        cameraPosition -= targetHeading / 2000.0;
                     }
                 }
                 if(cameraPosition>1.0)
@@ -245,12 +253,7 @@ public class BasicTeleOp extends LinearOpMode
                 if(cameraPosition<0.0)
                     cameraPosition=0.0;
                 extras.s4.setPosition(cameraPosition);
-                if(targetSearchingMode)
-                    cameratimer += 0.25;
-                else
-                    cameratimer += 0.1;
             }
-
 
 
             colors1 = extras.colorSensor1.getNormalizedColors();
@@ -336,6 +339,13 @@ public class BasicTeleOp extends LinearOpMode
             telemetry.addData("Elapsed time: ", getRuntime());
 
             drive.updatePoseEstimate();
+
+            datalog.loopCounter.set(loopCounter);
+            datalog.cameraPosition.set(cameraPosition);
+            datalog.targetHeading.set(targetHeading);
+            datalog.imuHeading.set(Math.toDegrees(adjustedAngle));
+            datalog.writeLine();
+
             telemetry.update();
         }
     }
