@@ -2,16 +2,17 @@ package org.firstinspires.ftc.teamcode;
 
 //import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
-import android.os.Environment;
 import android.util.Size;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -21,12 +22,6 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -46,6 +41,12 @@ public class VisionFunctions {
     private static final boolean USE_WEBCAM = true;
 
     public enum ObeliskPattern {GPP, PGP, PPG}
+
+    private Limelight3A limelight;
+
+    private IMU imu;
+
+    private long loopCounter = 0;
 
     ;
 
@@ -69,15 +70,27 @@ public class VisionFunctions {
         colorSensor2.setGain(gain);
         colorSensor3.setGain(gain);
 
-        initAprilTag();
+        initCameraAprilTag();
+        initLimelight();
 
     }
 
+    public void initLimelight() {
+        limelight = hm.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(0);
+        limelight.start();;
+        /*
+        imu = hardwareMap.get(IMU.class, "imu");
+        RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
+        imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
+        */
+    }
 
     /**
      * Initialize the AprilTag processor.
      */
-    private void initAprilTag() {
+    private void initCameraAprilTag() {
 
         // Create the AprilTag processor.
         aprilTag = new AprilTagProcessor.Builder()
@@ -191,7 +204,32 @@ public class VisionFunctions {
     /**
      * Read the Obelisk
      */
-    public ObeliskPattern readObelisk() {
+    public ObeliskPattern readObeliskLimelight() {
+        ObeliskPattern obelisk = ObeliskPattern.GPP;
+        LLResult llResult = limelight.getLatestResult();
+        List<LLResultTypes.FiducialResult> fiducials = llResult.getFiducialResults();
+        for (LLResultTypes.FiducialResult fiducial : fiducials) {
+            int id = fiducial.getFiducialId(); // The ID number of the fiducial
+            if (id == 21) {
+                obelisk = ObeliskPattern.GPP;
+                localLop.telemetry.addLine("LL GPP");
+            } else if (id == 22) {
+                obelisk = ObeliskPattern.PGP;
+                localLop.telemetry.addLine("LL PGP");
+            } else if (id == 23) {
+                obelisk = ObeliskPattern.PPG;
+                localLop.telemetry.addLine("LL PPG");
+            }
+
+        }
+        return obelisk;
+
+    }
+
+    /**
+     * Read the Obelisk
+     */
+    public ObeliskPattern readObeliskCamera() {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         localLop.telemetry.addData("# AprilTags Detected", currentDetections.size());
@@ -213,13 +251,13 @@ public class VisionFunctions {
 
             if (detection.id == 21) {
                 obelisk = ObeliskPattern.GPP;
-                localLop.telemetry.addLine("GPP");
+                localLop.telemetry.addLine("Cam GPP");
             } else if (detection.id == 22) {
                 obelisk = ObeliskPattern.PGP;
-                localLop.telemetry.addLine("PGP");
+                localLop.telemetry.addLine("Cam PGP");
             } else if (detection.id == 23) {
                 obelisk = ObeliskPattern.PPG;
-                localLop.telemetry.addLine("PPG");
+                localLop.telemetry.addLine("Cam PPG");
             }
 
         }   // end for() loop

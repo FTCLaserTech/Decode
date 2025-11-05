@@ -51,12 +51,9 @@ public class BasicAuto extends LinearOpMode
         while (!isStopRequested() && !opModeIsActive())
         {
             safeWaitSeconds(0.01);
-            obelisk = vision.readObelisk();
+            obelisk = vision.readObeliskCamera();
+            obelisk = vision.readObeliskLimelight();
             vision.readRedBearing();
-            telemetry.update();
-
-            safeWaitSeconds(0.01);
-            obelisk = vision.readObelisk();
             vision.readBlueBearing();
             telemetry.update();
         }
