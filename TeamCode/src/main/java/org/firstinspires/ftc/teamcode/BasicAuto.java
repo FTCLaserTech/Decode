@@ -37,6 +37,7 @@ public class BasicAuto extends LinearOpMode
 
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
+        VisionFunctions vision = new VisionFunctions(hardwareMap, this);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
 
         telemetry.addLine("Initialized");
@@ -45,18 +46,18 @@ public class BasicAuto extends LinearOpMode
         //telemetry.addData("heading", drive.pose.heading);
         telemetry.update();
 
-        ExtraOpModeFunctions.ObeliskPattern obelisk;
+        VisionFunctions.ObeliskPattern obelisk;
 
         while (!isStopRequested() && !opModeIsActive())
         {
             safeWaitSeconds(0.01);
-            obelisk = extras.readObelisk();
-            extras.readRedBearing();
+            obelisk = vision.readObelisk();
+            vision.readRedBearing();
             telemetry.update();
 
             safeWaitSeconds(0.01);
-            obelisk = extras.readObelisk();
-            extras.readBlueBearing();
+            obelisk = vision.readObelisk();
+            vision.readBlueBearing();
             telemetry.update();
         }
 

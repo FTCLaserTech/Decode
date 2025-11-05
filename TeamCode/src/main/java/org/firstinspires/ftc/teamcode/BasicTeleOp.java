@@ -19,6 +19,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 //imports from the Mecanum website
 
@@ -37,6 +38,7 @@ public class BasicTeleOp extends LinearOpMode
         datalog = new ExtraOpModeFunctions.Datalog("datalog_01");
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
+        VisionFunctions vision = new VisionFunctions(hardwareMap, this);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
         //TrajectoryBook book = new TrajectoryBook(drive, extras);
 
@@ -188,7 +190,7 @@ public class BasicTeleOp extends LinearOpMode
 
             }
 
-            targetHeading = extras.readRedBearing();
+            targetHeading = vision.readRedBearing();
             //telemetry.addData("camera timer: ", cameratimer);
             loopCounter += 1;
             telemetry.addData("loop counter: ", loopCounter);
@@ -256,9 +258,9 @@ public class BasicTeleOp extends LinearOpMode
             }
 
 
-            colors1 = extras.colorSensor1.getNormalizedColors();
-            colors2 = extras.colorSensor2.getNormalizedColors();
-            colors3 = extras.colorSensor3.getNormalizedColors();
+            colors1 = vision.colorSensor1.getNormalizedColors();
+            colors2 = vision.colorSensor2.getNormalizedColors();
+            colors3 = vision.colorSensor3.getNormalizedColors();
 
             slot1Detections = checkArtifact(colors1.green, colors1.blue) + slot1Detections.substring(0, slot1Detections.length() - 1);
             slot2Detections = checkArtifact(colors2.green, colors2.blue) + slot2Detections.substring(0, slot2Detections.length() - 1);
