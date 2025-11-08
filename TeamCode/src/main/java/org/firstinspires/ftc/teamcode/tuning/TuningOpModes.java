@@ -70,7 +70,7 @@ public final class TuningOpModes {
 
     private static PinpointView makePinpointView(PinpointLocalizer pl) {
         return new PinpointView() {
-            @Override
+            //@Override
             public float getHeadingVelocity() {
                 return 0;
             }

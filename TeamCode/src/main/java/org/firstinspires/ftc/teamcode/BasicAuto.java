@@ -53,8 +53,9 @@ public class BasicAuto extends LinearOpMode
             safeWaitSeconds(0.01);
             obelisk = vision.readObeliskCamera();
             obelisk = vision.readObeliskLimelight();
-            vision.readRedBearing();
-            vision.readBlueBearing();
+            vision.readRedAprilTag_cam();
+            vision.readRedAprilTag_ll();
+            //vision.readBlueAprilTag_cam();
             telemetry.update();
         }
 

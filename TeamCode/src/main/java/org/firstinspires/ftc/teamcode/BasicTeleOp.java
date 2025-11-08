@@ -1,12 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.lang.Math.toDegrees;
-
-import android.graphics.Color;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
@@ -18,13 +14,10 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 //imports from the Mecanum website
 
-import java.util.ArrayList;
-import java.util.Arrays;
 
 @TeleOp(group = "A")
 public class BasicTeleOp extends LinearOpMode
@@ -90,6 +83,8 @@ public class BasicTeleOp extends LinearOpMode
         boolean initArmAtStart = false;
 
         double cameratimer = 0.0;
+        AprilTagPoseFtc redAprilTagPose;
+        AprilTagPoseFtc blueAprilTagPose;
         double targetHeading = 0.0;
         double lastTargetHeading = 0.0;
         double cameraPosition = 0.5;
@@ -190,7 +185,16 @@ public class BasicTeleOp extends LinearOpMode
 
             }
 
-            targetHeading = vision.readRedBearing();
+            redAprilTagPose = vision.readRedAprilTag_cam();
+            if(redAprilTagPose == null)
+            {
+                targetHeading = -5000;
+            }
+            else
+            {
+                targetHeading = redAprilTagPose.bearing;
+            }
+
             //telemetry.addData("camera timer: ", cameratimer);
             loopCounter += 1;
             telemetry.addData("loop counter: ", loopCounter);
@@ -254,7 +258,7 @@ public class BasicTeleOp extends LinearOpMode
                     cameraPosition=1.0;
                 if(cameraPosition<0.0)
                     cameraPosition=0.0;
-                extras.s4.setPosition(cameraPosition);
+                //extras.s4.setPosition(cameraPosition);
             }
 
 

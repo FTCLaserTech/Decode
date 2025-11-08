@@ -18,8 +18,10 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDir
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
@@ -86,6 +88,7 @@ public class VisionFunctions {
         imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
         */
     }
+
 
     /**
      * Initialize the AprilTag processor.
@@ -202,7 +205,7 @@ public class VisionFunctions {
     }
 
     /**
-     * Read the Obelisk
+     * Read the Obelisk with the Limelight
      */
     public ObeliskPattern readObeliskLimelight() {
         ObeliskPattern obelisk = ObeliskPattern.GPP;
@@ -227,7 +230,7 @@ public class VisionFunctions {
     }
 
     /**
-     * Read the Obelisk
+     * Read the Obelisk with the camera
      */
     public ObeliskPattern readObeliskCamera() {
 
@@ -269,46 +272,121 @@ public class VisionFunctions {
 
         return obelisk;
 
-    }   // end method telemetryAprilTag()
+    }   // end method readObeliskCamera()
 
     /**
-     * Read the Obelisk
+     * Read the Red AprilTag with the camera
      */
-    public double readRedBearing() {
+    public AprilTagPoseFtc readRedAprilTag_cam() {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         localLop.telemetry.addData("# AprilTags Detected", currentDetections.size());
-        double bearing = -5000.0;
+        AprilTagPoseFtc pose = null;
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
             if (detection.id == 24) {
-                bearing = detection.ftcPose.bearing;
-                localLop.telemetry.addData("Red Bearing: ", detection.ftcPose.bearing);
+                pose = detection.ftcPose;
+                localLop.telemetry.addLine("Red Camera ");
+                printpose(pose);
             }
         }   // end for() loop
-        return bearing;
+        return pose;
 
-    }   // end method telemetryAprilTag()/**
+    }   // end method readRedAprilTag_cam()/**
 
     /**
-     * Read the Obelisk
+     * Read the Blue AprilTag with the camera
      */
-    public double readBlueBearing() {
+    public AprilTagPoseFtc readBlueAprilTag_cam() {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         localLop.telemetry.addData("# AprilTags Detected", currentDetections.size());
-        double bearing = -5000.0;
+        AprilTagPoseFtc pose = null;
 
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
             if (detection.id == 20) {
-                bearing = detection.ftcPose.bearing;
-                localLop.telemetry.addData("Blue Bearing: ", detection.ftcPose.bearing);
+                pose = detection.ftcPose;
+                localLop.telemetry.addLine("Blue Camera ");
+                printpose(pose);
             }
 
         }   // end for() loop
-        return bearing;
+        return pose;
 
-    }   // end method telemetryAprilTag()
+    }   // end method readBlueAprilTag_cam()
+
+    /**
+     * Read the Red AprilTag with the camera
+     */
+    public AprilTagPoseFtc readRedAprilTag_ll()
+    {
+        AprilTagPoseFtc pose = null;
+        LLResult llResult = limelight.getLatestResult();
+        List<LLResultTypes.FiducialResult> fiducials = llResult.getFiducialResults();
+        for (LLResultTypes.FiducialResult fiducial : fiducials) {
+            int id = fiducial.getFiducialId(); // The ID number of the fiducial
+            if (id == 24) {
+                Pose3D pose3d = fiducial.getTargetPoseCameraSpace();
+                //Pose3D pose3d = fiducial.getTargetPoseRobotSpace();
+                pose = pose3D_to_AprilTagPoseFtc(pose3d);
+
+                localLop.telemetry.addLine("Red Limelight ");
+                printpose(pose);
+            }
+        }
+        return pose;
+    }   // end method readRedAprilTag_cam()/**
+
+    /**
+     * Read the Blue AprilTag with the camera
+     */
+    public AprilTagPoseFtc readBlueAprilTag_ll()
+    {
+        AprilTagPoseFtc pose = null;
+        LLResult llResult = limelight.getLatestResult();
+        List<LLResultTypes.FiducialResult> fiducials = llResult.getFiducialResults();
+        for (LLResultTypes.FiducialResult fiducial : fiducials) {
+            int id = fiducial.getFiducialId(); // The ID number of the fiducial
+            if (id == 20) {
+                Pose3D pose3d = fiducial.getTargetPoseRobotSpace();
+                pose = pose3D_to_AprilTagPoseFtc(pose3d);
+
+                localLop.telemetry.addLine("Blue Limelight ");
+                printpose(pose);
+            }
+        }
+        return pose;
+    }   // end method readBlueAprilTag_cam()
+
+    public AprilTagPoseFtc pose3D_to_AprilTagPoseFtc(Pose3D pose3d)
+    {
+        AprilTagPoseFtc pose = new AprilTagPoseFtc(pose3d.getPosition().x*1000/25.4,
+                pose3d.getPosition().z*1000/25.4,
+                -pose3d.getPosition().y*1000/25.4,
+                pose3d.getOrientation().getYaw(),
+                pose3d.getOrientation().getPitch(),
+                pose3d.getOrientation().getRoll(),
+                Math.hypot(pose3d.getPosition().x, pose3d.getPosition().y),
+                Math.atan2(-pose3d.getPosition().x, pose3d.getPosition().y),
+                Math.atan2(pose3d.getPosition().z, pose3d.getPosition().y));
+
+        return(pose);
+    }
+
+    public void printpose(AprilTagPoseFtc pose)
+    {
+
+        localLop.telemetry.addData("x ", pose.x);
+        localLop.telemetry.addData("y ", pose.y);
+        localLop.telemetry.addData("z: ", pose.z);
+        localLop.telemetry.addData("yaw: ", pose.yaw);
+        localLop.telemetry.addData("pitch:", pose.pitch);
+        localLop.telemetry.addData("roll: ", pose.roll);
+        localLop.telemetry.addData("Bearing: ", pose.bearing);
+        localLop.telemetry.addData("Range: ", pose.range);
+        localLop.telemetry.addData("Elevation: ", pose.elevation);
+
+    }
 
 }
 
