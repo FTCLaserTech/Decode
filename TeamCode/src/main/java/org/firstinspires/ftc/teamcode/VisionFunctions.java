@@ -287,7 +287,7 @@ public class VisionFunctions {
             if (detection.id == 24) {
                 pose = detection.ftcPose;
                 localLop.telemetry.addLine("Red Camera ");
-                printpose(pose);
+                //printpose(pose);
             }
         }   // end for() loop
         return pose;
@@ -331,7 +331,7 @@ public class VisionFunctions {
                 pose = pose3D_to_AprilTagPoseFtc(pose3d);
 
                 localLop.telemetry.addLine("Red Limelight ");
-                printpose(pose);
+                //printpose(pose);
             }
         }
         return pose;
@@ -363,9 +363,9 @@ public class VisionFunctions {
         AprilTagPoseFtc pose = new AprilTagPoseFtc(pose3d.getPosition().x*1000/25.4,
                 pose3d.getPosition().z*1000/25.4,
                 -pose3d.getPosition().y*1000/25.4,
-                pose3d.getOrientation().getYaw(),
-                pose3d.getOrientation().getPitch(),
+                -pose3d.getOrientation().getPitch(),
                 pose3d.getOrientation().getRoll(),
+                pose3d.getOrientation().getYaw(),
                 Math.hypot(pose3d.getPosition().x, pose3d.getPosition().y),
                 Math.atan2(-pose3d.getPosition().x, pose3d.getPosition().y),
                 Math.atan2(pose3d.getPosition().z, pose3d.getPosition().y));

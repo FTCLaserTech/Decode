@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
+
 @Config
 //@Disabled
 
@@ -48,14 +50,30 @@ public class BasicAuto extends LinearOpMode
 
         VisionFunctions.ObeliskPattern obelisk;
 
+        AprilTagPoseFtc cam;
+        AprilTagPoseFtc ll;
+
         while (!isStopRequested() && !opModeIsActive())
         {
             safeWaitSeconds(0.01);
             obelisk = vision.readObeliskCamera();
             obelisk = vision.readObeliskLimelight();
-            vision.readRedAprilTag_cam();
-            vision.readRedAprilTag_ll();
+            cam = vision.readRedAprilTag_cam();
+            ll = vision.readRedAprilTag_ll();
             //vision.readBlueAprilTag_cam();
+
+            if((cam != null ) && (ll != null )) {
+                telemetry.addLine(String.format("x %.2f %.2f", cam.x, ll.x));
+                telemetry.addLine(String.format("y %.2f %.2f" , cam.y , ll.y));
+                telemetry.addLine(String.format("z %.2f %.2f" , cam.z , ll.z));
+                telemetry.addLine(String.format("yaw %.2f %.2f" , cam.yaw , ll.yaw));
+                telemetry.addLine(String.format("pitch %.2f %.2f" , cam.pitch , ll.pitch));
+                telemetry.addLine(String.format("roll %.2f %.2f" , cam.roll , ll.roll));
+                telemetry.addLine(String.format("Bearing %.2f %.2f" , cam.bearing , ll.bearing));
+                telemetry.addLine(String.format("Range %.2f %.2f" , cam.range , ll.range));
+                telemetry.addLine(String.format("Elevation %.2f %.2f" , cam.elevation , ll.elevation));
+            }
+
             telemetry.update();
         }
 
