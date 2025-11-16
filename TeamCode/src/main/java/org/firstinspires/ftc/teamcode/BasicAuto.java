@@ -25,6 +25,7 @@ public class BasicAuto extends LinearOpMode
 
     public void runOpMode() throws InterruptedException
     {
+        double startDelay = 0;
         double initialRotation = 270;
         Pose2d initPose = new Pose2d(0,0,Math.toRadians(initialRotation));
         Pose2d toSubmursible = new Pose2d(-12,30,Math.toRadians(270));
@@ -56,6 +57,19 @@ public class BasicAuto extends LinearOpMode
         while (!isStopRequested() && !opModeIsActive())
         {
             safeWaitSeconds(0.01);
+
+            // use up down buttons to add a delay after start
+            if(gamepad1.dpadUpWasPressed())
+            {
+                startDelay += 0.5;
+            }
+            if(gamepad1.dpadDownWasPressed())
+            {
+                startDelay -= 0.5;
+                startDelay = Math.max(0,startDelay);
+            }
+            telemetry.addData("Start Delay: ", startDelay);
+
             obelisk = vision.readObeliskCamera();
             obelisk = vision.readObeliskLimelight();
             cam = vision.readRedAprilTag_cam();
@@ -69,13 +83,15 @@ public class BasicAuto extends LinearOpMode
                 telemetry.addLine(String.format("yaw %.2f %.2f" , cam.yaw , ll.yaw));
                 telemetry.addLine(String.format("pitch %.2f %.2f" , cam.pitch , ll.pitch));
                 telemetry.addLine(String.format("roll %.2f %.2f" , cam.roll , ll.roll));
-                telemetry.addLine(String.format("Bearing %.2f %.2f" , cam.bearing , ll.bearing));
                 telemetry.addLine(String.format("Range %.2f %.2f" , cam.range , ll.range));
+                telemetry.addLine(String.format("Bearing %.2f %.2f" , cam.bearing , ll.bearing));
                 telemetry.addLine(String.format("Elevation %.2f %.2f" , cam.elevation , ll.elevation));
             }
 
             telemetry.update();
         }
+
+        safeWaitSeconds(startDelay);
 
         // launch pre-loaded artifacts
         Action DriveToNearSubmursibleAction = drive.actionBuilder(drive.localizer.getPose())
