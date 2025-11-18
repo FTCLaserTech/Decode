@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -52,7 +53,9 @@ public class ExtraOpModeFunctions
     public Servo s1;
     public Servo s2;
     public Servo s3;
-    public Servo s4;
+    public CRServo turret;
+    public DigitalChannel turretLimit;  // Digital channel Object
+
 
     public LinearOpMode localLop = null;
 
@@ -91,7 +94,9 @@ public class ExtraOpModeFunctions
         s1 = hardwareMap.get(Servo.class, "s1");
         s2 = hardwareMap.get(Servo.class, "s2");
         s3 = hardwareMap.get(Servo.class, "s3");
-        s4 = hardwareMap.get(Servo.class, "s4");
+        turret = hardwareMap.get(CRServo.class, "turret");
+        turretLimit = hardwareMap.get(DigitalChannel.class, "turretLimit");
+        turretLimit.setMode(DigitalChannel.Mode.INPUT);
 
 
     }
@@ -131,14 +136,14 @@ public class ExtraOpModeFunctions
         if(s4position < 1) {
             s4position += 0.001;
         }
-        s4.setPosition(s4position);
+        turret.setPower(s4position);
     }
     public void s4Down()
     {
         if(s4position > 0) {
             s4position -= 0.001;
         }
-        s4.setPosition(s4position);
+        turret.setPower(s4position);
     }
 
 

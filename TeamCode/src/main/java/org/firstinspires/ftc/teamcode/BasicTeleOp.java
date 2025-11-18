@@ -23,6 +23,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 public class BasicTeleOp extends LinearOpMode
 {
     public enum SearchingDirection {LEFT,RIGHT};
+    public enum LimitDirection {NA,CW,CCW};
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -87,9 +88,10 @@ public class BasicTeleOp extends LinearOpMode
         AprilTagPoseFtc blueAprilTagPose;
         double targetHeading = 0.0;
         double lastTargetHeading = 0.0;
-        double cameraPosition = 0.5;
+        double turretPower = 0.5;
         boolean targetSearchingMode = false;
         SearchingDirection targetSearchingDirection = SearchingDirection.LEFT;
+        LimitDirection limitDirection = LimitDirection.NA;
         long detectionCounter = 0;
         long noDetectionCounter = 0;
         long loopCounter = 0;
@@ -153,112 +155,95 @@ public class BasicTeleOp extends LinearOpMode
             {
                 extras.s2up();
                 telemetry.addData("b Pressed", "s2up");
-
             }
             if(gamepad2.aWasPressed())
             {
-                extras.s2down();
-                telemetry.addData("a Pressed", "s2down");
-            }
-            if(gamepad2.dpadUpWasPressed())
-            {
-                extras.s3up();
-                telemetry.addData("dpad up Pressed", "s3up");
-
-            }
-            if(gamepad2.dpadDownWasPressed())
-            {
-                extras.s3down();
-                telemetry.addData("dpad down Pressed", "s3down");
-
-            }
-            if(gamepad2.dpadLeftWasPressed())
-            {
-                extras.s4Down();
-                telemetry.addData("dpad Left Pressed", "s4down");
-
-            }
-            if(gamepad2.dpadRightWasPressed())
-            {
-                extras.s4up();
-                telemetry.addData("dpad Right Pressed", "s4up");
-
+                extras.turret.setPower(0.0);
+                telemetry.addData("a Pressed", "0.0");
             }
 
-            redAprilTagPose = vision.readRedAprilTag_cam();
-            if(redAprilTagPose == null)
-            {
-                targetHeading = -5000;
-            }
-            else
-            {
-                targetHeading = redAprilTagPose.bearing;
-            }
+            redAprilTagPose = vision.readRedAprilTag_ll();
 
             //telemetry.addData("camera timer: ", cameratimer);
             loopCounter += 1;
             telemetry.addData("loop counter: ", loopCounter);
             telemetry.addData("detection counter: ", detectionCounter);
             telemetry.addData("no detection counter: ", noDetectionCounter);
-            telemetry.addData("camera position: ", cameraPosition);
+            telemetry.addData("turret power: ", turretPower);
             telemetry.addData("target heading: ", targetHeading);
             //if(cameratimer < getRuntime())
-            if( (targetHeading != lastTargetHeading) || (targetSearchingMode == true) )
+            if( true )
             {
                 lastTargetHeading = targetHeading;
-                if(targetHeading == -5000.0) // AprilTag not found
+                if(redAprilTagPose == null) // AprilTag not found
                 {
                     noDetectionCounter += 1;
-                    double adjustedAngleDeg = Math.toDegrees(adjustedAngle);
-                    if(targetSearchingMode == false) // first time
+
+                    if(gamepad2.dpad_left)
                     {
-                        targetSearchingMode = true;
-                        if(adjustedAngleDeg < 0)
-                            targetSearchingDirection = SearchingDirection.LEFT;
-                        else
-                            targetSearchingDirection = SearchingDirection.RIGHT;
+                        turretPower = 1.0;
                     }
-                    else // already in searching mode
+                    else if(gamepad2.dpad_right)
                     {
-                        if( (noDetectionCounter % 10) == 0)
-                        {
-                            if (targetSearchingDirection == SearchingDirection.RIGHT) {
-                                cameraPosition += 0.11;
-                                if (cameraPosition > 1) {
-                                    cameraPosition = 1;
-                                    targetSearchingDirection = SearchingDirection.LEFT;
-                                }
-                            } else {
-                                cameraPosition -= 0.11;
-                                if (cameraPosition < 0) {
-                                    cameraPosition = 0;
-                                    targetSearchingDirection = SearchingDirection.RIGHT;
-                                }
-                            }
-                        }
+                        turretPower = -1.0;
                     }
+                    else if (gamepad2.dpad_down)
+                    {
+                        turretPower = 0.0;
+                    }
+
+                    if(extras.turretLimit.getState() == false)
+                    {
+                        turretPower = -turretPower;
+                    }
+
                 }
                 else // AprilTag found
                 {
+                    targetHeading = redAprilTagPose.bearing;
                     detectionCounter += 1;
                     targetSearchingMode = false;
                     if (abs(targetHeading) < 2.0)
                     {
-                        ;
+                        turretPower = 0;
                     }
-                    else if  (abs(targetHeading) < 12.0)
+                    else
                     {
-                        cameraPosition -= targetHeading / 4000.0;
+                        turretPower = (1.0-0.1)/(25.0-2.0)*(targetHeading-2.0)+0.1;
+                        if(turretPower > 1.0)
+                            turretPower = 1.0;
                     }
-                    else {
-                        cameraPosition -= targetHeading / 2000.0;
+
+                    if(extras.turretLimit.getState() == false)
+                    {
+                        if(limitDirection == LimitDirection.NA)
+                        {
+                            if(targetHeading > 0)
+                            {
+                                limitDirection = LimitDirection.CW;
+                            }
+                            else
+                            {
+                                limitDirection = LimitDirection.CCW;
+                            }
+                        }
+                        if((limitDirection == LimitDirection.CW)&&(targetHeading>0))
+                        {
+                            turretPower = 0.0;
+                        }
+                        else if((limitDirection == LimitDirection.CCW)&&(targetHeading<0))
+                        {
+                            turretPower = 0.0;
+                        }
                     }
+                    else
+                    {
+                        limitDirection = LimitDirection.NA;
+                    }
+
                 }
-                if(cameraPosition>1.0)
-                    cameraPosition=1.0;
-                if(cameraPosition<0.0)
-                    cameraPosition=0.0;
-                //extras.s4.setPosition(cameraPosition);
+                extras.turret.setPower(turretPower);
+                telemetry.addData("turret power2: ", extras.turret.getPower());
             }
 
 
@@ -347,7 +332,7 @@ public class BasicTeleOp extends LinearOpMode
             drive.updatePoseEstimate();
 
             datalog.loopCounter.set(loopCounter);
-            datalog.cameraPosition.set(cameraPosition);
+            datalog.cameraPosition.set(turretPower);
             datalog.targetHeading.set(targetHeading);
             datalog.imuHeading.set(Math.toDegrees(adjustedAngle));
             datalog.writeLine();
