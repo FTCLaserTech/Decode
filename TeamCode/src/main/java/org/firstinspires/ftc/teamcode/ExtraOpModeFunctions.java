@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 //import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
+import static java.lang.Math.abs;
+
 import android.os.Environment;
 import android.util.Size;
 
@@ -11,6 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -23,6 +26,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.Exposur
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.io.BufferedReader;
@@ -41,6 +45,10 @@ import java.util.concurrent.TimeUnit;
 public class ExtraOpModeFunctions
 {
     public enum RobotStartPosition {STRAIGHT, LEFT, RIGHT};
+    public enum TeamColor{RED,BLUE};
+    public TeamColor teamColor = TeamColor.RED;
+
+    public VisionFunctions vision = null;
 
     public enum ElevatorPosition {INIT, DOWN, HIGH_CHAMBER, HIGH_BASKET, LOW_BASKET, LOW_CHAMBER}
     public ElevatorPosition elevatorPosition = ElevatorPosition.INIT;
@@ -86,6 +94,7 @@ public class ExtraOpModeFunctions
     {
         hm = hardwareMap;
         localLop = linearOpMode;
+        vision = new VisionFunctions(hardwareMap, localLop);
 
         //intake = hardwareMap.get(CRServo.class, "intake");
         //intake.setDirection(CRServo.Direction.FORWARD);
@@ -95,6 +104,7 @@ public class ExtraOpModeFunctions
         s2 = hardwareMap.get(Servo.class, "s2");
         s3 = hardwareMap.get(Servo.class, "s3");
         turret = hardwareMap.get(CRServo.class, "turret");
+        turret.setDirection(DcMotorSimple.Direction.REVERSE);
         turretLimit = hardwareMap.get(DigitalChannel.class, "turretLimit");
         turretLimit.setMode(DigitalChannel.Mode.INPUT);
 
@@ -239,6 +249,115 @@ public class ExtraOpModeFunctions
         return(angle);
     }
 
+    public enum SearchingDirection {LEFT,RIGHT};
+    public enum LimitDirection {NA,CW,CCW};
+    double targetHeading = 0.0;
+    double lastTargetHeading = 0.0;
+    double turretPower = 0.5;
+    SearchingDirection targetSearchingDirection = SearchingDirection.LEFT;
+    LimitDirection limitDirection = LimitDirection.NA;
+
+    public void trackDepot()
+    {
+        AprilTagPoseFtc aprilTagPose;
+
+        if(teamColor== ExtraOpModeFunctions.TeamColor.RED)
+            aprilTagPose = vision.readRedAprilTag_ll();
+        else
+            aprilTagPose = vision.readBlueAprilTag_ll();
+
+        localLop.telemetry.addData("turret power: ", turretPower);
+        localLop.telemetry.addData("target heading: ", targetHeading);
+        if( true )
+        {
+            lastTargetHeading = targetHeading;
+            if(aprilTagPose == null) // AprilTag not found
+            {
+                if(localLop.gamepad2.dpad_left)
+                {
+                    turretPower = 1.0;
+                }
+                else if(localLop.gamepad2.dpad_right)
+                {
+                    turretPower = -1.0;
+                }
+                else if (localLop.gamepad2.dpad_down)
+                {
+                    turretPower = 0.0;
+                }
+
+                if(turretLimit.getState() == false)
+                {
+                    turretPower = -turretPower;
+                }
+
+            }
+            else // AprilTag found
+            {
+                targetHeading = aprilTagPose.bearing;
+                if (abs(targetHeading) < 2.0)
+                {
+                    turretPower = 0;
+                }
+                else
+                {
+                    //turretPower = (1.0-0.05)/(45.0-2.0)*(targetHeading-2.0)+0.05;
+                    turretPower = angleToSpeed(targetHeading);
+                    if(turretPower > 1.0)
+                        turretPower = 1.0;
+                }
+
+                if(turretLimit.getState() == false)
+                {
+                    if(limitDirection ==LimitDirection.NA)
+                    {
+                        if(targetHeading > 0)
+                        {
+                            limitDirection = LimitDirection.CW;
+                        }
+                        else
+                        {
+                            limitDirection = LimitDirection.CCW;
+                        }
+                    }
+                    if((limitDirection == LimitDirection.CW)&&(targetHeading>0))
+                    {
+                        turretPower = 0.0;
+                    }
+                    else if((limitDirection ==LimitDirection.CCW)&&(targetHeading<0))
+                    {
+                        turretPower = 0.0;
+                    }
+                }
+                else
+                {
+                    limitDirection =LimitDirection.NA;
+                }
+
+            }
+            turret.setPower(turretPower);
+            localLop.telemetry.addData("turret power2: ", turret.getPower());
+        }
+    }
+
+    public double angleToSpeed(double angle)
+    {
+        double x1 = 2.0;
+        double y1 = 0.05;
+        double x2 = 24.0;
+        double y2 = 1.0;
+        double x3 = -x1;
+        double y3 = y1;
+
+        double y = y1*(angle-x2)*(angle-x3)/((x1-x2)*(x1-x3))
+                +y2*(angle-x1)*(angle-x3)/((x2-x1)*(x2-x3))
+                +y3*(angle-x1)*(angle-x2)/((x3-x1)*(x3-x2));
+
+        if(angle<0)
+            y = -y;
+        return(y);
+    }
+
     /*
      * This class encapsulates all the fields that will go into the datalog.
      */
@@ -284,5 +403,6 @@ public class ExtraOpModeFunctions
             datalogger.writeLine();
         }
     }
+
 }
 
