@@ -2,27 +2,16 @@ package org.firstinspires.ftc.teamcode;
 
 //import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
-import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
-
 import android.os.Environment;
 
 import com.acmerobotics.dashboard.config.Config;
 
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,7 +32,8 @@ public class ExtraOpModeFunctionsTest
     public LinearOpMode localLop = null;
     public HardwareMap hm = null;
 
-    public DcMotorEx shooter;
+    public DcMotorEx shooter1;
+    public DcMotorEx shooter2;
 
     public boolean firstPressed = true;
 
@@ -52,12 +42,19 @@ public class ExtraOpModeFunctionsTest
         hm = hardwareMap;
         localLop = linearOpMode;
 
-        shooter = hardwareMap.get(DcMotorEx.class, "lift");
-        shooter.setDirection(DcMotorEx.Direction.FORWARD);
-        shooter.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        //shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shooter.setPower(0.0);
+        shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
+        shooter1.setDirection(DcMotorEx.Direction.FORWARD);
+        shooter1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //shooter1.setPower(0.0);
+        shooter1.setVelocity(0.0);
+
+        shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+        shooter2.setDirection(DcMotorEx.Direction.FORWARD);
+        shooter2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //shooter2.setPower(0.0);
+        shooter2.setVelocity(0.0);
     }
 
 

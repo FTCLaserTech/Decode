@@ -1,17 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.IMU;
-
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 @TeleOp(group = "A")
 public class BasicTeleOpTest extends LinearOpMode
@@ -42,6 +32,11 @@ public class BasicTeleOpTest extends LinearOpMode
         double backRightPower;
         double stickRotation;
 
+        double maxShooterRPM = 6000.0;  //RPM
+        double shooterTicksPerRev = 28.0;
+        double maxShooterTPS = shooterTicksPerRev * maxShooterRPM / 60; // 2800
+
+
         double shooterVelocity = 0.0;
 
         double previousOrientation = extras.readAutoStartRotation();
@@ -68,29 +63,30 @@ public class BasicTeleOpTest extends LinearOpMode
             }
             if(gamepad1.bWasPressed())
             {
-                shooterVelocity = 1.0;
+                shooterVelocity = 2000.0;
             }
             if(gamepad1.yWasPressed())
             {
-                shooterVelocity = shooterVelocity + 0.01;
-                if (shooterVelocity > 1.0)
+                shooterVelocity = shooterVelocity + 500.0;
+                if (shooterVelocity > maxShooterTPS)
                 {
-                    shooterVelocity = 1.0;
+                    shooterVelocity = maxShooterTPS;
                 }
             }
             if(gamepad1.aWasPressed())
             {
-                shooterVelocity = shooterVelocity - 0.01;
+                shooterVelocity = shooterVelocity - 500.0;
                 if (shooterVelocity < 0.0)
                 {
                     shooterVelocity = 0.0;
                 }
             }
 
-            extras.shooter.setPower(shooterVelocity);
+            extras.shooter1.setVelocity(shooterVelocity);
+            //extras.shooter.setPower(shooterVelocity);
 
-            telemetry.addData("Shooter power: ", shooterVelocity);
-            telemetry.addData("Shooter velocity: ", extras.shooter.getVelocity());
+            telemetry.addData("Shooter velocity set: ", shooterVelocity);
+            telemetry.addData("Shooter velocity actual: ", extras.shooter1.getVelocity());
 
             /*
             stickSideways = gamepad1.left_stick_x * speedMultiplier;

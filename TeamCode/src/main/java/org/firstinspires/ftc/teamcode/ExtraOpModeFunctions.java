@@ -50,9 +50,6 @@ public class ExtraOpModeFunctions
 
     public VisionFunctions vision = null;
 
-    public enum ElevatorPosition {INIT, DOWN, HIGH_CHAMBER, HIGH_BASKET, LOW_BASKET, LOW_CHAMBER}
-    public ElevatorPosition elevatorPosition = ElevatorPosition.INIT;
-
     public static final double PI = 3.14159265;
 
     public int elevatorTarget = 0;
