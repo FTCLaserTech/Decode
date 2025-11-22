@@ -67,7 +67,7 @@ public class BasicTeleOpTest extends LinearOpMode
             }
             if(gamepad1.yWasPressed())
             {
-                shooterVelocity = shooterVelocity + 500.0;
+                shooterVelocity = shooterVelocity + 100.0;
                 if (shooterVelocity > maxShooterTPS)
                 {
                     shooterVelocity = maxShooterTPS;
@@ -75,7 +75,7 @@ public class BasicTeleOpTest extends LinearOpMode
             }
             if(gamepad1.aWasPressed())
             {
-                shooterVelocity = shooterVelocity - 500.0;
+                shooterVelocity = shooterVelocity - 100.0;
                 if (shooterVelocity < 0.0)
                 {
                     shooterVelocity = 0.0;
@@ -83,10 +83,13 @@ public class BasicTeleOpTest extends LinearOpMode
             }
 
             extras.shooter1.setVelocity(shooterVelocity);
+            extras.shooter2.setVelocity(shooterVelocity);
             //extras.shooter.setPower(shooterVelocity);
 
             telemetry.addData("Shooter velocity set: ", shooterVelocity);
-            telemetry.addData("Shooter velocity actual: ", extras.shooter1.getVelocity());
+            telemetry.addData("Shooter1 velocity actual: ", extras.shooter1.getVelocity());
+            telemetry.addData("Shooter2 velocity actual: ", extras.shooter2.getVelocity());
+
 
             /*
             stickSideways = gamepad1.left_stick_x * speedMultiplier;

@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.io.BufferedReader;
@@ -50,7 +51,7 @@ public class ExtraOpModeFunctionsTest
         shooter1.setVelocity(0.0);
 
         shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
-        shooter2.setDirection(DcMotorEx.Direction.FORWARD);
+        shooter2.setDirection(DcMotorEx.Direction.REVERSE);
         shooter2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //shooter2.setPower(0.0);
