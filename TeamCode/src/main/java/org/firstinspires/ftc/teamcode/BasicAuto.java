@@ -25,7 +25,6 @@ public class BasicAuto extends LinearOpMode
 
     public void runOpMode() throws InterruptedException
     {
-        double startDelay = 0;
         double initialRotation = 270;
         Pose2d initPose = new Pose2d(0,0,Math.toRadians(initialRotation));
         Pose2d toSubmursible = new Pose2d(-12,30,Math.toRadians(270));
@@ -42,6 +41,7 @@ public class BasicAuto extends LinearOpMode
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
         VisionFunctions vision = new VisionFunctions(hardwareMap, this);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
+        AutoInit autoInit = new AutoInit(this, extras, vision);
 
         telemetry.addLine("Initialized");
         //telemetry.addData("x", drive.pose.position.x);
@@ -56,27 +56,12 @@ public class BasicAuto extends LinearOpMode
 
         while (!isStopRequested() && !opModeIsActive())
         {
+            autoInit.autoInitFunction();
             safeWaitSeconds(0.01);
 
-            // use up down buttons to add a delay after start
-            if(gamepad1.dpadUpWasPressed())
+            /*
+            if((cam != null ) && (ll != null ))
             {
-                startDelay += 0.5;
-            }
-            if(gamepad1.dpadDownWasPressed())
-            {
-                startDelay -= 0.5;
-                startDelay = Math.max(0,startDelay);
-            }
-            telemetry.addData("Start Delay: ", startDelay);
-
-            obelisk = vision.readObeliskCamera();
-            obelisk = vision.readObeliskLimelight();
-            cam = vision.readRedAprilTag_cam();
-            ll = vision.readRedAprilTag_ll();
-            //vision.readBlueAprilTag_cam();
-
-            if((cam != null ) && (ll != null )) {
                 telemetry.addLine(String.format("x %.2f %.2f", cam.x, ll.x));
                 telemetry.addLine(String.format("y %.2f %.2f" , cam.y , ll.y));
                 telemetry.addLine(String.format("z %.2f %.2f" , cam.z , ll.z));
@@ -87,11 +72,21 @@ public class BasicAuto extends LinearOpMode
                 telemetry.addLine(String.format("Bearing %.2f %.2f" , cam.bearing , ll.bearing));
                 telemetry.addLine(String.format("Elevation %.2f %.2f" , cam.elevation , ll.elevation));
             }
+            */
 
             telemetry.update();
         }
 
-        safeWaitSeconds(startDelay);
+        safeWaitSeconds(autoInit.startDelay);
+
+        // power up and aim the shooter
+
+        // when ready, shoot the artifacts
+
+        // drive off the line
+
+
+        /////////
 
         // launch pre-loaded artifacts
         Action DriveToNearSubmursibleAction = drive.actionBuilder(drive.localizer.getPose())

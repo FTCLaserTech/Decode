@@ -22,7 +22,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 @TeleOp(group = "A")
 public class BasicTeleOp extends LinearOpMode
 {
-
+    public enum Targeting{MANUAL,AUTO};
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -32,6 +32,8 @@ public class BasicTeleOp extends LinearOpMode
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
+
+        Targeting targeting = Targeting.AUTO;
 
         //TrajectoryBook book = new TrajectoryBook(drive, extras);
 
@@ -97,23 +99,31 @@ public class BasicTeleOp extends LinearOpMode
         //telemetry.addData("Odo Orientation: ", drive.odo.getHeading());
         telemetry.addData("Init Complete", initArmAtStart);
 
-        telemetry.addData("-24: ", extras.angleToSpeed(-24));
-        telemetry.addData("-10: ", extras.angleToSpeed(-10));
-        telemetry.addData("-2: ", extras.angleToSpeed(-2));
-        telemetry.addData("0: ", extras.angleToSpeed(0));
-        telemetry.addData("2: ", extras.angleToSpeed(2));
-        telemetry.addData("10: ", extras.angleToSpeed(10));
-        telemetry.addData("24: ", extras.angleToSpeed(24));
-
         telemetry.update();
-
 
         waitForStart();
 
         while (!isStopRequested())
         {
             telemetry.addData("team color" , extras.teamColor);
-            extras.trackDepot();
+
+            if(targeting == Targeting.AUTO)
+            {
+                extras.trackDepot();
+            }
+            else // manual targeting
+            {
+                // buttons for rotate
+
+                // buttons for range
+
+            }
+
+            // shooter on/off function
+
+            // shoot 1
+            // shoot all
+
             if (gamepad1.left_bumper)
                 speedMultiplier = 0.85;
             else
@@ -140,6 +150,7 @@ public class BasicTeleOp extends LinearOpMode
                     -gamepad1.right_stick_x
             ));
 
+            // change team color if needed
             if(gamepad2.xWasPressed())
             {
                 if(extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
@@ -147,22 +158,23 @@ public class BasicTeleOp extends LinearOpMode
                 else
                     extras.teamColor = ExtraOpModeFunctions.TeamColor.RED;
             }
+
             if(gamepad2.yWasPressed())
             {
-                extras.s1down();
+                //extras.s1down();
                 telemetry.addData("y Pressed", "s1down");
             }
             if(gamepad2.bWasPressed())
             {
-                extras.s2up();
+                //extras.s2up();
                 telemetry.addData("b Pressed", "s2up");
             }
+
             if(gamepad2.aWasPressed())
             {
-                extras.turret.setPower(0.0);
+                //extras.turret.setPower(0.0);
                 telemetry.addData("a Pressed", "0.0");
             }
-
 
             colors1 = extras.vision.colorSensor1.getNormalizedColors();
             colors2 = extras.vision.colorSensor2.getNormalizedColors();
@@ -171,10 +183,6 @@ public class BasicTeleOp extends LinearOpMode
             slot1Detections = checkArtifact(colors1.green, colors1.blue) + slot1Detections.substring(0, slot1Detections.length() - 1);
             slot2Detections = checkArtifact(colors2.green, colors2.blue) + slot2Detections.substring(0, slot2Detections.length() - 1);
             slot3Detections = checkArtifact(colors3.green, colors3.blue) + slot3Detections.substring(0, slot3Detections.length() - 1);
-
-            //telemetry.addLine(slot1Detections);
-           // telemetry.addLine(slot2Detections);
-            //telemetry.addLine(slot3Detections);
 
             if(slot1Detections.indexOf("G") != -1)
                 slot1Artifact = "G";
@@ -198,18 +206,6 @@ public class BasicTeleOp extends LinearOpMode
                 slot3Artifact = "N";
 
             telemetry.addLine(slot1Artifact + " " + slot2Artifact + " " + slot3Artifact);
-
-            /*
-            telemetry.addLine()
-                    .addData("Red", "%.3f", colors1.red)
-                    .addData("Green", "%.3f", colors1.green)
-                    .addData("Blue", "%.3f", colors1.blue);
-            telemetry.addLine()
-                    .addData("Hue", "%.3f", hsvValues1[0])
-                    .addData("Saturation", "%.3f", hsvValues1[1])
-                    .addData("Value", "%.3f", hsvValues1[2]);
-            telemetry.addData("Alpha", "%.3f", colors1.alpha);
-            */
 
             // RESET IMU
             if ((gamepad1.back) && (gamepad1.b))

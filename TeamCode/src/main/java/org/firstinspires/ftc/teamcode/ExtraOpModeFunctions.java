@@ -63,6 +63,7 @@ public class ExtraOpModeFunctions
 
 
     public LinearOpMode localLop = null;
+    public HardwareMap hm = null;
 
     public CRServo intake;
 
@@ -73,8 +74,6 @@ public class ExtraOpModeFunctions
     public RevBlinkinLedDriver blinkinLedDriver;
     public RevBlinkinLedDriver.BlinkinPattern pattern;
 
-    public HardwareMap hm = null;
-    
     public enum BasketDelivery {IDLE, ARMUP, WAIT1, INTAKEOUT, WAIT2, INTAKEOFF}
     BasketDelivery basketDeliveryState = BasketDelivery.IDLE;
 

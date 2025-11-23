@@ -35,6 +35,7 @@ public class VisionFunctions {
     public static final double PI = 3.14159265;
 
     public LinearOpMode localLop = null;
+    public HardwareMap hm = null;
 
     public CRServo intake;
 
@@ -44,21 +45,17 @@ public class VisionFunctions {
 
     public enum ObeliskPattern {GPP, PGP, PPG}
 
-    private Limelight3A limelight;
+    public Limelight3A limelight;
 
     private IMU imu;
 
     private long loopCounter = 0;
-
-    ;
 
     public boolean firstPressed = true;
 
     public NormalizedColorSensor colorSensor1;
     public NormalizedColorSensor colorSensor2;
     public NormalizedColorSensor colorSensor3;
-
-    public HardwareMap hm = null;
 
     public VisionFunctions(HardwareMap hardwareMap, LinearOpMode linearOpMode) {
         hm = hardwareMap;
@@ -80,7 +77,7 @@ public class VisionFunctions {
     public void initLimelight() {
         limelight = hm.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
-        limelight.start();;
+        limelight.start();
         /*
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP,
