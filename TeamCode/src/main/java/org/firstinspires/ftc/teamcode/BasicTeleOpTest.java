@@ -67,7 +67,7 @@ public class BasicTeleOpTest extends LinearOpMode
             }
             if(gamepad1.yWasPressed())
             {
-                shooterVelocity = shooterVelocity + 100.0;
+                shooterVelocity = shooterVelocity + 50.0;
                 if (shooterVelocity > maxShooterTPS)
                 {
                     shooterVelocity = maxShooterTPS;
@@ -75,7 +75,7 @@ public class BasicTeleOpTest extends LinearOpMode
             }
             if(gamepad1.aWasPressed())
             {
-                shooterVelocity = shooterVelocity - 100.0;
+                shooterVelocity = shooterVelocity - 50.0;
                 if (shooterVelocity < 0.0)
                 {
                     shooterVelocity = 0.0;

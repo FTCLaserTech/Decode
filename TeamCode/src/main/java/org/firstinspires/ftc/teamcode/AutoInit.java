@@ -95,6 +95,7 @@ public class AutoInit {
             if(localVision.limelight.isRunning())
             {
                 localVision.limelight.stop();
+                localExtras.turret.setPower(0.0);
             }
             localLop.telemetry.addLine("Vision Check - g1 a");
         }

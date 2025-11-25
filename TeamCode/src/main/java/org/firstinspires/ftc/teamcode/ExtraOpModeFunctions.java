@@ -13,6 +13,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
@@ -65,8 +67,20 @@ public class ExtraOpModeFunctions
     public LinearOpMode localLop = null;
     public HardwareMap hm = null;
 
-    public CRServo intake;
+    public DcMotorEx intake;
 
+
+    double maxShooterRPM = 6000.0;  //RPM
+    double shooterTicksPerRev = 28.0;
+    double maxShooterTPS = shooterTicksPerRev * maxShooterRPM / 60; // 2800
+
+
+    double shooterVelocity = 0.0;
+
+    public DcMotorEx shooter1;
+    public DcMotorEx shooter2;
+    public DcMotorEx intake1;
+    public DcMotorEx intake2;
 
     public boolean firstPressed = true;
 
@@ -104,7 +118,54 @@ public class ExtraOpModeFunctions
         turretLimit = hardwareMap.get(DigitalChannel.class, "turretLimit");
         turretLimit.setMode(DigitalChannel.Mode.INPUT);
 
+        shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
+        shooter1.setDirection(DcMotorEx.Direction.FORWARD);
+        shooter1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter1.setVelocity(0.0);
 
+        shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+        shooter2.setDirection(DcMotorEx.Direction.REVERSE);
+        shooter2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        shooter2.setVelocity(0.0);
+
+        intake1 = hardwareMap.get(DcMotorEx.class, "intakeIn");
+        intake1.setDirection(DcMotorEx.Direction.FORWARD);
+        intake1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        intake1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intake1.setVelocity(0.0);
+
+        intake2 = hardwareMap.get(DcMotorEx.class, "intakeOut");
+        intake2.setDirection(DcMotorEx.Direction.REVERSE);
+        intake2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        intake2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intake2.setVelocity(0.0);
+
+    }
+
+    public void intake1Forward()
+    {
+        intake1.setPower(1);
+    }
+    public void intake1Reverse()
+    {
+        intake1.setPower(-1);
+    }
+    public void intake1Off()
+    {
+        intake1.setPower(0);
+    }
+
+    public void intake2Forward() {
+        intake2.setPower(1);
+    }
+    public void intake2Reverse() {
+        intake2.setPower(-1);
+    }
+    public void intake2Off()
+    {
+        intake2.setPower(0);
     }
 
 
@@ -153,18 +214,6 @@ public class ExtraOpModeFunctions
     }
 
 
-
-
-    public void intakeIn() {
-        intake.setPower(1);
-    }
-    public void intakeOut() {
-        intake.setPower(-1);
-    }
-    public void intakeOff()
-    {
-        intake.setPower(0);
-    }
 
     public enum ArmPosition {STOP, EXTEND, RETRACT, HORIZONTAL, VERTICAL, HANG1, HANG2,HOME}
     ArmPosition armPosition = ArmPosition.STOP;

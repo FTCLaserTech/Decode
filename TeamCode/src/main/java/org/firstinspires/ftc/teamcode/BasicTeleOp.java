@@ -35,6 +35,7 @@ public class BasicTeleOp extends LinearOpMode
 
         Targeting targeting = Targeting.AUTO;
 
+
         //TrajectoryBook book = new TrajectoryBook(drive, extras);
 
         IMU.Parameters imuParameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -105,26 +106,81 @@ public class BasicTeleOp extends LinearOpMode
 
         while (!isStopRequested())
         {
-            telemetry.addData("team color" , extras.teamColor);
+            telemetry.addData("team color", extras.teamColor);
 
-            if(targeting == Targeting.AUTO)
+            if (gamepad2.dpadRightWasPressed())
+            {
+                if (targeting == Targeting.AUTO)
+                {
+                    targeting = Targeting.MANUAL;
+                } else
+                {
+                    targeting = Targeting.AUTO;
+                }
+            }
+
+            if (targeting == Targeting.AUTO)
             {
                 extras.trackDepot();
-            }
-            else // manual targeting
+            } else // manual targeting
             {
                 // buttons for rotate
+                extras.turret.setPower(gamepad2.left_stick_x * 0.5);
 
                 // buttons for range
+                if (gamepad2.dpad_up)
+                {
+                    extras.shooterVelocity = extras.shooterVelocity + 50.0;
+                    if (extras.shooterVelocity > extras.maxShooterTPS)
+                    {
+                        extras.shooterVelocity = extras.maxShooterTPS;
+                    }
+                }
+                if (gamepad2.dpad_down)
+                {
+                    extras.shooterVelocity = extras.shooterVelocity - 50.0;
+                    if (extras.shooterVelocity < 0.0)
+                    {
+                        extras.shooterVelocity = 0.0;
+                    }
+                }
 
             }
 
+            extras.shooter1.setVelocity(extras.shooterVelocity);
+            extras.shooter2.setVelocity(extras.shooterVelocity);
+
+            telemetry.addData("Shooter velocity set: ", extras.shooterVelocity);
+            telemetry.addData("Shooter1 velocity actual: ", extras.shooter1.getVelocity());
+            telemetry.addData("Shooter2 velocity actual: ", extras.shooter2.getVelocity());
             // shooter on/off function
 
-            // shoot 1
-            // shoot all
 
-            if (gamepad1.left_bumper)
+            // intake control
+            if (gamepad1.right_trigger > 0)
+            {
+                extras.intake1Forward();
+            }
+            else
+            {
+                extras.intake1Off();
+            }
+
+            // shoot all
+            if (gamepad1.left_trigger > 0)
+            {
+                extras.intake1Forward();
+                extras.intake2Forward();
+            }
+            else
+            {
+                extras.intake1Off();
+                extras.intake2Off();
+            }
+
+
+
+            if (gamepad2.left_bumper)
                 speedMultiplier = 0.85;
             else
                 speedMultiplier = 1.0;
