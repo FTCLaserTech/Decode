@@ -84,11 +84,20 @@ public class BasicTeleOpTest extends LinearOpMode
 
             extras.shooter1.setVelocity(shooterVelocity);
             extras.shooter2.setVelocity(shooterVelocity);
-            //extras.shooter.setPower(shooterVelocity);
 
             telemetry.addData("Shooter velocity set: ", shooterVelocity);
             telemetry.addData("Shooter1 velocity actual: ", extras.shooter1.getVelocity());
             telemetry.addData("Shooter2 velocity actual: ", extras.shooter2.getVelocity());
+
+
+            if (extras.beamBreak.isPressed())
+            {
+                telemetry.addData("Touch Sensor", "Is Pressed");
+            }
+            else
+            {
+                telemetry.addData("Touch Sensor", "Is Not Pressed");
+            }
 
 
             /*

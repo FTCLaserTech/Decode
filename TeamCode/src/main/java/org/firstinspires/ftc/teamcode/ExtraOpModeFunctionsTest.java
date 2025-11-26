@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,6 +37,8 @@ public class ExtraOpModeFunctionsTest
     public DcMotorEx shooter1;
     public DcMotorEx shooter2;
 
+    public TouchSensor beamBreak;
+
     public boolean firstPressed = true;
 
     public ExtraOpModeFunctionsTest(HardwareMap hardwareMap, LinearOpMode linearOpMode)
@@ -47,18 +50,16 @@ public class ExtraOpModeFunctionsTest
         shooter1.setDirection(DcMotorEx.Direction.FORWARD);
         shooter1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //shooter1.setPower(0.0);
         shooter1.setVelocity(0.0);
 
         shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
         shooter2.setDirection(DcMotorEx.Direction.REVERSE);
         shooter2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //shooter2.setPower(0.0);
         shooter2.setVelocity(0.0);
+
+        beamBreak = hardwareMap.get(TouchSensor.class, "beamBreak");
     }
-
-
 
     public double adjustAngleForDriverPosition(double angle, RobotStartPosition robotStartPosition)
     {

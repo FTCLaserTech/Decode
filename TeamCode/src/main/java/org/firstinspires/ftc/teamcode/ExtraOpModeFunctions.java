@@ -7,8 +7,12 @@ import static java.lang.Math.abs;
 import android.os.Environment;
 import android.util.Size;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
@@ -327,6 +331,23 @@ public class ExtraOpModeFunctions
         localLop.telemetry.addData("turret power2: ", turret.getPower());
 
         return (trackDepotState);
+    }
+
+    public class TrackDepotAction implements Action
+    {
+        public boolean isComplete = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet)
+        {
+            trackDepot();
+            return(isComplete);
+        }
+
+        public void setComplete()
+        {
+            isComplete = true;
+        }
     }
 
     public double angleToSpeed(double angle)

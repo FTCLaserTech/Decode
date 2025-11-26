@@ -50,10 +50,12 @@ public class AudienceSimple extends LinearOpMode
             autoInit.autoInitFunction();
             safeWaitSeconds(0.01);
 
-
             telemetry.update();
         }
 
+        // AFTER START IS PRESSED
+
+        // turn on the LimeLight
         vision.limelight.start();
 
         // power up and aim the shooter
@@ -67,14 +69,13 @@ public class AudienceSimple extends LinearOpMode
 
         safeWaitSeconds(autoInit.startDelay);
 
-        // when ready, shoot the artifacts
-        if (shooterReady)
+        // shoot the artifacts if on target
+        if (shooterReady == ExtraOpModeFunctions.TrackDepotState.ONTARGET)
         {
             extras.intakeForward();
+            // wait for shooting to finish
+            safeWaitSeconds(3);
         }
-
-        // wait for shooting
-        safeWaitSeconds(3);
 
         // drive off the line
         Action DriveOfflineAction = drive.actionBuilder(drive.localizer.getPose())
@@ -83,6 +84,7 @@ public class AudienceSimple extends LinearOpMode
 
         safeWaitSeconds(3);
 
+        // turn the intake and shooter off
         extras.intakeOff();
         extras.setShooter(0.0);
 
