@@ -63,32 +63,34 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive model parameters
-        public double inPerTick = 1;
+        // 2000 counts per revolution
+        // 32mm wheel diameter
+        public double inPerTick = Math.PI*(32/25.4)/2000;  //Original: 1
         public double lateralInPerTick = inPerTick;
-        public double trackWidthTicks = 0;
+        public double trackWidthTicks = 1140;  // 0
 
         // feedforward parameters (in tick units)
-        public double kS = 0;
-        public double kV = 0;
-        public double kA = 0;
+        public double kS = 1.18430416815;  // 0;
+        public double kV = 0.00415292995;  // 0;
+        public double kA = 0.00047;  // 0;
 
         // path profile parameters (in inches)
-        public double maxWheelVel = 50;
-        public double minProfileAccel = -30;
-        public double maxProfileAccel = 50;
+        public double maxWheelVel = 45;  // Original: 50
+        public double minProfileAccel = -40;  // Original: -30
+        public double maxProfileAccel = 40;  // Original: 50
 
         // turn profile parameters (in radians)
-        public double maxAngVel = Math.PI; // shared with path
-        public double maxAngAccel = Math.PI;
+        public double maxAngVel = 8;  // Math.PI; // shared with path
+        public double maxAngAccel = 8;  // Math.PI;
 
         // path controller gains
-        public double axialGain = 0.0;
-        public double lateralGain = 0.0;
-        public double headingGain = 0.0; // shared with turn
+        public double axialGain = 8.5;  // 0.0;
+        public double lateralGain = 8.0;  //0.0;
+        public double headingGain = 6.0;  // 0.0; // shared with turn
 
-        public double axialVelGain = 0.0;
-        public double lateralVelGain = 0.0;
-        public double headingVelGain = 0.0; // shared with turn
+        public double axialVelGain = 0.5;  // 0.0;
+        public double lateralVelGain = 0.5;  // 0.0;
+        public double headingVelGain = 0.5;  // 0.0; // shared with turn
     }
 
     public static Params PARAMS = new Params();
@@ -250,11 +252,7 @@ public final class MecanumDrive {
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
         //localizer = new DriveLocalizer(pose);
-
-        // 2000 counts per revolution
-        // 32mm wheel diameter
-        double inpertick = Math.PI*(32/25.4)/2000;
-        localizer = new PinpointLocalizer(hardwareMap, inpertick, pose);
+        localizer = new PinpointLocalizer(hardwareMap, PARAMS.inPerTick, pose);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
