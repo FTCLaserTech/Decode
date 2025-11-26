@@ -68,6 +68,7 @@ public class BasicTeleOp extends LinearOpMode
         double elevatorMaxCurrent = 0;
         int numDangerElevatorAmps = 0;
         boolean manualLiftStop = false;
+        boolean shooterOn = false;
 
         String slot1Detections = "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN";
         String slot2Detections = "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN";
@@ -86,6 +87,7 @@ public class BasicTeleOp extends LinearOpMode
         boolean initArmAtStart = false;
 
 
+        double lightColor = extras.Light_Red;
         boolean targetSearchingMode = false;
         long loopCounter = 0;
 
@@ -121,11 +123,43 @@ public class BasicTeleOp extends LinearOpMode
 
             if (targeting == Targeting.AUTO)
             {
-                extras.trackDepot();
-            } else // manual targeting
+                ExtraOpModeFunctions.TrackDepotState trackDepotState = extras.trackDepot();
+                switch (trackDepotState)
+                {
+                    case NOTFOUND:
+                        extras.turret.setPower(gamepad2.left_stick_x * 0.5);
+                        lightColor = extras.Light_Red;
+                        break;
+                    case ONTARGET:
+                        lightColor = extras.Light_Green;
+                        break;
+                    case TARGETING:
+                        lightColor = extras.Light_Blue;
+                        break;
+                }
+            }
+            else // manual targeting
             {
+                lightColor = extras.Light_Purple;
                 // buttons for rotate
-                //extras.turret.setPower(gamepad2.left_stick_x * 0.5);
+                if(extras.turretLimit.getState() == false)
+                {
+                    if (extras.turretPower == 0)
+                    {
+                        ;
+                    }
+                    else if (extras.turretPower > 0)
+                    {
+                        extras.limitDirection = ExtraOpModeFunctions.LimitDirection.CW;
+                    }
+                    else
+                    {
+                        extras.limitDirection = ExtraOpModeFunctions.LimitDirection.CCW;
+                    }
+                    extras.turretPower = -extras.turretPower;
+                }
+
+                extras.turret.setPower(gamepad2.left_stick_x * 0.5);
 
                 // buttons for range
                 if (gamepad2.dpad_up)
@@ -146,10 +180,25 @@ public class BasicTeleOp extends LinearOpMode
                 }
             }
 
-            // shooter on/off function
-            extras.shooter1.setVelocity(extras.shooterVelocity);
-            extras.shooter2.setVelocity(extras.shooterVelocity);
+            extras.light.setPosition(lightColor);
 
+            // shooter on/off function
+            if(gamepad1.aWasPressed())
+            {
+                if(shooterOn == true){
+                    shooterOn = false;
+                }
+                else{
+                    shooterOn = true;
+                }
+            }
+            if(shooterOn == true){
+                extras.setShooter(extras.shooterVelocity);
+            }
+            else
+            {
+                extras.setShooter(0.0);
+            }
             telemetry.addData("Shooter velocity set: ", extras.shooterVelocity);
             telemetry.addData("Shooter1 velocity actual: ", extras.shooter1.getVelocity());
             telemetry.addData("Shooter2 velocity actual: ", extras.shooter2.getVelocity());
@@ -167,18 +216,16 @@ public class BasicTeleOp extends LinearOpMode
             // intake and shooter control
             if (gamepad1.left_trigger > 0)
             {
-                extras.intake1Forward();
-                extras.intake2Forward();
+                extras.intakeForward();
             }
             else
             {
-                extras.intake1Off();
-                extras.intake2Off();
+                extras.intakeOff();
             }
 
 
 
-            if (gamepad2.left_bumper)
+            if (gamepad1.left_bumper)
                 speedMultiplier = 0.85;
             else
                 speedMultiplier = 1.0;

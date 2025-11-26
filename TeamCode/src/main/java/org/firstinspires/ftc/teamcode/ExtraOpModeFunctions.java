@@ -37,6 +37,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.sql.Time;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -52,6 +53,7 @@ public class ExtraOpModeFunctions
 
     public enum RobotStartPosition {STRAIGHT, LEFT, RIGHT};
     public enum TeamColor{RED,BLUE};
+    public enum TrackDepotState{NOTFOUND,TARGETING,ONTARGET};
     public TeamColor teamColor = TeamColor.RED;
 
     public static final double PI = 3.14159265;
@@ -62,6 +64,12 @@ public class ExtraOpModeFunctions
     public DcMotorEx intake2;
     public CRServo turret;
     public DigitalChannel turretLimit;  // Digital channel Object
+    public Servo light;
+
+    public static double Light_Green = 0.500;
+    public static double Light_Red = 0.280;
+    public static double Light_Blue = 0.611;
+    public static double Light_Purple = 0.666;
 
 
     double maxShooterRPM = 6000.0;  //RPM
@@ -109,7 +117,10 @@ public class ExtraOpModeFunctions
         intake2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intake2.setVelocity(0.0);
 
+        light = hardwareMap.get(Servo.class, "light");
+
     }
+
 
     public void intake1Forward()
     {
@@ -135,6 +146,28 @@ public class ExtraOpModeFunctions
         intake2.setPower(0);
     }
 
+    public void intakeForward()
+    {
+        intake1Forward();
+        intake2Forward();
+    }
+
+    public void intakeOff()
+    {
+        intake1Off();
+        intake2Off();
+    }
+
+    public void setShooter(double shooterSpeed)
+    {
+        shooter1.setVelocity(shooterSpeed);
+        shooter2.setVelocity(shooterSpeed);
+    }
+
+    public double getShooter()
+    {
+        return((shooter1.getVelocity()+shooter2.getVelocity())/2);
+    }
 
     public double adjustAngleForDriverPosition(double angle, RobotStartPosition robotStartPosition)
     {
@@ -204,10 +237,14 @@ public class ExtraOpModeFunctions
     double turretPower = 0.5;
     SearchingDirection targetSearchingDirection = SearchingDirection.LEFT;
     LimitDirection limitDirection = LimitDirection.NA;
+    double targetRange = 0.0;
 
-    public void trackDepot()
+    public TrackDepotState trackDepot()
     {
         AprilTagPoseFtc aprilTagPose;
+        boolean aimGood = false;
+        boolean rangeGood = false;
+        TrackDepotState trackDepotState = TrackDepotState.NOTFOUND;
 
         if(teamColor== ExtraOpModeFunctions.TeamColor.RED)
             aprilTagPose = vision.readRedAprilTag_ll();
@@ -216,76 +253,80 @@ public class ExtraOpModeFunctions
 
         localLop.telemetry.addData("turret power: ", turretPower);
         localLop.telemetry.addData("target heading: ", targetHeading);
-        if( true )
+
+        lastTargetHeading = targetHeading;
+        if(aprilTagPose == null) // AprilTag not found
         {
-            lastTargetHeading = targetHeading;
-            if(aprilTagPose == null) // AprilTag not found
+            if(turretLimit.getState() == false)
             {
-                if(localLop.gamepad2.dpad_left)
-                {
+                turretPower = -turretPower;
+            }
+        }
+        else // AprilTag found
+        {
+            if (abs(targetHeading) < 2.0)
+            {
+                turretPower = 0;
+                aimGood = true;
+            }
+            else
+            {
+                //turretPower = (1.0-0.05)/(45.0-2.0)*(targetHeading-2.0)+0.05;
+                turretPower = angleToSpeed(targetHeading);
+                if(turretPower > 1.0)
                     turretPower = 1.0;
-                }
-                else if(localLop.gamepad2.dpad_right)
+            }
+
+            if(turretLimit.getState() == false)
+            {
+                if(limitDirection == LimitDirection.NA)
                 {
-                    turretPower = -1.0;
+                    if(targetHeading > 0)
+                    {
+                        limitDirection = LimitDirection.CW;
+                    }
+                    else
+                    {
+                        limitDirection = LimitDirection.CCW;
+                    }
                 }
-                else if (localLop.gamepad2.dpad_down)
+                if((limitDirection == LimitDirection.CW)&&(targetHeading>0))
                 {
                     turretPower = 0.0;
                 }
-
-                if(turretLimit.getState() == false)
+                else if((limitDirection ==LimitDirection.CCW)&&(targetHeading<0))
                 {
-                    turretPower = -turretPower;
+                    turretPower = 0.0;
                 }
-
             }
-            else // AprilTag found
+            else
             {
-                targetHeading = aprilTagPose.bearing;
-                if (abs(targetHeading) < 2.0)
-                {
-                    turretPower = 0;
-                }
-                else
-                {
-                    //turretPower = (1.0-0.05)/(45.0-2.0)*(targetHeading-2.0)+0.05;
-                    turretPower = angleToSpeed(targetHeading);
-                    if(turretPower > 1.0)
-                        turretPower = 1.0;
-                }
-
-                if(turretLimit.getState() == false)
-                {
-                    if(limitDirection ==LimitDirection.NA)
-                    {
-                        if(targetHeading > 0)
-                        {
-                            limitDirection = LimitDirection.CW;
-                        }
-                        else
-                        {
-                            limitDirection = LimitDirection.CCW;
-                        }
-                    }
-                    if((limitDirection == LimitDirection.CW)&&(targetHeading>0))
-                    {
-                        turretPower = 0.0;
-                    }
-                    else if((limitDirection ==LimitDirection.CCW)&&(targetHeading<0))
-                    {
-                        turretPower = 0.0;
-                    }
-                }
-                else
-                {
-                    limitDirection =LimitDirection.NA;
-                }
-
+                limitDirection =LimitDirection.NA;
             }
-            turret.setPower(turretPower);
-            localLop.telemetry.addData("turret power2: ", turret.getPower());
+
+            // range
+            targetRange = aprilTagPose.range;
+            // insert range to speed function
+            double shooterSpeed = 0.0;
+            setShooter(shooterSpeed);
+            if(abs(getShooter()-shooterSpeed) < 50)
+            {
+                rangeGood = true;
+            }
+
+            if (aimGood && rangeGood)
+            {
+                trackDepotState = TrackDepotState.ONTARGET;
+            }
+            else
+            {
+                trackDepotState = TrackDepotState.TARGETING;
+            }
         }
+        turret.setPower(turretPower);
+        localLop.telemetry.addData("turret power2: ", turret.getPower());
+
+        return (trackDepotState);
     }
 
     public double angleToSpeed(double angle)
