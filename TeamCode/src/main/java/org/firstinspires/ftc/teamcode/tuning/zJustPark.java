@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.tuning;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.SECONDS;
 
@@ -12,6 +12,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.AutoInit;
+import org.firstinspires.ftc.teamcode.ExtraOpModeFunctions;
+import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.VisionFunctions;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Config
@@ -19,7 +23,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Autonomous(group = "a")
 
-public class AudienceSimple extends LinearOpMode
+public class zJustPark extends LinearOpMode
 {
     @Override
 
@@ -58,36 +62,15 @@ public class AudienceSimple extends LinearOpMode
         // turn on the LimeLight
         vision.limelight.start();
 
-        // power up and aim the shooter
-        ElapsedTime timer = new ElapsedTime(SECONDS);
-        timer.reset();
-        ExtraOpModeFunctions.TrackDepotState shooterReady = ExtraOpModeFunctions.TrackDepotState.NOTFOUND;
-        while (!isStopRequested() && (shooterReady != ExtraOpModeFunctions.TrackDepotState.ONTARGET) && (timer.time() < 10))
-        {
-            shooterReady = extras.trackDepot();
-        }
-
         safeWaitSeconds(autoInit.startDelay);
-
-        // shoot the artifacts if on target
-        if (shooterReady == ExtraOpModeFunctions.TrackDepotState.ONTARGET)
-        {
-            extras.intakeForward();
-            // wait for shooting to finish
-            safeWaitSeconds(3);
-        }
 
         // drive off the line
         Action DriveOfflineAction = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(offLine.position, offLine.heading, new TranslationalVelConstraint(50.0), new ProfileAccelConstraint(-50,50))
+                .strafeToLinearHeading(offLine.position, offLine.heading)
                 .build();
         Actions.runBlocking(DriveOfflineAction);
 
         safeWaitSeconds(3);
-
-        // turn the intake and shooter off
-        extras.intakeOff();
-        extras.setShooter(0.0);
 
         // Save the ending location
         //extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);

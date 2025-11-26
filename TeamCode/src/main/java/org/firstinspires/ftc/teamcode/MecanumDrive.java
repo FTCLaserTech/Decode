@@ -249,7 +249,12 @@ public final class MecanumDrive {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new DriveLocalizer(pose);
+        //localizer = new DriveLocalizer(pose);
+
+        // 2000 counts per revolution
+        // 32mm wheel diameter
+        double inpertick = Math.PI*(32/25.4)/2000;
+        localizer = new PinpointLocalizer(hardwareMap, inpertick, pose);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
