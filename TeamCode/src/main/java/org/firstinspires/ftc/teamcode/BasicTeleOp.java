@@ -125,7 +125,7 @@ public class BasicTeleOp extends LinearOpMode
             } else // manual targeting
             {
                 // buttons for rotate
-                extras.turret.setPower(gamepad2.left_stick_x * 0.5);
+                //extras.turret.setPower(gamepad2.left_stick_x * 0.5);
 
                 // buttons for range
                 if (gamepad2.dpad_up)
@@ -144,17 +144,15 @@ public class BasicTeleOp extends LinearOpMode
                         extras.shooterVelocity = 0.0;
                     }
                 }
-
             }
 
+            // shooter on/off function
             extras.shooter1.setVelocity(extras.shooterVelocity);
             extras.shooter2.setVelocity(extras.shooterVelocity);
 
             telemetry.addData("Shooter velocity set: ", extras.shooterVelocity);
             telemetry.addData("Shooter1 velocity actual: ", extras.shooter1.getVelocity());
             telemetry.addData("Shooter2 velocity actual: ", extras.shooter2.getVelocity());
-            // shooter on/off function
-
 
             // intake control
             if (gamepad1.right_trigger > 0)
@@ -166,7 +164,7 @@ public class BasicTeleOp extends LinearOpMode
                 extras.intake1Off();
             }
 
-            // shoot all
+            // intake and shooter control
             if (gamepad1.left_trigger > 0)
             {
                 extras.intake1Forward();

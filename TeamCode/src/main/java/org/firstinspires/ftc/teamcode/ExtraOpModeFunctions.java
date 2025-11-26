@@ -46,59 +46,33 @@ import java.util.concurrent.TimeUnit;
 
 public class ExtraOpModeFunctions
 {
+    public LinearOpMode localLop = null;
+    public HardwareMap hm = null;
+    public VisionFunctions vision = null;
+
     public enum RobotStartPosition {STRAIGHT, LEFT, RIGHT};
     public enum TeamColor{RED,BLUE};
     public TeamColor teamColor = TeamColor.RED;
 
-    public VisionFunctions vision = null;
-
     public static final double PI = 3.14159265;
-
-    public int elevatorTarget = 0;
-    int elevatorResetCounter = 0;
-
-    public Servo s1;
-    public Servo s2;
-    public Servo s3;
-    public CRServo turret;
-    public DigitalChannel turretLimit;  // Digital channel Object
-
-
-    public LinearOpMode localLop = null;
-    public HardwareMap hm = null;
-
-    public DcMotorEx intake;
-
-
-    double maxShooterRPM = 6000.0;  //RPM
-    double shooterTicksPerRev = 28.0;
-    double maxShooterTPS = shooterTicksPerRev * maxShooterRPM / 60; // 2800
-
-
-    double shooterVelocity = 0.0;
 
     public DcMotorEx shooter1;
     public DcMotorEx shooter2;
     public DcMotorEx intake1;
     public DcMotorEx intake2;
+    public CRServo turret;
+    public DigitalChannel turretLimit;  // Digital channel Object
 
-    public boolean firstPressed = true;
+
+    double maxShooterRPM = 6000.0;  //RPM
+    double shooterTicksPerRev = 28.0;
+    double maxShooterTPS = shooterTicksPerRev * maxShooterRPM / 60; // 2800
+    double shooterVelocity = 0.0;
 
 
     public RevBlinkinLedDriver blinkinLedDriver;
     public RevBlinkinLedDriver.BlinkinPattern pattern;
 
-    public enum BasketDelivery {IDLE, ARMUP, WAIT1, INTAKEOUT, WAIT2, INTAKEOFF}
-    BasketDelivery basketDeliveryState = BasketDelivery.IDLE;
-
-    public enum Collect {IDLE, DUMP, WAIT, COLLECT}
-    Collect dumpState = Collect.IDLE;
-
-    public enum Elevator {IDLE, HALF, WAIT, DOWN}
-    Elevator elevatorState = Elevator.IDLE;
-
-    public enum SpecimenPickupStates {IDLE, PICKUP, WAIT, DROPTAIL}
-    SpecimenPickupStates specimenPickupState = SpecimenPickupStates.IDLE;
 
     public ExtraOpModeFunctions(HardwareMap hardwareMap, LinearOpMode linearOpMode)
     {
@@ -106,13 +80,6 @@ public class ExtraOpModeFunctions
         localLop = linearOpMode;
         vision = new VisionFunctions(hardwareMap, localLop);
 
-        //intake = hardwareMap.get(CRServo.class, "intake");
-        //intake.setDirection(CRServo.Direction.FORWARD);
-        //intake.setPower(0);
-
-        s1 = hardwareMap.get(Servo.class, "s1");
-        s2 = hardwareMap.get(Servo.class, "s2");
-        s3 = hardwareMap.get(Servo.class, "s3");
         turret = hardwareMap.get(CRServo.class, "turret");
         turret.setDirection(DcMotorSimple.Direction.REVERSE);
         turretLimit = hardwareMap.get(DigitalChannel.class, "turretLimit");
@@ -168,70 +135,6 @@ public class ExtraOpModeFunctions
         intake2.setPower(0);
     }
 
-
-
-    public void s1up()
-    {
-        s1.setPosition(0);
-    }
-
-    public void s1down()
-    {
-        s1.setPosition(1);
-    }
-    public void s2up()
-    {
-        s2.setPosition(0);
-    }
-
-    public void s2down()
-    {
-        s2.setPosition(1);
-    }
-    public void s3up()
-    {
-        s3.setPosition(0);
-    }
-
-    public void s3down()
-    {
-        s3.setPosition(1);
-    }
-    public double s4position = 0.5;
-    public void s4up()
-    {
-        if(s4position < 1) {
-            s4position += 0.001;
-        }
-        turret.setPower(s4position);
-    }
-    public void s4Down()
-    {
-        if(s4position > 0) {
-            s4position -= 0.001;
-        }
-        turret.setPower(s4position);
-    }
-
-
-
-    public enum ArmPosition {STOP, EXTEND, RETRACT, HORIZONTAL, VERTICAL, HANG1, HANG2,HOME}
-    ArmPosition armPosition = ArmPosition.STOP;
-
-    /*
-    public void setElevatorPosition(int target)
-    {
-        elevatorLeft.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        elevatorRight.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        elevatorLeft.setTargetPosition(target);
-        elevatorRight.setTargetPosition(target);
-        elevatorLeft.setPower(1.0);
-        elevatorRight.setPower(1.0);
-    }
-    */
-
-    public boolean armMoving = false;
-    public int step = 0;
 
     public double adjustAngleForDriverPosition(double angle, RobotStartPosition robotStartPosition)
     {
