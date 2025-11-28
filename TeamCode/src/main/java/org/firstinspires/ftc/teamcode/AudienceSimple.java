@@ -5,8 +5,6 @@ import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.SECONDS;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.ProfileAccelConstraint;
-import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -27,12 +25,11 @@ public class AudienceSimple extends LinearOpMode
     {
         double initialRotation = 270;
         Pose2d initPose = new Pose2d(0,0,Math.toRadians(initialRotation));
-        Pose2d offLine = new Pose2d(0,10,Math.toRadians(270));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
         VisionFunctions vision = new VisionFunctions(hardwareMap, this);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
-        AutoInit autoInit = new AutoInit(this, extras, vision);
+        AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
 
         telemetry.addLine("Initialized");
         //telemetry.addData("x", drive.pose.position.x);
@@ -47,11 +44,15 @@ public class AudienceSimple extends LinearOpMode
 
         while (!isStopRequested() && !opModeIsActive())
         {
-            autoInit.autoInitFunction();
+            autoFun.autoInitFunction();
             safeWaitSeconds(0.01);
 
             telemetry.update();
         }
+
+        Pose2d toFirstArtifacts = new Pose2d(autoFun.redBlue(30),-30,Math.toRadians(270));
+        Pose2d pickUpFirstArtifacts = new Pose2d(autoFun.redBlue(30),-40,Math.toRadians(270));
+        Pose2d backToLaunchZone = new Pose2d(autoFun.redBlue(0),0,Math.toRadians(270));
 
         // AFTER START IS PRESSED
 
@@ -62,12 +63,12 @@ public class AudienceSimple extends LinearOpMode
         ElapsedTime timer = new ElapsedTime(SECONDS);
         timer.reset();
         ExtraOpModeFunctions.TrackDepotState shooterReady = ExtraOpModeFunctions.TrackDepotState.NOTFOUND;
-        while (!isStopRequested() && (shooterReady != ExtraOpModeFunctions.TrackDepotState.ONTARGET) && (timer.time() < 10))
+        while (!isStopRequested() && (shooterReady != ExtraOpModeFunctions.TrackDepotState.ONTARGET) && (timer.time() < 5))
         {
             shooterReady = extras.trackDepot();
         }
 
-        safeWaitSeconds(autoInit.startDelay);
+        safeWaitSeconds(autoFun.startDelay);
 
         // shoot the artifacts if on target
         if (shooterReady == ExtraOpModeFunctions.TrackDepotState.ONTARGET)
@@ -78,10 +79,13 @@ public class AudienceSimple extends LinearOpMode
         }
 
         // drive off the line
-        Action DriveOfflineAction = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(offLine.position, offLine.heading, new TranslationalVelConstraint(50.0), new ProfileAccelConstraint(-50,50))
+        Action PickupFirstArtifacts = drive.actionBuilder(drive.localizer.getPose())
+                //.strafeToLinearHeading(toFirstArtifacts.position, toFirstArtifacts.heading, new TranslationalVelConstraint(50.0), new ProfileAccelConstraint(-50,50))
+                .strafeToLinearHeading(toFirstArtifacts.position, toFirstArtifacts.heading)
+                .strafeToLinearHeading(pickUpFirstArtifacts.position, pickUpFirstArtifacts.heading)
+                .strafeToLinearHeading(backToLaunchZone.position, backToLaunchZone.heading)
                 .build();
-        Actions.runBlocking(DriveOfflineAction);
+        Actions.runBlocking(PickupFirstArtifacts);
 
         safeWaitSeconds(3);
 

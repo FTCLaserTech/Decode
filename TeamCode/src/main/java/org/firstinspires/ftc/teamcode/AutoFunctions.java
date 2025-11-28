@@ -4,7 +4,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
@@ -12,20 +11,37 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 @Config
 
 
-public class AutoInit {
+public class AutoFunctions
+{
     public LinearOpMode localLop = null;
     public VisionFunctions localVision = null;
     public ExtraOpModeFunctions localExtras = null;
 
     public double startDelay = 0.0;
 
-    public AutoInit(LinearOpMode linearOpMode, ExtraOpModeFunctions extras, VisionFunctions vision) {
+    public AutoFunctions(LinearOpMode linearOpMode, ExtraOpModeFunctions extras, VisionFunctions vision) {
         localLop = linearOpMode;
         localVision = vision;
         localExtras = extras;
     }
 
-    public void autoInitFunction() {
+    public void autoInitFunction()
+    {
+        // use g1 x button to change red/blue
+        if(localLop.gamepad1.xWasPressed())
+        {
+            if(localExtras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
+            {
+                localExtras.teamColor = ExtraOpModeFunctions.TeamColor.BLUE;
+            }
+            else
+            {
+                localExtras.teamColor = ExtraOpModeFunctions.TeamColor.RED;
+            }
+
+            localExtras.saveTeamColor(localExtras.teamColor);
+        }
+        localLop.telemetry.addData("Team Color - gp1 x: ", localExtras.teamColor);
 
         // use gp1 dpad up down buttons to add a delay after start
         if(localLop.gamepad1.dpadUpWasPressed())
@@ -38,16 +54,6 @@ public class AutoInit {
             startDelay = Math.max(0,startDelay);
         }
         localLop.telemetry.addData("Start Delay - gp1 dup, ddn: ", startDelay);
-
-        // use g1 x button to change red/blue
-        if(localLop.gamepad1.xWasPressed())
-        {
-            if(localExtras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
-                localExtras.teamColor = ExtraOpModeFunctions.TeamColor.BLUE;
-            else
-                localExtras.teamColor = ExtraOpModeFunctions.TeamColor.RED;
-        }
-        localLop.telemetry.addData("Team Color - gp1 x: ", localExtras.teamColor);
 
         // use g1 a button to check obelisk and point at depot
         if(localLop.gamepad1.a)
@@ -99,8 +105,18 @@ public class AutoInit {
             }
             localLop.telemetry.addLine("Vision Check - g1 a");
         }
-
     }
 
+    public double redBlue(double value)
+    {
+        if(localExtras.teamColor == ExtraOpModeFunctions.TeamColor.BLUE)
+        {
+            return(-value);
+        }
+        else
+        {
+            return(value);
+        }
+    }
 }
 

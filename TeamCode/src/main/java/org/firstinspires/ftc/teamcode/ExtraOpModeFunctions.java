@@ -5,7 +5,6 @@ package org.firstinspires.ftc.teamcode;
 import static java.lang.Math.abs;
 
 import android.os.Environment;
-import android.util.Size;
 
 import androidx.annotation.NonNull;
 
@@ -21,19 +20,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,9 +32,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.sql.Time;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 @Config
@@ -64,10 +52,11 @@ public class ExtraOpModeFunctions
 
     public DcMotorEx shooter1;
     public DcMotorEx shooter2;
-    public DcMotorEx intake1;
-    public DcMotorEx intake2;
+    public DcMotorEx intake;
+    public Servo ballStop;
     public CRServo turret;
-    public DigitalChannel turretLimit;  // Digital channel Object
+    public DigitalChannel turretLimitCW;  // Digital channel Object
+    public DigitalChannel turretLimitCCW;  // Digital channel Object
     public Servo light;
 
     public static double Light_Green = 0.500;
@@ -94,8 +83,10 @@ public class ExtraOpModeFunctions
 
         turret = hardwareMap.get(CRServo.class, "turret");
         turret.setDirection(DcMotorSimple.Direction.REVERSE);
-        turretLimit = hardwareMap.get(DigitalChannel.class, "turretLimit");
-        turretLimit.setMode(DigitalChannel.Mode.INPUT);
+        turretLimitCW = hardwareMap.get(DigitalChannel.class, "turretLimitCW");
+        turretLimitCW.setMode(DigitalChannel.Mode.INPUT);
+        turretLimitCCW = hardwareMap.get(DigitalChannel.class, "turretLimitCCW");
+        turretLimitCCW.setMode(DigitalChannel.Mode.INPUT);
 
         shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
         shooter1.setDirection(DcMotorEx.Direction.FORWARD);
@@ -109,57 +100,41 @@ public class ExtraOpModeFunctions
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter2.setVelocity(0.0);
 
-        intake1 = hardwareMap.get(DcMotorEx.class, "intakeIn");
-        intake1.setDirection(DcMotorEx.Direction.FORWARD);
-        intake1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        intake1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        intake1.setVelocity(0.0);
+        intake = hardwareMap.get(DcMotorEx.class, "intake");
+        intake.setDirection(DcMotorEx.Direction.FORWARD);
+        intake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intake.setVelocity(0.0);
 
-        intake2 = hardwareMap.get(DcMotorEx.class, "intakeOut");
-        intake2.setDirection(DcMotorEx.Direction.REVERSE);
-        intake2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        intake2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        intake2.setVelocity(0.0);
+        ballStop = hardwareMap.get(Servo.class, "ballStop");
 
         light = hardwareMap.get(Servo.class, "light");
 
     }
 
-
-    public void intake1Forward()
-    {
-        intake1.setPower(1);
-    }
-    public void intake1Reverse()
-    {
-        intake1.setPower(-1);
-    }
-    public void intake1Off()
-    {
-        intake1.setPower(0);
-    }
-
-    public void intake2Forward() {
-        intake2.setPower(1);
-    }
-    public void intake2Reverse() {
-        intake2.setPower(-1);
-    }
-    public void intake2Off()
-    {
-        intake2.setPower(0);
-    }
-
     public void intakeForward()
     {
-        intake1Forward();
-        intake2Forward();
+        intake.setPower(1.0);
     }
 
     public void intakeOff()
     {
-        intake1Off();
-        intake2Off();
+        intake.setPower(0.0);
+    }
+
+    public void intakeReverse()
+    {
+        intake.setPower(-1.0);
+    }
+
+    public void ballStopOn()
+    {
+        ballStop.setPosition(1.0);
+    }
+
+    public void ballStopOff()
+    {
+        ballStop.setPosition(0.0);
     }
 
     public void setShooter(double shooterSpeed)
@@ -206,7 +181,7 @@ public class ExtraOpModeFunctions
         directory.mkdir();
         try
         {
-            fileWriter = new FileWriter(directoryPath+"/"+TEAM_LOG+".csv");
+            fileWriter = new FileWriter(directoryPath+"/.csv");
             fileWriter.write(angle.toString());
             fileWriter.close();
         }
@@ -223,7 +198,7 @@ public class ExtraOpModeFunctions
         directory.mkdir();
         try
         {
-            BufferedReader br = new BufferedReader(new FileReader(directoryPath+"/"+TEAM_LOG+".csv"));
+            BufferedReader br = new BufferedReader(new FileReader(directoryPath+"/START_ROTATION.csv"));
             angle = Double.parseDouble(br.readLine());
             br.close();
         }
@@ -232,6 +207,41 @@ public class ExtraOpModeFunctions
             e.printStackTrace();
         }
         return(angle);
+    }
+    public void saveTeamColor(TeamColor teamColor)
+    {
+        Writer fileWriter;
+        String directoryPath = Environment.getExternalStorageDirectory().getPath()+"/"+BASE_FOLDER_NAME;
+        File directory = new File(directoryPath);
+        directory.mkdir();
+        try
+        {
+            fileWriter = new FileWriter(directoryPath+"/TEAM_COLOR.csv");
+            fileWriter.write(teamColor.toString());
+            fileWriter.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+    public TeamColor readTeamColor()
+    {
+        TeamColor teamColor = TeamColor.RED;
+        String directoryPath = Environment.getExternalStorageDirectory().getPath()+"/"+BASE_FOLDER_NAME;
+        File directory = new File(directoryPath);
+        directory.mkdir();
+        try
+        {
+            BufferedReader br = new BufferedReader(new FileReader(directoryPath+"/TEAM_COLOR.csv"));
+            teamColor = TeamColor.valueOf(br.readLine());
+            br.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return(teamColor);
     }
 
     public enum SearchingDirection {LEFT,RIGHT};
@@ -261,7 +271,7 @@ public class ExtraOpModeFunctions
         lastTargetHeading = targetHeading;
         if(aprilTagPose == null) // AprilTag not found
         {
-            if(turretLimit.getState() == false)
+            if(turretLimitCW.getState() == false)
             {
                 turretPower = -turretPower;
             }
@@ -281,7 +291,7 @@ public class ExtraOpModeFunctions
                     turretPower = 1.0;
             }
 
-            if(turretLimit.getState() == false)
+            if(turretLimitCW.getState() == false)
             {
                 if(limitDirection == LimitDirection.NA)
                 {

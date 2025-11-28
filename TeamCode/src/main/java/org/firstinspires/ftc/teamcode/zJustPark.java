@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Config
@@ -25,12 +26,13 @@ public class zJustPark extends LinearOpMode
     {
         double initialRotation = 270;
         Pose2d initPose = new Pose2d(0,0,Math.toRadians(initialRotation));
-        Pose2d offLine = new Pose2d(0,10,Math.toRadians(270));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
         VisionFunctions vision = new VisionFunctions(hardwareMap, this);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
-        AutoInit autoInit = new AutoInit(this, extras, vision);
+        AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
+
+        extras.teamColor = extras.readTeamColor();
 
         telemetry.addLine("Initialized");
         //telemetry.addData("x", drive.pose.position.x);
@@ -39,24 +41,24 @@ public class zJustPark extends LinearOpMode
         telemetry.update();
 
         VisionFunctions.ObeliskPattern obelisk;
-
-        AprilTagPoseFtc cam;
         AprilTagPoseFtc ll;
 
         while (!isStopRequested() && !opModeIsActive())
         {
-            autoInit.autoInitFunction();
+            autoFun.autoInitFunction();
             safeWaitSeconds(0.01);
 
             telemetry.update();
         }
+
+        Pose2d offLine = new Pose2d(autoFun.redBlue(0),-20,Math.toRadians(270));
 
         // AFTER START IS PRESSED
 
         // turn on the LimeLight
         vision.limelight.start();
 
-        safeWaitSeconds(autoInit.startDelay);
+        safeWaitSeconds(autoFun.startDelay);
 
         // drive off the line
         Action DriveOfflineAction = drive.actionBuilder(drive.localizer.getPose())
@@ -67,7 +69,9 @@ public class zJustPark extends LinearOpMode
         safeWaitSeconds(3);
 
         // Save the ending location
-        //extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);
+        extras.saveAutoStartRotation(drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+        // Save the team color
+        extras.saveTeamColor(extras.teamColor);
     }
 
     public void safeWaitSeconds(double time)

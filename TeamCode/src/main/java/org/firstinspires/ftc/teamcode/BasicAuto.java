@@ -27,21 +27,11 @@ public class BasicAuto extends LinearOpMode
     {
         double initialRotation = 270;
         Pose2d initPose = new Pose2d(0,0,Math.toRadians(initialRotation));
-        Pose2d toSubmursible = new Pose2d(-12,30,Math.toRadians(270));
-        Pose2d backUpFromSubmursible = new Pose2d(20,26,Math.toRadians(270));
-        Pose2d lineUpForSweep = new Pose2d(30,50,Math.toRadians(270));
-        Pose2d slideOver1 = new Pose2d(36,53,Math.toRadians(270));
-        Pose2d sweep = new Pose2d(35,10,Math.toRadians(270));
-        Pose2d backTo1 = new Pose2d(35,52,Math.toRadians(270));
-        Pose2d slideOver2 = new Pose2d(47,52,Math.toRadians(270));
-        Pose2d sweep2 = new Pose2d(47,10,Math.toRadians(270));
-        Pose2d park = new Pose2d(-20,-2,Math.toRadians(265));
-
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
         VisionFunctions vision = new VisionFunctions(hardwareMap, this);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
-        AutoInit autoInit = new AutoInit(this, extras, vision);
+        AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
 
         telemetry.addLine("Initialized");
         //telemetry.addData("x", drive.pose.position.x);
@@ -56,7 +46,7 @@ public class BasicAuto extends LinearOpMode
 
         while (!isStopRequested() && !opModeIsActive())
         {
-            autoInit.autoInitFunction();
+            autoFun.autoInitFunction();
             safeWaitSeconds(0.01);
 
             /*
@@ -77,7 +67,17 @@ public class BasicAuto extends LinearOpMode
             telemetry.update();
         }
 
-        safeWaitSeconds(autoInit.startDelay);
+        Pose2d toSubmursible = new Pose2d(-12,30,Math.toRadians(270));
+        Pose2d backUpFromSubmursible = new Pose2d(20,26,Math.toRadians(270));
+        Pose2d lineUpForSweep = new Pose2d(30,50,Math.toRadians(270));
+        Pose2d slideOver1 = new Pose2d(36,53,Math.toRadians(270));
+        Pose2d sweep = new Pose2d(35,10,Math.toRadians(270));
+        Pose2d backTo1 = new Pose2d(35,52,Math.toRadians(270));
+        Pose2d slideOver2 = new Pose2d(47,52,Math.toRadians(270));
+        Pose2d sweep2 = new Pose2d(47,10,Math.toRadians(270));
+        Pose2d park = new Pose2d(-20,-2,Math.toRadians(265));
+
+        safeWaitSeconds(autoFun.startDelay);
 
         // power up and aim the shooter
 

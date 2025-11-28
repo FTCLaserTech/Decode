@@ -9,10 +9,10 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -36,8 +36,6 @@ public class VisionFunctions {
 
     public LinearOpMode localLop = null;
     public HardwareMap hm = null;
-
-    public CRServo intake;
 
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
@@ -69,9 +67,77 @@ public class VisionFunctions {
         colorSensor2.setGain(gain);
         colorSensor3.setGain(gain);
 
-        initCameraAprilTag();
+        //initCameraAprilTag();
         initLimelight();
 
+    }
+
+    public void readColorSensors()
+    {
+        NormalizedRGBA colors1;
+        NormalizedRGBA colors2;
+        NormalizedRGBA colors3;
+
+        String slot1Detections = "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN";
+        String slot2Detections = "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN";
+        String slot3Detections = "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNN";
+        String slot1Artifact = "N";
+        String slot2Artifact = "N";
+        String slot3Artifact = "N";
+
+        colors1 = colorSensor1.getNormalizedColors();
+        colors2 = colorSensor2.getNormalizedColors();
+        colors3 = colorSensor3.getNormalizedColors();
+
+        slot1Detections = checkArtifact(colors1.green, colors1.blue) + slot1Detections.substring(0, slot1Detections.length() - 1);
+        slot2Detections = checkArtifact(colors2.green, colors2.blue) + slot2Detections.substring(0, slot2Detections.length() - 1);
+        slot3Detections = checkArtifact(colors3.green, colors3.blue) + slot3Detections.substring(0, slot3Detections.length() - 1);
+
+        if(slot1Detections.indexOf("G") != -1)
+            slot1Artifact = "G";
+        else if(slot1Detections.indexOf("P") != -1)
+            slot1Artifact = "P";
+        else
+            slot1Artifact = "N";
+
+        if(slot2Detections.indexOf("G") != -1)
+            slot2Artifact = "G";
+        else if(slot2Detections.indexOf("P") != -1)
+            slot2Artifact = "P";
+        else
+            slot2Artifact = "N";
+
+        if(slot3Detections.indexOf("G") != -1)
+            slot3Artifact = "G";
+        else if(slot3Detections.indexOf("P") != -1)
+            slot3Artifact = "P";
+        else
+            slot3Artifact = "N";
+
+        localLop.telemetry.addLine(slot1Artifact + " " + slot2Artifact + " " + slot3Artifact);
+    }
+
+    String checkArtifact(float green, float blue)
+    {
+        double threshold = 0.020;
+        if((green>threshold) && (blue>threshold))
+        {
+            if (green > blue)
+            {
+                //telemetry.addLine("Green");
+                return("G");
+            }
+            else
+            {
+                //telemetry.addLine("Purple");
+                return("P");
+            }
+        }
+        else
+        {
+            //telemetry.addLine("No Ball");
+            return("N");
+        }
     }
 
     public void initLimelight() {
@@ -313,47 +379,43 @@ public class VisionFunctions {
     }   // end method readBlueAprilTag_cam()
 
     /**
-     * Read the Red AprilTag with the camera
+     * Read the Depot AprilTag with the camera
      */
-    public AprilTagPoseFtc readRedAprilTag_ll()
+    public AprilTagPoseFtc readDepotAprilTag_ll(int idColor)
     {
         AprilTagPoseFtc pose = null;
         LLResult llResult = limelight.getLatestResult();
         List<LLResultTypes.FiducialResult> fiducials = llResult.getFiducialResults();
-        for (LLResultTypes.FiducialResult fiducial : fiducials) {
+        for (LLResultTypes.FiducialResult fiducial : fiducials)
+        {
             int id = fiducial.getFiducialId(); // The ID number of the fiducial
-            if (id == 24) {
+            if (id == idColor)
+            {
                 Pose3D pose3d = fiducial.getTargetPoseCameraSpace();
-                //Pose3D pose3d = fiducial.getTargetPoseRobotSpace();
                 pose = pose3D_to_AprilTagPoseFtc(pose3d);
-
-                localLop.telemetry.addLine("Red Limelight ");
                 //printpose(pose);
             }
         }
         return pose;
-    }   // end method readRedAprilTag_cam()/**
+    }   // end method readDepotAprilTag_ll()
+
+    /**
+     * Read the Red AprilTag with the camera
+     */
+    public AprilTagPoseFtc readRedAprilTag_ll()
+    {
+        localLop.telemetry.addLine("Red Limelight ");
+        return readDepotAprilTag_ll(24);
+    }   // end method readRedAprilTag_ll()/**
 
     /**
      * Read the Blue AprilTag with the camera
      */
     public AprilTagPoseFtc readBlueAprilTag_ll()
     {
-        AprilTagPoseFtc pose = null;
-        LLResult llResult = limelight.getLatestResult();
-        List<LLResultTypes.FiducialResult> fiducials = llResult.getFiducialResults();
-        for (LLResultTypes.FiducialResult fiducial : fiducials) {
-            int id = fiducial.getFiducialId(); // The ID number of the fiducial
-            if (id == 20) {
-                Pose3D pose3d = fiducial.getTargetPoseRobotSpace();
-                pose = pose3D_to_AprilTagPoseFtc(pose3d);
-
-                localLop.telemetry.addLine("Blue Limelight ");
-                printpose(pose);
-            }
-        }
-        return pose;
-    }   // end method readBlueAprilTag_cam()
+        localLop.telemetry.addLine("Blue Limelight ");
+        return readDepotAprilTag_ll(20);
+    }   // end method readBlueAprilTag_ll()
 
     public AprilTagPoseFtc pose3D_to_AprilTagPoseFtc(Pose3D pose3d)
     {
