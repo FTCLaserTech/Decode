@@ -109,6 +109,7 @@ public class ExtraOpModeFunctions
         ballStop = hardwareMap.get(Servo.class, "ballStop");
 
         light = hardwareMap.get(Servo.class, "light");
+        light.setPosition(Light_Green);
 
     }
 
