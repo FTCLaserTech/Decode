@@ -23,6 +23,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
@@ -55,8 +56,8 @@ public class ExtraOpModeFunctions
     public DcMotorEx intake;
     public Servo ballStop;
     public CRServo turret;
-    public DigitalChannel turretLimitCW;  // Digital channel Object
-    public DigitalChannel turretLimitCCW;  // Digital channel Object
+    public TouchSensor turretLimitCW;  // Digital channel Object
+    public TouchSensor turretLimitCCW;  // Digital channel Object
     public Servo light;
 
     public static double Light_Green = 0.500;
@@ -83,10 +84,10 @@ public class ExtraOpModeFunctions
 
         turret = hardwareMap.get(CRServo.class, "turret");
         turret.setDirection(DcMotorSimple.Direction.REVERSE);
-        turretLimitCW = hardwareMap.get(DigitalChannel.class, "turretLimitCW");
-        turretLimitCW.setMode(DigitalChannel.Mode.INPUT);
-        turretLimitCCW = hardwareMap.get(DigitalChannel.class, "turretLimitCCW");
-        turretLimitCCW.setMode(DigitalChannel.Mode.INPUT);
+        turretLimitCW = hardwareMap.get(TouchSensor.class, "turretLimitCW");
+        //turretLimitCW.setMode(DigitalChannel.Mode.INPUT);
+        turretLimitCCW = hardwareMap.get(TouchSensor.class, "turretLimitCCW");
+        //turretLimitCCW.setMode(DigitalChannel.Mode.INPUT);
 
         shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
         shooter1.setDirection(DcMotorEx.Direction.FORWARD);
@@ -246,12 +247,10 @@ public class ExtraOpModeFunctions
     }
 
     public enum SearchingDirection {LEFT,RIGHT};
-    public enum LimitDirection {NA,CW,CCW};
     double targetHeading = 0.0;
     double lastTargetHeading = 0.0;
     double turretPower = 0.5;
     SearchingDirection targetSearchingDirection = SearchingDirection.LEFT;
-    LimitDirection limitDirection = LimitDirection.NA;
     double targetRange = 0.0;
 
     public TrackDepotState trackDepot()
@@ -272,7 +271,12 @@ public class ExtraOpModeFunctions
         lastTargetHeading = targetHeading;
         if(aprilTagPose == null) // AprilTag not found
         {
-            if(turretLimitCW.getState() == false)
+            if(turretLimitCW.isPressed())
+            {
+                turretPower = -turretPower;
+            }
+
+            if(turretLimitCCW.isPressed())
             {
                 turretPower = -turretPower;
             }
@@ -292,31 +296,13 @@ public class ExtraOpModeFunctions
                     turretPower = 1.0;
             }
 
-            if(turretLimitCW.getState() == false)
+            if((turretLimitCW.isPressed())&&(targetHeading>0))
             {
-                if(limitDirection == LimitDirection.NA)
-                {
-                    if(targetHeading > 0)
-                    {
-                        limitDirection = LimitDirection.CW;
-                    }
-                    else
-                    {
-                        limitDirection = LimitDirection.CCW;
-                    }
-                }
-                if((limitDirection == LimitDirection.CW)&&(targetHeading>0))
-                {
-                    turretPower = 0.0;
-                }
-                else if((limitDirection ==LimitDirection.CCW)&&(targetHeading<0))
-                {
-                    turretPower = 0.0;
-                }
+                turretPower = 0.0;
             }
-            else
+            else if((turretLimitCCW.isPressed())&&(targetHeading<0))
             {
-                limitDirection =LimitDirection.NA;
+                turretPower = 0.0;
             }
 
             // range

@@ -133,21 +133,14 @@ public class BasicTeleOp extends LinearOpMode
             {
                 lightColor = extras.Light_Purple;
                 // buttons for rotate
-                if((extras.turretLimitCW.getState() == false) || (extras.turretLimitCCW.getState() == false))
+                extras.turretPower = gamepad2.left_stick_x * 0.5;
+                if((extras.turretLimitCW.isPressed())&&(extras.turretPower>0))
                 {
-                    if (extras.turretPower == 0)
-                    {
-                        ;
-                    }
-                    else if (extras.turretPower > 0)
-                    {
-                        extras.limitDirection = ExtraOpModeFunctions.LimitDirection.CW;
-                    }
-                    else
-                    {
-                        extras.limitDirection = ExtraOpModeFunctions.LimitDirection.CCW;
-                    }
-                    extras.turretPower = -extras.turretPower;
+                    extras.turretPower = 0.0;
+                }
+                else if((extras.turretLimitCCW.isPressed())&&(extras.turretPower<0))
+                {
+                    extras.turretPower = 0.0;
                 }
                 extras.turret.setPower(gamepad2.left_stick_x * 0.5);
 

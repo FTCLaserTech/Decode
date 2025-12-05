@@ -67,6 +67,7 @@ public class AudienceSimple extends LinearOpMode
         {
             shooterReady = extras.trackDepot();
         }
+        extras.setShooter(0.0);
 
         safeWaitSeconds(autoFun.startDelay);
 
