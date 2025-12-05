@@ -136,7 +136,7 @@ public class ExtraOpModeFunctions
 
     public void ballStopOff()
     {
-        ballStop.setPosition(0.0);
+        ballStop.setPosition(0.5);
     }
 
     public void setShooter(double shooterSpeed)

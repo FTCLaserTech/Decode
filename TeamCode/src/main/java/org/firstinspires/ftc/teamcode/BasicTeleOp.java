@@ -191,21 +191,15 @@ public class BasicTeleOp extends LinearOpMode
             telemetry.addData("Shooter1 velocity actual: ", extras.shooter1.getVelocity());
             telemetry.addData("Shooter2 velocity actual: ", extras.shooter2.getVelocity());
 
-            // intake control
-            if (gamepad1.right_trigger > 0)
-            {
-                extras.intakeForward();
-            }
-            else
-            {
-                extras.intakeOff();
-            }
-
             // intake and shooter control
             if (gamepad1.left_trigger > 0)
             {
                 extras.intakeForward();
                 extras.ballStopOff();
+            }
+            else if (gamepad1.right_trigger > 0)
+            {
+                extras.intakeForward();
             }
             else
             {
