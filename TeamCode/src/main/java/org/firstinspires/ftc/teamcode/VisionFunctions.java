@@ -392,11 +392,11 @@ public class VisionFunctions {
             if (id == idColor)
             {
                 Pose3D pose3d = fiducial.getTargetPoseCameraSpace();
-                pose = pose3D_to_AprilTagPoseFtc(pose3d);
+                return(pose3D_to_AprilTagPoseFtc(pose3d));
                 //printpose(pose);
             }
         }
-        return pose;
+        return null;
     }   // end method readDepotAprilTag_ll()
 
     /**

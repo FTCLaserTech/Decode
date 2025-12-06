@@ -88,6 +88,8 @@ public class BasicTeleOp extends LinearOpMode
 
         waitForStart();
 
+        extras.vision.limelight.start();
+
         while (!isStopRequested())
         {
             // change team color if needed
@@ -115,6 +117,7 @@ public class BasicTeleOp extends LinearOpMode
             if (targeting == Targeting.AUTO)
             {
                 ExtraOpModeFunctions.TrackDepotState trackDepotState = extras.trackDepot();
+                telemetry.addData("Track Depot State: ", trackDepotState);
                 switch (trackDepotState)
                 {
                     case NOTFOUND:
@@ -142,7 +145,7 @@ public class BasicTeleOp extends LinearOpMode
                 {
                     extras.turretPower = 0.0;
                 }
-                extras.turret.setPower(gamepad2.left_stick_x * 0.5);
+                extras.turret.setPower(extras.turretPower * 0.5);
 
                 // buttons for range
                 if (gamepad2.dpadUpWasPressed())
@@ -163,7 +166,11 @@ public class BasicTeleOp extends LinearOpMode
                 }
             }
 
-            extras.light.setPosition(lightColor);
+            extras.light1.setPosition(lightColor);
+            extras.light2.setPosition(lightColor);
+
+            telemetry.addData("CW Limit: ", extras.turretLimitCW.isPressed());
+            telemetry.addData("CCW Limit: ", extras.turretLimitCCW.isPressed());
 
             //extras.vision.readColorSensors();
 

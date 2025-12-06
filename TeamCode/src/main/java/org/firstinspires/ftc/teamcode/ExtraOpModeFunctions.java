@@ -58,7 +58,8 @@ public class ExtraOpModeFunctions
     public CRServo turret;
     public TouchSensor turretLimitCW;  // Digital channel Object
     public TouchSensor turretLimitCCW;  // Digital channel Object
-    public Servo light;
+    public Servo light1;
+    public Servo light2;
 
     public static double Light_Green = 0.500;
     public static double Light_Red = 0.280;
@@ -109,8 +110,10 @@ public class ExtraOpModeFunctions
 
         ballStop = hardwareMap.get(Servo.class, "ballStop");
 
-        light = hardwareMap.get(Servo.class, "light");
-        light.setPosition(Light_Green);
+        light1 = hardwareMap.get(Servo.class, "light1");
+        light2 = hardwareMap.get(Servo.class, "light2");
+        light1.setPosition(Light_Green);
+        light2.setPosition(Light_Green);
 
     }
 
@@ -265,12 +268,10 @@ public class ExtraOpModeFunctions
         else
             aprilTagPose = vision.readBlueAprilTag_ll();
 
-        localLop.telemetry.addData("turret power: ", turretPower);
-        localLop.telemetry.addData("target heading: ", targetHeading);
-
         lastTargetHeading = targetHeading;
         if(aprilTagPose == null) // AprilTag not found
         {
+            localLop.telemetry.addLine("No April Tag");
             if(turretLimitCW.isPressed())
             {
                 turretPower = -turretPower;
@@ -283,6 +284,11 @@ public class ExtraOpModeFunctions
         }
         else // AprilTag found
         {
+            localLop.telemetry.addLine("April Tag Found");
+
+            targetHeading = aprilTagPose.bearing;
+            localLop.telemetry.addData("target heading: ", targetHeading);
+
             if (abs(targetHeading) < 2.0)
             {
                 turretPower = 0;
@@ -296,21 +302,30 @@ public class ExtraOpModeFunctions
                     turretPower = 1.0;
             }
 
-            if((turretLimitCW.isPressed())&&(targetHeading>0))
+            if((turretLimitCW.isPressed())&&(targetHeading<0))
             {
                 turretPower = 0.0;
             }
-            else if((turretLimitCCW.isPressed())&&(targetHeading<0))
+            else if((turretLimitCCW.isPressed())&&(targetHeading>0))
             {
                 turretPower = 0.0;
             }
 
             // range
             targetRange = aprilTagPose.range;
+            localLop.telemetry.addData("targetRange: ", targetRange);
             // insert range to speed function
-            double shooterSpeed = 0.0;
-            setShooter(shooterSpeed);
-            if(abs(getShooter()-shooterSpeed) < 50)
+            //double shooterSpeed = 0.0;
+            if(targetRange>65)
+            {
+                shooterVelocity = 1800;
+            }
+            else
+            {
+                shooterVelocity = 1.5 * targetRange + 1.5;
+            }
+            //setShooter(shooterSpeed);
+            if(abs(getShooter()-shooterVelocity) < 50)
             {
                 rangeGood = true;
             }
@@ -360,7 +375,7 @@ public class ExtraOpModeFunctions
                 +y2*(angle-x1)*(angle-x3)/((x2-x1)*(x2-x3))
                 +y3*(angle-x1)*(angle-x2)/((x3-x1)*(x3-x2));
 
-        if(angle<0)
+        if(angle>0)
             y = -y;
         return(y);
     }
