@@ -46,7 +46,7 @@ public class ExtraOpModeFunctions
 
     public enum RobotStartPosition {STRAIGHT, LEFT, RIGHT};
     public enum TeamColor{RED,BLUE};
-    public enum TrackDepotState{NOTFOUND,TARGETING,ONTARGET};
+    public enum TrackDepotState{NOTFOUND,TARGETING, TARGETING_ATSPEED, TARGETING_AIMED,ONTARGET};
     public TeamColor teamColor = TeamColor.RED;
 
     public static final double PI = 3.14159265;
@@ -332,6 +332,14 @@ public class ExtraOpModeFunctions
             {
                 trackDepotState = TrackDepotState.ONTARGET;
             }
+            else if (aimGood)
+            {
+                trackDepotState = TrackDepotState.TARGETING_AIMED;
+            }
+            else if (rangeGood)
+            {
+                trackDepotState = TrackDepotState.TARGETING_ATSPEED;
+            }
             else
             {
                 trackDepotState = TrackDepotState.TARGETING;
@@ -364,7 +372,7 @@ public class ExtraOpModeFunctions
     {
         // fitting a parabola through 3 points
         double x1 = 2.0;  // this is the minimum angle window
-        double y1 = 0.08;  // this point sets the minimum speed close to
+        double y1 = 0.14;  // this point sets the minimum speed close to
         double x2 = 24.0;  // this angle has the maximum speed
         double y2 = 1.0;  // this is the maximum speed - a servo max is 1
         double x3 = -x1;

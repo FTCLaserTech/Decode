@@ -126,7 +126,11 @@ public class BasicTeleOp extends LinearOpMode
                     case ONTARGET:
                         lightColor = extras.Light_Green;
                         break;
+                    case TARGETING_AIMED:
+                        lightColor = extras.Light_Purple;
+                        break;
                     case TARGETING:
+                    case TARGETING_ATSPEED:
                         lightColor = extras.Light_Blue;
                         break;
                 }
