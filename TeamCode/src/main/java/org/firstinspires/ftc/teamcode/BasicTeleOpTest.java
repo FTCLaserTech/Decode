@@ -99,6 +99,8 @@ public class BasicTeleOpTest extends LinearOpMode
                 telemetry.addData("Touch Sensor", "Is Not Pressed");
             }
 
+            telemetry.addData("turretLimitCW: ", extras.turretLimitCW);
+            telemetry.addData("turretLimitCCW: ", extras.turretLimitCCW);
 
             /*
             stickSideways = gamepad1.left_stick_x * speedMultiplier;

@@ -86,9 +86,7 @@ public class ExtraOpModeFunctions
         turret = hardwareMap.get(CRServo.class, "turret");
         turret.setDirection(DcMotorSimple.Direction.REVERSE);
         turretLimitCW = hardwareMap.get(TouchSensor.class, "turretLimitCW");
-        //turretLimitCW.setMode(DigitalChannel.Mode.INPUT);
         turretLimitCCW = hardwareMap.get(TouchSensor.class, "turretLimitCCW");
-        //turretLimitCCW.setMode(DigitalChannel.Mode.INPUT);
 
         shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
         shooter1.setDirection(DcMotorEx.Direction.FORWARD);
@@ -364,10 +362,11 @@ public class ExtraOpModeFunctions
 
     public double angleToSpeed(double angle)
     {
-        double x1 = 2.0;
-        double y1 = 0.05;
-        double x2 = 24.0;
-        double y2 = 1.0;
+        // fitting a parabola through 3 points
+        double x1 = 2.0;  // this is the minimum angle window
+        double y1 = 0.08;  // this point sets the minimum speed close to
+        double x2 = 24.0;  // this angle has the maximum speed
+        double y2 = 1.0;  // this is the maximum speed - a servo max is 1
         double x3 = -x1;
         double y3 = y1;
 

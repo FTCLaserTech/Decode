@@ -50,7 +50,6 @@ public class BasicTeleOp extends LinearOpMode
         double adjustedAngle;
         double speedMultiplier;
 
-
         boolean manualStickMove = false;
 
         double slope;
