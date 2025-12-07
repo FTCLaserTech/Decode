@@ -49,6 +49,7 @@ public class BasicTeleOp extends LinearOpMode
         double stickSidewaysRotated;
         double adjustedAngle;
         double speedMultiplier;
+        double rotationMultiplier;
 
         boolean manualStickMove = false;
 
@@ -92,9 +93,9 @@ public class BasicTeleOp extends LinearOpMode
         while (!isStopRequested())
         {
             // change team color if needed
-            if(gamepad2.xWasPressed())
+            if (gamepad2.xWasPressed())
             {
-                if(extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
+                if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
                     extras.teamColor = ExtraOpModeFunctions.TeamColor.BLUE;
                 else
                     extras.teamColor = ExtraOpModeFunctions.TeamColor.RED;
@@ -121,32 +122,22 @@ public class BasicTeleOp extends LinearOpMode
                 {
                     case NOTFOUND:
                         extras.turret.setPower(gamepad2.left_stick_x * 0.5);
-                        lightColor = extras.Light_Red;
-                        break;
-                    case ONTARGET:
-                        lightColor = extras.Light_Green;
-                        break;
-                    case TARGETING_AIMED:
-                        lightColor = extras.Light_Purple;
-                        break;
-                    case TARGETING:
-                    case TARGETING_ATSPEED:
-                        lightColor = extras.Light_Blue;
                         break;
                 }
             }
             else // manual targeting
             {
-                lightColor = extras.Light_Purple;
-                // buttons for rotate
+                //buttons for rotate
                 extras.turretPower = gamepad2.left_stick_x * 0.5;
-                if((extras.turretLimitCW.isPressed())&&(extras.turretPower>0))
+                if ((extras.turretLimitCW.isPressed()) && (extras.turretPower > 0))
                 {
                     extras.turretPower = 0.0;
+                    //extras.turretPower = -extras.turretPower;
                 }
-                else if((extras.turretLimitCCW.isPressed())&&(extras.turretPower<0))
+                else if ((extras.turretLimitCCW.isPressed()) && (extras.turretPower < 0))
                 {
                     extras.turretPower = 0.0;
+                    //extras.turretPower = -extras.turretPower;
                 }
                 extras.turret.setPower(extras.turretPower * 0.5);
 
@@ -167,10 +158,9 @@ public class BasicTeleOp extends LinearOpMode
                         extras.shooterVelocity = 0.0;
                     }
                 }
+                extras.light1.setPosition(extras.Light_Yellow);
+                extras.light2.setPosition(extras.Light_Yellow);
             }
-
-            extras.light1.setPosition(lightColor);
-            extras.light2.setPosition(lightColor);
 
             telemetry.addData("CW Limit: ", extras.turretLimitCW.isPressed());
             telemetry.addData("CCW Limit: ", extras.turretLimitCCW.isPressed());
@@ -178,31 +168,36 @@ public class BasicTeleOp extends LinearOpMode
             //extras.vision.readColorSensors();
 
             // shooter on/off function
-            if(gamepad1.aWasPressed())
+            if (gamepad1.aWasPressed())
             {
-                if(shooterOn == true)
+                if (shooterOn == true)
                 {
                     shooterOn = false;
-                }
-                else
+                } else
                 {
                     shooterOn = true;
                 }
             }
-            if(shooterOn == true)
+            if(targeting == Targeting.MANUAL)
             {
-                extras.setShooter(extras.shooterVelocity);
-            }
-            else
-            {
-                extras.setShooter(0.0);
+                if (shooterOn == true)
+                {
+                    extras.setShooter(extras.shooterVelocity);
+                } else
+                {
+                    extras.setShooter(0.0);
+                }
             }
             telemetry.addData("Shooter velocity set: ", extras.shooterVelocity);
             telemetry.addData("Shooter1 velocity actual: ", extras.shooter1.getVelocity());
             telemetry.addData("Shooter2 velocity actual: ", extras.shooter2.getVelocity());
 
             // intake and shooter control
-            if (gamepad1.right_trigger > 0)
+            if (gamepad1.right_bumper)
+            {
+                extras.intakeReverse();
+            }
+            else if (gamepad1.right_trigger > 0)
             {
                 extras.intakeForward();
                 extras.ballStopOff();
@@ -210,18 +205,24 @@ public class BasicTeleOp extends LinearOpMode
             else if (gamepad1.left_trigger > 0)
             {
                 extras.intakeForward();
-            }
-            else
+            } else
             {
                 extras.intakeOff();
                 extras.ballStopOn();
             }
 
+
             // DRIVE CONTROL STARTS HERE
             if (gamepad1.left_bumper)
+            {
                 speedMultiplier = 0.55;
+                rotationMultiplier = 0.55;
+            }
             else
-                speedMultiplier = 0.7;
+            {
+                speedMultiplier = 1.0;
+                rotationMultiplier = 1.0;
+            }
 
             //adjustedAngle = 0;
             adjustedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
@@ -249,9 +250,8 @@ public class BasicTeleOp extends LinearOpMode
                             stickSidewaysRotated,
                             stickForwardRotated
                     ),
-                    -gamepad1.right_stick_x
+                    -(gamepad1.right_stick_x * rotationMultiplier)
             ));
-
             if(gamepad2.yWasPressed())
             {
                 //extras.s1down();

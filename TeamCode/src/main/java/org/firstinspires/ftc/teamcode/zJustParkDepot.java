@@ -18,7 +18,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Autonomous(group = "a")
 
-public class zJustPark extends LinearOpMode
+public class zJustParkDepot extends LinearOpMode
 {
     @Override
 
@@ -42,7 +42,6 @@ public class zJustPark extends LinearOpMode
 
         VisionFunctions.ObeliskPattern obelisk;
         AprilTagPoseFtc ll;
-
         while (!isStopRequested() && !opModeIsActive())
         {
             autoFun.autoInitFunction();
@@ -51,7 +50,7 @@ public class zJustPark extends LinearOpMode
             telemetry.update();
         }
 
-        Pose2d offLine = new Pose2d(autoFun.redBlue(0),-20,Math.toRadians(270));
+        Pose2d offLine = new Pose2d(autoFun.redBlueT(-2),20,Math.toRadians(270));
 
         // AFTER START IS PRESSED
 

@@ -65,9 +65,9 @@ public final class MecanumDrive {
         // drive model parameters
         // 2000 counts per revolution
         // 32mm wheel diameter
-        //public double inPerTick  = Math.PI*(32/254.)/2000;
-        public double inPerTick = 0.00153467418;  //Original: 1
-        public double lateralInPerTick = 0.00120701353; // inPerTick;
+        public double inPerTick  = Math.PI*(32/25.4)/2000; // 0.0019789543307087
+        //public double inPerTick = 0.00153467418;  //Original: 1
+        public double lateralInPerTick = 0.0015921910012556975; // inPerTick;
         public double trackWidthTicks = 7582.54866667;  // 0
 
         // feedforward parameters (in tick units)

@@ -42,6 +42,28 @@ public class AutoFunctions
             localExtras.saveTeamColor(localExtras.teamColor);
         }
         localLop.telemetry.addData("Team Color - gp1 x: ", localExtras.teamColor);
+        if(localExtras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
+        {
+            localExtras.light1.setPosition(localExtras.Light_Red);
+            localExtras.light2.setPosition(localExtras.Light_Red);
+        }
+        else
+        {
+            localExtras.light1.setPosition(localExtras.Light_Blue);
+            localExtras.light2.setPosition(localExtras.Light_Blue);
+        }
+
+        // load artifacts
+        localLop.telemetry.addLine("Load Artifacts - gp1 Left Trigger: ");
+        if (localLop.gamepad1.left_trigger > 0)
+        {
+            localExtras.ballStopOn();
+            localExtras.intakeForward();
+        }
+        else
+        {
+            localExtras.intakeOff();
+        }
 
         // use gp1 dpad up down buttons to add a delay after start
         if(localLop.gamepad1.dpadUpWasPressed())
@@ -107,7 +129,7 @@ public class AutoFunctions
         }
     }
 
-    public double redBlue(double value)
+    public double redBlueT(double value)
     {
         if(localExtras.teamColor == ExtraOpModeFunctions.TeamColor.BLUE)
         {
@@ -116,6 +138,18 @@ public class AutoFunctions
         else
         {
             return(value);
+        }
+    }
+
+    public double redBlueR(double start, double value)
+    {
+        if(localExtras.teamColor == ExtraOpModeFunctions.TeamColor.BLUE)
+        {
+            return(start+value);
+        }
+        else
+        {
+            return(start-value);
         }
     }
 }

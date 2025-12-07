@@ -65,13 +65,15 @@ public class ExtraOpModeFunctions
     public static double Light_Red = 0.280;
     public static double Light_Blue = 0.611;
     public static double Light_Purple = 0.666;
+    public static double Light_Yellow = 0.388;
+    double lightColor = Light_Red;
 
 
     double maxShooterRPM = 6000.0;  //RPM
     double shooterTicksPerRev = 28.0;
     double maxShooterTPS = shooterTicksPerRev * maxShooterRPM / 60; // 2800
     double shooterVelocity = 0.0;
-
+    double turretGoodAngle = 1.0;
 
     public RevBlinkinLedDriver blinkinLedDriver;
     public RevBlinkinLedDriver.BlinkinPattern pattern;
@@ -249,8 +251,7 @@ public class ExtraOpModeFunctions
 
     public enum SearchingDirection {LEFT,RIGHT};
     double targetHeading = 0.0;
-    double lastTargetHeading = 0.0;
-    double turretPower = 0.5;
+    double turretPower = 0.0;
     SearchingDirection targetSearchingDirection = SearchingDirection.LEFT;
     double targetRange = 0.0;
 
@@ -266,19 +267,20 @@ public class ExtraOpModeFunctions
         else
             aprilTagPose = vision.readBlueAprilTag_ll();
 
-        lastTargetHeading = targetHeading;
         if(aprilTagPose == null) // AprilTag not found
         {
             localLop.telemetry.addLine("No April Tag");
             if(turretLimitCW.isPressed())
             {
-                turretPower = -turretPower;
+                turretPower = -abs(turretPower);
             }
 
             if(turretLimitCCW.isPressed())
             {
-                turretPower = -turretPower;
+                turretPower = abs(turretPower);
             }
+
+            lightColor = Light_Red;
         }
         else // AprilTag found
         {
@@ -286,8 +288,9 @@ public class ExtraOpModeFunctions
 
             targetHeading = aprilTagPose.bearing;
             localLop.telemetry.addData("target heading: ", targetHeading);
+            localLop.telemetry.addData("target elevation: ", aprilTagPose.elevation);
 
-            if (abs(targetHeading) < 2.0)
+            if (abs(targetHeading) < turretGoodAngle)
             {
                 turretPower = 0;
                 aimGood = true;
@@ -296,34 +299,30 @@ public class ExtraOpModeFunctions
             {
                 //turretPower = (1.0-0.05)/(45.0-2.0)*(targetHeading-2.0)+0.05;
                 turretPower = angleToSpeed(targetHeading);
-                if(turretPower > 1.0)
-                    turretPower = 1.0;
+                //if(turretPower > 1.0)
+                //    turretPower = 1.0;
             }
 
-            if((turretLimitCW.isPressed())&&(targetHeading<0))
+            if((turretLimitCW.isPressed())&&(turretPower>0))
             {
                 turretPower = 0.0;
+                //turretPower = -turretPower;
             }
-            else if((turretLimitCCW.isPressed())&&(targetHeading>0))
+            else if((turretLimitCCW.isPressed())&&(turretPower<0))
             {
                 turretPower = 0.0;
+                //turretPower = -turretPower;
             }
 
             // range
             targetRange = aprilTagPose.range;
             localLop.telemetry.addData("targetRange: ", targetRange);
             // insert range to speed function
-            //double shooterSpeed = 0.0;
-            if(targetRange>65)
-            {
-                shooterVelocity = 1800;
-            }
-            else
-            {
-                shooterVelocity = 1.5 * targetRange + 1.5;
-            }
-            //setShooter(shooterSpeed);
-            if(abs(getShooter()-shooterVelocity) < 50)
+            shooterVelocity = 1049 + (12.8*targetRange) - (0.0294 * targetRange * targetRange);
+            setShooter(shooterVelocity);
+            localLop.telemetry.addData("Shooter velocity set: ", shooterVelocity);
+            localLop.telemetry.addData("Shooter1 velocity actual: ", shooter1.getVelocity());
+            localLop.telemetry.addData("Shooter2 velocity actual: ", shooter2.getVelocity());            if(abs(getShooter()-shooterVelocity) < 50)
             {
                 rangeGood = true;
             }
@@ -331,20 +330,26 @@ public class ExtraOpModeFunctions
             if (aimGood && rangeGood)
             {
                 trackDepotState = TrackDepotState.ONTARGET;
+                lightColor = Light_Green;
             }
             else if (aimGood)
             {
                 trackDepotState = TrackDepotState.TARGETING_AIMED;
+                lightColor = Light_Purple;
             }
             else if (rangeGood)
             {
                 trackDepotState = TrackDepotState.TARGETING_ATSPEED;
+                lightColor = Light_Blue;
             }
             else
             {
                 trackDepotState = TrackDepotState.TARGETING;
+                lightColor = Light_Blue;
             }
         }
+        light1.setPosition(lightColor);
+        light2.setPosition(lightColor);
         turret.setPower(turretPower);
         localLop.telemetry.addData("turret power2: ", turret.getPower());
 
@@ -371,10 +376,10 @@ public class ExtraOpModeFunctions
     public double angleToSpeed(double angle)
     {
         // fitting a parabola through 3 points
-        double x1 = 2.0;  // this is the minimum angle window
-        double y1 = 0.14;  // this point sets the minimum speed close to
-        double x2 = 24.0;  // this angle has the maximum speed
-        double y2 = 1.0;  // this is the maximum speed - a servo max is 1
+        double x1 = turretGoodAngle;  // this is the minimum angle window
+        double y1 = 0.13;  // this point sets the minimum speed close to
+        double x2 = 12.0;  // this angle has the maximum speed
+        double y2 = 0.5;  // this is the maximum speed - a servo max is 1
         double x3 = -x1;
         double y3 = y1;
 
@@ -382,6 +387,10 @@ public class ExtraOpModeFunctions
                 +y2*(angle-x1)*(angle-x3)/((x2-x1)*(x2-x3))
                 +y3*(angle-x1)*(angle-x2)/((x3-x1)*(x3-x2));
 
+        if(y>y2)
+        {
+            y = y2;
+        }
         if(angle>0)
             y = -y;
         return(y);

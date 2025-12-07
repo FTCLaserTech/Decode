@@ -17,7 +17,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Autonomous(group = "a")
 
-public class AudienceSimple extends LinearOpMode
+public class DepotSimple extends LinearOpMode
 {
     @Override
 
@@ -50,8 +50,8 @@ public class AudienceSimple extends LinearOpMode
             telemetry.update();
         }
 
-        Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(10),0,Math.toRadians(autoFun.redBlueR(initialRotation,90)));
-        Pose2d toParkPosition = new Pose2d(autoFun.redBlueT(0),-30,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(-25),20,Math.toRadians(autoFun.redBlueR(initialRotation,145)));
+        Pose2d toSpike3 = new Pose2d(autoFun.redBlueT(0),-30,Math.toRadians(autoFun.redBlueR(initialRotation,180)));
         Pose2d toFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-30,Math.toRadians(270));
         Pose2d pickUpFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-40,Math.toRadians(270));
         Pose2d backToLaunchZone = new Pose2d(autoFun.redBlueT(0),0,Math.toRadians(270));
@@ -93,10 +93,12 @@ public class AudienceSimple extends LinearOpMode
         }
 
         // drive off the line
+        /*
         Action ToPark = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
                 .build();
         Actions.runBlocking(ToPark);
+         */
 
         safeWaitSeconds(2);
 

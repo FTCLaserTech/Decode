@@ -59,6 +59,7 @@ public class VisionFunctions {
         hm = hardwareMap;
         localLop = linearOpMode;
 
+        /*
         colorSensor1 = hardwareMap.get(NormalizedColorSensor.class, "cs0");
         colorSensor2 = hardwareMap.get(NormalizedColorSensor.class, "cs1");
         colorSensor3 = hardwareMap.get(NormalizedColorSensor.class, "cs2");
@@ -66,6 +67,7 @@ public class VisionFunctions {
         colorSensor1.setGain(gain);
         colorSensor2.setGain(gain);
         colorSensor3.setGain(gain);
+        */
 
         //initCameraAprilTag();
         initLimelight();
