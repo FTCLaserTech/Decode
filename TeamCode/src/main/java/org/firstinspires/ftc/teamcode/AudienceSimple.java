@@ -50,13 +50,15 @@ public class AudienceSimple extends LinearOpMode
             telemetry.update();
         }
 
+        // AFTER START IS PRESSED
+
         Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(10),0,Math.toRadians(autoFun.redBlueR(initialRotation,90)));
         Pose2d toParkPosition = new Pose2d(autoFun.redBlueT(0),-30,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
         Pose2d toFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-30,Math.toRadians(270));
         Pose2d pickUpFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-40,Math.toRadians(270));
         Pose2d backToLaunchZone = new Pose2d(autoFun.redBlueT(0),0,Math.toRadians(270));
 
-        // AFTER START IS PRESSED
+        extras.saveTeamColor(extras.teamColor);
 
         // turn on the LimeLight
         vision.limelight.start();

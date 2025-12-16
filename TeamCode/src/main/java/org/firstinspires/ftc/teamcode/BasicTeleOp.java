@@ -16,6 +16,9 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+import dev.nextftc.control.ControlSystem;
+import dev.nextftc.control.KineticState;
+
 //imports from the Mecanum website
 
 
@@ -34,6 +37,7 @@ public class BasicTeleOp extends LinearOpMode
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
 
         Targeting targeting = Targeting.AUTO;
+
 
 
         //TrajectoryBook book = new TrajectoryBook(drive, extras);
@@ -228,11 +232,13 @@ public class BasicTeleOp extends LinearOpMode
             adjustedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
             if(extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
             {
-                adjustedAngle = adjustedAngle + PI/2 + previousOrientation;
+                //adjustedAngle = adjustedAngle + PI/2 + previousOrientation;
+                adjustedAngle = adjustedAngle - PI/2 + previousOrientation;
             }
             else  // team color is blue
             {
-                adjustedAngle = adjustedAngle - PI/2 + previousOrientation;
+                //adjustedAngle = adjustedAngle - PI/2 + previousOrientation;
+                adjustedAngle = adjustedAngle + PI/2 + previousOrientation;
             }
 
             //drive.odo.update();
@@ -259,15 +265,17 @@ public class BasicTeleOp extends LinearOpMode
             }
             if(gamepad2.bWasPressed())
             {
-                //extras.s2up();
+                extras.freezeRange = true;
                 telemetry.addData("b Pressed", "s2up");
             }
 
             if(gamepad2.aWasPressed())
             {
-                //extras.turret.setPower(0.0);
+                extras.freezeRange = false;
                 telemetry.addData("a Pressed", "0.0");
             }
+            telemetry.addData("freezeRange", extras.freezeRange);
+
 
             // RESET IMU
             if ((gamepad1.back) && (gamepad1.b))

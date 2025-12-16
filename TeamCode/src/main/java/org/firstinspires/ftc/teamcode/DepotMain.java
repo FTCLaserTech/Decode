@@ -50,13 +50,15 @@ public class DepotMain extends LinearOpMode
             telemetry.update();
         }
 
+        // AFTER START IS PRESSED
+
         Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(-25),20,Math.toRadians(autoFun.redBlueR(initialRotation,145)));
         Pose2d toSpike3 = new Pose2d(autoFun.redBlueT(-50),20,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
-        Pose2d pickupSpike3 = new Pose2d(autoFun.redBlueT(-50),-15,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d pickupSpike3 = new Pose2d(autoFun.redBlueT(-50),-17,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
         Pose2d toSpike2 = new Pose2d(autoFun.redBlueT(-75),20,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
-        Pose2d pickupSpike2 = new Pose2d(autoFun.redBlueT(-75),-21,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d pickupSpike2 = new Pose2d(autoFun.redBlueT(-75),-23,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
 
-        // AFTER START IS PRESSED
+        extras.saveTeamColor(extras.teamColor);
 
         // turn on the LimeLight
         vision.limelight.start();

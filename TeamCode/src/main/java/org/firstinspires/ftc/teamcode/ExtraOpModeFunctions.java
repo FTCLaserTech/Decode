@@ -34,6 +34,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+import dev.nextftc.control.ControlSystem;
+import dev.nextftc.control.KineticState;
+import dev.nextftc.control.feedback.PIDCoefficients;
+
 
 @Config
 
@@ -60,6 +64,8 @@ public class ExtraOpModeFunctions
     public TouchSensor turretLimitCCW;  // Digital channel Object
     public Servo light1;
     public Servo light2;
+    private ControlSystem controller;
+    public static PIDCoefficients coefficients = new PIDCoefficients(0.001, 0.0, 0.0);
 
     public static double Light_Green = 0.500;
     public static double Light_Red = 0.280;
@@ -74,6 +80,7 @@ public class ExtraOpModeFunctions
     double maxShooterTPS = shooterTicksPerRev * maxShooterRPM / 60; // 2800
     double shooterVelocity = 0.0;
     double turretGoodAngle = 1.0;
+    boolean freezeRange = false;
 
     public RevBlinkinLedDriver blinkinLedDriver;
     public RevBlinkinLedDriver.BlinkinPattern pattern;
@@ -115,6 +122,11 @@ public class ExtraOpModeFunctions
         light1.setPosition(Light_Green);
         light2.setPosition(Light_Green);
 
+        controller = ControlSystem.builder()
+                .velPid(coefficients)
+                .build();
+
+        controller.setGoal(new KineticState(0.0, 0.0));
     }
 
     public void intakeForward()
@@ -318,8 +330,17 @@ public class ExtraOpModeFunctions
             targetRange = aprilTagPose.range;
             localLop.telemetry.addData("targetRange: ", targetRange);
             // insert range to speed function
-            shooterVelocity = 1049 + (12.8*targetRange) - (0.0294 * targetRange * targetRange);
-            setShooter(shooterVelocity);
+            if(freezeRange == false)
+            {
+                shooterVelocity = 1049 + (12.8 * targetRange) - (0.0294 * targetRange * targetRange);
+                controller.setGoal(new KineticState(0, shooterVelocity));
+
+            }
+            setShooter(controller.calculate(new KineticState(
+                    shooter1.getCurrentPosition(),
+                    shooter1.getVelocity()
+            )));
+            //setShooter(shooterVelocity);
             localLop.telemetry.addData("Shooter velocity set: ", shooterVelocity);
             localLop.telemetry.addData("Shooter1 velocity actual: ", shooter1.getVelocity());
             localLop.telemetry.addData("Shooter2 velocity actual: ", shooter2.getVelocity());            if(abs(getShooter()-shooterVelocity) < 50)
