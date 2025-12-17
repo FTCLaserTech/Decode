@@ -12,12 +12,8 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-
-import dev.nextftc.control.ControlSystem;
-import dev.nextftc.control.KineticState;
 
 //imports from the Mecanum website
 
@@ -38,8 +34,6 @@ public class BasicTeleOp extends LinearOpMode
 
         Targeting targeting = Targeting.AUTO;
 
-
-
         //TrajectoryBook book = new TrajectoryBook(drive, extras);
 
         IMU.Parameters imuParameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -55,17 +49,11 @@ public class BasicTeleOp extends LinearOpMode
         double speedMultiplier;
         double rotationMultiplier;
 
-        boolean manualStickMove = false;
+        double turretPower = 0.0;
+        double launcherSpeed = 0.0;
 
-        double slope;
-
-        double frontLeftPower;
-        double frontRightPower;
-        double backLeftPower;
-        double backRightPower;
-        double stickRotation;
-
-        boolean shooterOn = false;
+        boolean launcherOn = true;
+        boolean depotFound = false;
 
         //drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -100,103 +88,107 @@ public class BasicTeleOp extends LinearOpMode
             if (gamepad2.xWasPressed())
             {
                 if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
+                {
                     extras.teamColor = ExtraOpModeFunctions.TeamColor.BLUE;
+                }
                 else
+                {
                     extras.teamColor = ExtraOpModeFunctions.TeamColor.RED;
+                }
             }
             telemetry.addData("Team Color: ", extras.teamColor);
 
+            // change between AUTO and MANUAL targeting
             if (gamepad2.dpadRightWasPressed())
             {
                 if (targeting == Targeting.AUTO)
                 {
                     targeting = Targeting.MANUAL;
-                } else
+                }
+                else
                 {
                     targeting = Targeting.AUTO;
                 }
             }
             telemetry.addData("Targeting Mode: ", targeting);
 
-            if (targeting == Targeting.AUTO)
+            // launcher on/off function
+            if (gamepad1.aWasPressed())
             {
-                ExtraOpModeFunctions.TrackDepotState trackDepotState = extras.trackDepot();
-                telemetry.addData("Track Depot State: ", trackDepotState);
-                switch (trackDepotState)
+                if (launcherOn == true)
                 {
-                    case NOTFOUND:
-                        extras.turret.setPower(gamepad2.left_stick_x * 0.5);
-                        break;
+                    launcherOn = false;
+                } else
+                {
+                    launcherOn = true;
                 }
+            }
+            telemetry.addData("Launcher On: ", launcherOn);
+
+            // Look for the Depot
+            depotFound = extras.lookForDeopt();
+
+            if ((targeting == Targeting.AUTO) && (depotFound))
+            {
+                turretPower = extras.autoAimTurret();
+                telemetry.addData("AutoTurret Aim OK? ", extras.isTurretAimGood());
+
+                launcherSpeed = extras.autoLauncherSpeed();
             }
             else // manual targeting
             {
-                //buttons for rotate
-                extras.turretPower = gamepad2.left_stick_x * 0.5;
-                if ((extras.turretLimitCW.isPressed()) && (extras.turretPower > 0))
-                {
-                    extras.turretPower = 0.0;
-                    //extras.turretPower = -extras.turretPower;
-                }
-                else if ((extras.turretLimitCCW.isPressed()) && (extras.turretPower < 0))
-                {
-                    extras.turretPower = 0.0;
-                    //extras.turretPower = -extras.turretPower;
-                }
-                extras.turret.setPower(extras.turretPower * 0.5);
+                // manual turret
+                // joystick for rotate
+                turretPower = gamepad2.left_stick_x * 0.5;
 
+                // manual speed
                 // buttons for range
                 if (gamepad2.dpadUpWasPressed())
                 {
-                    extras.shooterVelocity = extras.shooterVelocity + 50.0;
-                    if (extras.shooterVelocity > extras.maxShooterTPS)
-                    {
-                        extras.shooterVelocity = extras.maxShooterTPS;
-                    }
+                    //launcherSpeed = launcherSpeed + 50.0;
+                    launcherSpeed = launcherSpeed + 0.05;
                 }
                 if (gamepad2.dpadDownWasPressed())
                 {
-                    extras.shooterVelocity = extras.shooterVelocity - 50.0;
-                    if (extras.shooterVelocity < 0.0)
-                    {
-                        extras.shooterVelocity = 0.0;
-                    }
+                    //launcherSpeed = launcherSpeed - 50.0;
+                    launcherSpeed = launcherSpeed - 0.05;
                 }
-                extras.light1.setPosition(extras.Light_Yellow);
-                extras.light2.setPosition(extras.Light_Yellow);
             }
 
+            // check if the turret is at a limit and stop it if it is
             telemetry.addData("CW Limit: ", extras.turretLimitCW.isPressed());
             telemetry.addData("CCW Limit: ", extras.turretLimitCCW.isPressed());
-
-            //extras.vision.readColorSensors();
-
-            // shooter on/off function
-            if (gamepad1.aWasPressed())
+            if ((extras.turretLimitCW.isPressed()) && (turretPower > 0))
             {
-                if (shooterOn == true)
-                {
-                    shooterOn = false;
-                } else
-                {
-                    shooterOn = true;
-                }
+                turretPower = 0.0;
             }
-            if(targeting == Targeting.MANUAL)
+            else if ((extras.turretLimitCCW.isPressed()) && (turretPower < 0))
             {
-                if (shooterOn == true)
-                {
-                    extras.setShooter(extras.shooterVelocity);
-                } else
-                {
-                    extras.setShooter(0.0);
-                }
+                turretPower = 0.0;
             }
-            telemetry.addData("Shooter velocity set: ", extras.shooterVelocity);
-            telemetry.addData("Shooter1 velocity actual: ", extras.shooter1.getVelocity());
-            telemetry.addData("Shooter2 velocity actual: ", extras.shooter2.getVelocity());
+            // now set the turret power
+            extras.turret.setPower(turretPower * 0.5);
+            telemetry.addData("turret power: ", extras.turret.getPower());
 
-            // intake and shooter control
+            // check if the launcher speed is in range and adjust if needed
+            if (launcherSpeed > extras.maxLauncherTPS)
+            {
+                launcherSpeed = extras.maxLauncherTPS;
+            }
+            else if (launcherSpeed < 0.0)
+            {
+                launcherSpeed = 0.0;
+            }
+            // now set the launcher speed
+            if (launcherOn == false)
+            {
+                launcherSpeed = 0.0;
+            }
+            extras.setLauncher(launcherSpeed);
+
+            extras.setLights();
+
+            // intake and banana control
             if (gamepad1.right_bumper)
             {
                 extras.intakeReverse();
@@ -316,14 +308,6 @@ public class BasicTeleOp extends LinearOpMode
             telemetry.addData("Elapsed time: ", getRuntime());
 
             drive.updatePoseEstimate();
-
-            /*
-            datalog.loopCounter.set(loopCounter);
-            datalog.cameraPosition.set(extras.turretPower);
-            datalog.targetHeading.set(extras.targetHeading);
-            datalog.imuHeading.set(Math.toDegrees(adjustedAngle));
-            datalog.writeLine();
-            */
 
             telemetry.update();
         }

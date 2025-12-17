@@ -103,7 +103,7 @@ public class AutoFunctions
                 // move to the target
                 localLop.telemetry.addData("Depot angle: ", pose.bearing);
                 localLop.telemetry.addData("Depot range: ", pose.range);
-                localExtras.trackDepot();
+                //localExtras.trackDepot();
             }
             else
             {

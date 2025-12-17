@@ -64,7 +64,7 @@ public class DepotMain extends LinearOpMode
         vision.limelight.start();
 
         // Turn on shooter to the expected speed
-        extras.setShooter(1350.0);
+        extras.setLauncher(1350.0);
 
         //
         // shoot preload
@@ -75,6 +75,7 @@ public class DepotMain extends LinearOpMode
                 .build();
         Actions.runBlocking(ToInitialPosition);
 
+        /*
         // power up and aim the shooter
         ElapsedTime timer = new ElapsedTime(SECONDS);
         timer.reset();
@@ -84,6 +85,7 @@ public class DepotMain extends LinearOpMode
             shooterReady = extras.trackDepot();
             telemetry.update();
         }
+         */
 
         safeWaitSeconds(autoFun.startDelay);
 
@@ -113,6 +115,7 @@ public class DepotMain extends LinearOpMode
                 .build();
         Actions.runBlocking(BackToLaunchSpot);
 
+        /*
         timer.reset();
         shooterReady = ExtraOpModeFunctions.TrackDepotState.NOTFOUND;
         while (!isStopRequested() && (shooterReady != ExtraOpModeFunctions.TrackDepotState.ONTARGET) && (timer.time() < 2))
@@ -120,6 +123,7 @@ public class DepotMain extends LinearOpMode
             shooterReady = extras.trackDepot();
             telemetry.update();
         }
+         */
 
         // shoot the artifacts
         //safeWaitSeconds(1);
@@ -147,6 +151,7 @@ public class DepotMain extends LinearOpMode
                 .build();
         Actions.runBlocking(BackToLaunchSpot2);
 
+        /*
         timer.reset();
         shooterReady = ExtraOpModeFunctions.TrackDepotState.NOTFOUND;
         while (!isStopRequested() && (shooterReady != ExtraOpModeFunctions.TrackDepotState.ONTARGET) && (timer.time() < 2))
@@ -154,6 +159,7 @@ public class DepotMain extends LinearOpMode
             shooterReady = extras.trackDepot();
             telemetry.update();
         }
+         */
 
         // shoot the artifacts
         //safeWaitSeconds(1);
@@ -167,7 +173,7 @@ public class DepotMain extends LinearOpMode
 
         // turn the intake and shooter off
         extras.ballStopOn();
-        extras.setShooter(0.0);
+        extras.setLauncher(0.0);
 
         // Save the ending location
         //extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);

@@ -64,7 +64,7 @@ public class DepotSimple extends LinearOpMode
         vision.limelight.start();
 
         // Turn on shooter to the expected speed
-        extras.setShooter(1800.0);
+        extras.setLauncher(1800.0);
 
         // drive off the line and rotate towards the depot
         Action ToInitialPosition = drive.actionBuilder(drive.localizer.getPose())
@@ -72,6 +72,7 @@ public class DepotSimple extends LinearOpMode
                 .build();
         Actions.runBlocking(ToInitialPosition);
 
+        /*
         // power up and aim the shooter
         ElapsedTime timer = new ElapsedTime(SECONDS);
         timer.reset();
@@ -81,18 +82,16 @@ public class DepotSimple extends LinearOpMode
             shooterReady = extras.trackDepot();
             telemetry.update();
         }
+         */
 
         safeWaitSeconds(autoFun.startDelay);
 
-        // shoot the artifacts if on target
-        if (shooterReady == ExtraOpModeFunctions.TrackDepotState.ONTARGET)
-        {
-            safeWaitSeconds(3);
-            extras.intakeForward();
-            extras.ballStopOff();
-            // wait for shooting to finish
-            safeWaitSeconds(3);
-        }
+        // shoot the artifacts
+        safeWaitSeconds(3);
+        extras.intakeForward();
+        extras.ballStopOff();
+        // wait for shooting to finish
+        safeWaitSeconds(3);
 
         // drive off the line
         /*
@@ -107,7 +106,7 @@ public class DepotSimple extends LinearOpMode
         // turn the intake and shooter off
         extras.intakeOff();
         extras.ballStopOn();
-        extras.setShooter(0.0);
+        extras.setLauncher(0.0);
 
         // Save the ending location
         //extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);

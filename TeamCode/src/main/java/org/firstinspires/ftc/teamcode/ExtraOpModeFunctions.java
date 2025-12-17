@@ -19,7 +19,6 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -37,6 +36,7 @@ import java.io.Writer;
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
 import dev.nextftc.control.feedback.PIDCoefficients;
+import dev.nextftc.control.feedforward.BasicFeedforwardParameters;
 
 
 @Config
@@ -55,8 +55,8 @@ public class ExtraOpModeFunctions
 
     public static final double PI = 3.14159265;
 
-    public DcMotorEx shooter1;
-    public DcMotorEx shooter2;
+    public DcMotorEx launcher1;
+    public DcMotorEx launcher2;
     public DcMotorEx intake;
     public Servo ballStop;
     public CRServo turret;
@@ -64,8 +64,15 @@ public class ExtraOpModeFunctions
     public TouchSensor turretLimitCCW;  // Digital channel Object
     public Servo light1;
     public Servo light2;
-    private ControlSystem controller;
-    public static PIDCoefficients coefficients = new PIDCoefficients(0.001, 0.0, 0.0);
+    public ControlSystem controller;
+    public PIDCoefficients velPidCoefficients =
+            new PIDCoefficients(0.0, 0.0, 0.0);
+    public BasicFeedforwardParameters basicFeedforwardParameters =
+            new BasicFeedforwardParameters(1.0, 0.0, 0.0);
+
+    private AprilTagPoseFtc aprilTagPose;
+    private boolean aimGood = false;
+    private boolean rangeGood = false;
 
     public static double Light_Green = 0.500;
     public static double Light_Red = 0.280;
@@ -75,10 +82,10 @@ public class ExtraOpModeFunctions
     double lightColor = Light_Red;
 
 
-    double maxShooterRPM = 6000.0;  //RPM
-    double shooterTicksPerRev = 28.0;
-    double maxShooterTPS = shooterTicksPerRev * maxShooterRPM / 60; // 2800
-    double shooterVelocity = 0.0;
+    double maxLauncherRPM = 6000.0;  //RPM
+    double launcherTicksPerRev = 28.0;
+    double maxLauncherTPS = launcherTicksPerRev * maxLauncherRPM / 60; // 2800
+    //private double shooterTargetVelocity = 0.0;
     double turretGoodAngle = 1.0;
     boolean freezeRange = false;
 
@@ -97,17 +104,21 @@ public class ExtraOpModeFunctions
         turretLimitCW = hardwareMap.get(TouchSensor.class, "turretLimitCW");
         turretLimitCCW = hardwareMap.get(TouchSensor.class, "turretLimitCCW");
 
-        shooter1 = hardwareMap.get(DcMotorEx.class, "shooter1");
-        shooter1.setDirection(DcMotorEx.Direction.FORWARD);
-        shooter1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        shooter1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter1.setVelocity(0.0);
+        launcher1 = hardwareMap.get(DcMotorEx.class, "shooter1");
+        launcher1.setDirection(DcMotorEx.Direction.FORWARD);
+        launcher1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        //launcher1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launcher1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        launcher1.setPower(0.0);
+        //launcher1.setVelocity(0.0);
 
-        shooter2 = hardwareMap.get(DcMotorEx.class, "shooter2");
-        shooter2.setDirection(DcMotorEx.Direction.REVERSE);
-        shooter2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter2.setVelocity(0.0);
+        launcher2 = hardwareMap.get(DcMotorEx.class, "shooter2");
+        launcher2.setDirection(DcMotorEx.Direction.REVERSE);
+        launcher2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        //launcher2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launcher2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        launcher2.setPower(0.0);
+        //launcher2.setVelocity(0.0);
 
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         intake.setDirection(DcMotorEx.Direction.FORWARD);
@@ -123,7 +134,8 @@ public class ExtraOpModeFunctions
         light2.setPosition(Light_Green);
 
         controller = ControlSystem.builder()
-                .velPid(coefficients)
+                .velPid(velPidCoefficients)
+                .basicFF(basicFeedforwardParameters)
                 .build();
 
         controller.setGoal(new KineticState(0.0, 0.0));
@@ -154,15 +166,27 @@ public class ExtraOpModeFunctions
         ballStop.setPosition(0.5);
     }
 
-    public void setShooter(double shooterSpeed)
+    public void setLauncher(double launcherSpeed)
     {
-        shooter1.setVelocity(shooterSpeed);
-        shooter2.setVelocity(shooterSpeed);
+        controller.setGoal(new KineticState(0, launcherSpeed));
+        double power = controller.calculate(new KineticState(
+                launcher1.getCurrentPosition(),
+                launcher1.getVelocity()
+        ));
+        launcher1.setPower(power);
+        launcher2.setPower(power);
+        //launcher1.setVelocity(shooterSpeed);
+        //launcher2.setVelocity(shooterSpeed);
+        localLop.telemetry.addData("Launcher velocity target: ", launcherSpeed);
+        localLop.telemetry.addData("Launcher power set: ", power);
+        localLop.telemetry.addData("Launcher1 velocity actual: ", launcher1.getVelocity());
+        localLop.telemetry.addData("Launcher2 velocity actual: ", launcher2.getVelocity());
+        localLop.telemetry.addData("Launcher Speed OK? ", isLauncherSpeedGood(launcherSpeed));
     }
 
-    public double getShooter()
+    public double getLauncherSpeed()
     {
-        return((shooter1.getVelocity()+shooter2.getVelocity())/2);
+        return((launcher1.getVelocity()+ launcher2.getVelocity())/2);
     }
 
     public double adjustAngleForDriverPosition(double angle, RobotStartPosition robotStartPosition)
@@ -262,119 +286,105 @@ public class ExtraOpModeFunctions
     }
 
     public enum SearchingDirection {LEFT,RIGHT};
-    double targetHeading = 0.0;
-    double turretPower = 0.0;
+    double depotHeading = 0.0;
+    //private double turretPower = 0.0;
     SearchingDirection targetSearchingDirection = SearchingDirection.LEFT;
     double targetRange = 0.0;
 
-    public TrackDepotState trackDepot()
+    public boolean lookForDeopt()
     {
-        AprilTagPoseFtc aprilTagPose;
-        boolean aimGood = false;
-        boolean rangeGood = false;
-        TrackDepotState trackDepotState = TrackDepotState.NOTFOUND;
-
         if(teamColor== ExtraOpModeFunctions.TeamColor.RED)
+        {
             aprilTagPose = vision.readRedAprilTag_ll();
+        }
         else
+        {
             aprilTagPose = vision.readBlueAprilTag_ll();
-
+        }
         if(aprilTagPose == null) // AprilTag not found
         {
             localLop.telemetry.addLine("No April Tag");
-            if(turretLimitCW.isPressed())
-            {
-                turretPower = -abs(turretPower);
-            }
-
-            if(turretLimitCCW.isPressed())
-            {
-                turretPower = abs(turretPower);
-            }
-
-            lightColor = Light_Red;
+            return(false);
         }
-        else // AprilTag found
+        return(true);
+    }
+
+    public double autoAimTurret()
+    {
+        double turretPower = 0.0;
+
+        depotHeading = aprilTagPose.bearing;
+        localLop.telemetry.addLine("Auto Aim Turret");
+        localLop.telemetry.addData("depot heading: ", depotHeading);
+        localLop.telemetry.addData("depot elevation: ", aprilTagPose.elevation);
+
+        if (abs(depotHeading) < turretGoodAngle) // depot is in range so turn off turret servo
         {
-            localLop.telemetry.addLine("April Tag Found");
-
-            targetHeading = aprilTagPose.bearing;
-            localLop.telemetry.addData("target heading: ", targetHeading);
-            localLop.telemetry.addData("target elevation: ", aprilTagPose.elevation);
-
-            if (abs(targetHeading) < turretGoodAngle)
-            {
-                turretPower = 0;
-                aimGood = true;
-            }
-            else
-            {
-                //turretPower = (1.0-0.05)/(45.0-2.0)*(targetHeading-2.0)+0.05;
-                turretPower = angleToSpeed(targetHeading);
-                //if(turretPower > 1.0)
-                //    turretPower = 1.0;
-            }
-
-            if((turretLimitCW.isPressed())&&(turretPower>0))
-            {
-                turretPower = 0.0;
-                //turretPower = -turretPower;
-            }
-            else if((turretLimitCCW.isPressed())&&(turretPower<0))
-            {
-                turretPower = 0.0;
-                //turretPower = -turretPower;
-            }
-
-            // range
-            targetRange = aprilTagPose.range;
-            localLop.telemetry.addData("targetRange: ", targetRange);
-            // insert range to speed function
-            if(freezeRange == false)
-            {
-                shooterVelocity = 1049 + (12.8 * targetRange) - (0.0294 * targetRange * targetRange);
-                controller.setGoal(new KineticState(0, shooterVelocity));
-
-            }
-            setShooter(controller.calculate(new KineticState(
-                    shooter1.getCurrentPosition(),
-                    shooter1.getVelocity()
-            )));
-            //setShooter(shooterVelocity);
-            localLop.telemetry.addData("Shooter velocity set: ", shooterVelocity);
-            localLop.telemetry.addData("Shooter1 velocity actual: ", shooter1.getVelocity());
-            localLop.telemetry.addData("Shooter2 velocity actual: ", shooter2.getVelocity());            if(abs(getShooter()-shooterVelocity) < 50)
-            {
-                rangeGood = true;
-            }
-
-            if (aimGood && rangeGood)
-            {
-                trackDepotState = TrackDepotState.ONTARGET;
-                lightColor = Light_Green;
-            }
-            else if (aimGood)
-            {
-                trackDepotState = TrackDepotState.TARGETING_AIMED;
-                lightColor = Light_Purple;
-            }
-            else if (rangeGood)
-            {
-                trackDepotState = TrackDepotState.TARGETING_ATSPEED;
-                lightColor = Light_Blue;
-            }
-            else
-            {
-                trackDepotState = TrackDepotState.TARGETING;
-                lightColor = Light_Blue;
-            }
+            turretPower = 0;
+            aimGood = true;
         }
+        else
+        {
+            turretPower = angleToSpeed(depotHeading);
+            aimGood = false;
+        }
+        return(turretPower);
+    }
+
+    public boolean isTurretAimGood()
+    {
+        return(aimGood);
+    }
+
+    public double autoLauncherSpeed()
+    {
+        double shooterTargetVelocity = 0.0;
+        targetRange = aprilTagPose.range;
+        localLop.telemetry.addData("targetRange: ", targetRange);
+        if(freezeRange == false)
+        {
+            // range to speed function
+            shooterTargetVelocity = 1049 + (12.8 * targetRange) - (0.0294 * targetRange * targetRange);
+        }
+        return(shooterTargetVelocity);
+    }
+
+    public boolean isLauncherSpeedGood(double shooterTargetVelocity)
+    {
+        if(abs(getLauncherSpeed() - shooterTargetVelocity) < 50)
+        {
+            rangeGood = true;
+        }
+        else
+        {
+            rangeGood = false;
+        }
+        return(rangeGood);
+    }
+
+
+    public void setLights()
+    {
+        if (aimGood && rangeGood)
+        {
+            lightColor = Light_Green;
+        }
+        else if (aimGood)
+        {
+            lightColor = Light_Purple;
+        }
+        else if (rangeGood)
+        {
+            lightColor = Light_Blue;
+        }
+        else
+        {
+            lightColor = Light_Blue;
+        }
+
         light1.setPosition(lightColor);
         light2.setPosition(lightColor);
-        turret.setPower(turretPower);
-        localLop.telemetry.addData("turret power2: ", turret.getPower());
 
-        return (trackDepotState);
     }
 
     public class TrackDepotAction implements Action
@@ -384,7 +394,7 @@ public class ExtraOpModeFunctions
         @Override
         public boolean run(@NonNull TelemetryPacket packet)
         {
-            trackDepot();
+            //trackDepot();
             return(isComplete);
         }
 
