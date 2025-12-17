@@ -145,13 +145,13 @@ public class BasicTeleOp extends LinearOpMode
                 // buttons for range
                 if (gamepad2.dpadUpWasPressed())
                 {
-                    //launcherSpeed = launcherSpeed + 50.0;
-                    launcherSpeed = launcherSpeed + 0.05;
+                    launcherSpeed = launcherSpeed + 20.0;
+                    //launcherSpeed = launcherSpeed + 0.05;
                 }
                 if (gamepad2.dpadDownWasPressed())
                 {
-                    //launcherSpeed = launcherSpeed - 50.0;
-                    launcherSpeed = launcherSpeed - 0.05;
+                    launcherSpeed = launcherSpeed - 20.0;
+                    //launcherSpeed = launcherSpeed - 0.05;
                 }
             }
 
