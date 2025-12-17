@@ -66,9 +66,9 @@ public class ExtraOpModeFunctions
     public Servo light2;
     public ControlSystem controller;
     public PIDCoefficients velPidCoefficients =
-            new PIDCoefficients(0.0, 0.0, 0.0);
+            new PIDCoefficients(0.005, 0.0, 0.0);
     public BasicFeedforwardParameters basicFeedforwardParameters =
-            new BasicFeedforwardParameters(1.0, 0.0, 0.0);
+            new BasicFeedforwardParameters(0.005, 0.01, 0.02);
 
     private AprilTagPoseFtc aprilTagPose;
     private boolean aimGood = false;
