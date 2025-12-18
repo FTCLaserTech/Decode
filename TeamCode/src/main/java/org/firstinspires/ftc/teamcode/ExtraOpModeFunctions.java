@@ -373,7 +373,6 @@ public class ExtraOpModeFunctions
         return(rangeGood);
     }
 
-
     public void setLights()
     {
         if (aimGood && rangeGood)
@@ -400,27 +399,36 @@ public class ExtraOpModeFunctions
 
     public class SetLauncherAction implements Action
     {
-        public boolean isComplete = false;
-        public double launcherSpeed = 0.0;
+        private double launcherSpeed = 0.0;
+        private int launcherSpeedCount = 0;
 
-        public void Set
+        public SetLauncherAction(double speed)
+        {
+            launcherSpeed = speed;
+        }
         @Override
         public boolean run(@NonNull TelemetryPacket packet)
         {
             setLauncher(launcherSpeed);
-            return(isComplete);
-        }
-
-        public void setComplete()
-        {
-            isComplete = true;
+            if(isLauncherSpeedGood(launcherSpeed))
+            {
+                launcherSpeedCount++;
+                if(launcherSpeedCount > 5)
+                {
+                    return(true);
+                }
+            }
+            else
+            {
+                launcherSpeedCount = 0;
+            }
+            return(false);
         }
     }
 
     public Action setLauncherAction(double speed)
     {
-        return new SetLauncherAction();
-
+        return(new SetLauncherAction(speed));
     }
 
     public double angleToSpeed(double angle)

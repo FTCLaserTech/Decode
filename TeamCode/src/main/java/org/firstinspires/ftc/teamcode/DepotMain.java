@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -65,7 +66,8 @@ public class DepotMain extends LinearOpMode
         vision.limelight.start();
 
         // Turn on shooter to the expected speed
-        extras.setLauncher(1350.0);
+        double launcherSpeed = 1350.0;
+        extras.setLauncher(launcherSpeed);
 
         //
         // shoot preload
@@ -74,9 +76,11 @@ public class DepotMain extends LinearOpMode
         Action ToInitialPosition = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
+
         Actions.runBlocking(new ParallelAction(
-                ToInitialPosition,
-                ));
+                new SequentialAction(ToInitialPosition,
+                extras.setLauncherAction(launcherSpeed)
+                )));
 
         /*
         // power up and aim the shooter
