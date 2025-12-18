@@ -4,6 +4,7 @@ import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.SECONDS;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -52,7 +53,7 @@ public class DepotMain extends LinearOpMode
 
         // AFTER START IS PRESSED
 
-        Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(-25),20,Math.toRadians(autoFun.redBlueR(initialRotation,145)));
+        Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(-30),25,Math.toRadians(autoFun.redBlueR(initialRotation,145)));
         Pose2d toSpike3 = new Pose2d(autoFun.redBlueT(-50),20,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
         Pose2d pickupSpike3 = new Pose2d(autoFun.redBlueT(-50),-17,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
         Pose2d toSpike2 = new Pose2d(autoFun.redBlueT(-75),20,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
@@ -73,7 +74,9 @@ public class DepotMain extends LinearOpMode
         Action ToInitialPosition = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
-        Actions.runBlocking(ToInitialPosition);
+        Actions.runBlocking(new ParallelAction(
+                ToInitialPosition,
+                ));
 
         /*
         // power up and aim the shooter

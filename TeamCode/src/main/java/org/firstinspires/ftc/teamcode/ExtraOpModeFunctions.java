@@ -398,14 +398,16 @@ public class ExtraOpModeFunctions
 
     }
 
-    public class TrackDepotAction implements Action
+    public class SetLauncherAction implements Action
     {
         public boolean isComplete = false;
+        public double launcherSpeed = 0.0;
 
+        public void Set
         @Override
         public boolean run(@NonNull TelemetryPacket packet)
         {
-            //trackDepot();
+            setLauncher(launcherSpeed);
             return(isComplete);
         }
 
@@ -413,6 +415,12 @@ public class ExtraOpModeFunctions
         {
             isComplete = true;
         }
+    }
+
+    public Action setLauncherAction(double speed)
+    {
+        return new SetLauncherAction();
+
     }
 
     public double angleToSpeed(double angle)
