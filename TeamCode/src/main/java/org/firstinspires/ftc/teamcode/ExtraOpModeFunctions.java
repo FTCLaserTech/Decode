@@ -8,6 +8,7 @@ import android.os.Environment;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -24,6 +25,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 import java.io.BufferedReader;
@@ -48,6 +50,9 @@ public class ExtraOpModeFunctions
     public HardwareMap hm = null;
     public VisionFunctions vision = null;
 
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+    Telemetry dashboardTelemetry = dashboard.getTelemetry();
+
     public enum RobotStartPosition {STRAIGHT, LEFT, RIGHT};
     public enum TeamColor{RED,BLUE};
     public enum TrackDepotState{NOTFOUND,TARGETING, TARGETING_ATSPEED, TARGETING_AIMED,ONTARGET};
@@ -65,10 +70,10 @@ public class ExtraOpModeFunctions
     public Servo light1;
     public Servo light2;
     public ControlSystem controller;
-    public PIDCoefficients velPidCoefficients =
+    public static PIDCoefficients velPidCoefficients =
             new PIDCoefficients(0.005, 0.0, 0.0);
-    public BasicFeedforwardParameters basicFeedforwardParameters =
-            new BasicFeedforwardParameters(0.005, 0.01, 0.02);
+    public static BasicFeedforwardParameters basicFeedforwardParameters =
+            new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
     private AprilTagPoseFtc aprilTagPose;
     private boolean aimGood = false;
@@ -182,6 +187,12 @@ public class ExtraOpModeFunctions
         localLop.telemetry.addData("Launcher1 velocity actual: ", launcher1.getVelocity());
         localLop.telemetry.addData("Launcher2 velocity actual: ", launcher2.getVelocity());
         localLop.telemetry.addData("Launcher Speed OK? ", isLauncherSpeedGood(launcherSpeed));
+
+        dashboardTelemetry.addData("Launcher velocity target", launcherSpeed);
+        dashboardTelemetry.addData("Launcher power set", power);
+        dashboardTelemetry.addData("Launcher1 velocity actual", launcher1.getVelocity());
+        dashboardTelemetry.addData("Launcher2 velocity actual", launcher2.getVelocity());
+        dashboardTelemetry.update();
     }
 
     public double getLauncherSpeed()
