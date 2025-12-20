@@ -186,6 +186,8 @@ public class ExtraOpModeFunctions
         localLop.telemetry.addData("Launcher power set: ", power);
         localLop.telemetry.addData("Launcher1 velocity actual: ", launcher1.getVelocity());
         localLop.telemetry.addData("Launcher2 velocity actual: ", launcher2.getVelocity());
+        localLop.telemetry.addData("Launcher1 power actual: ", launcher1.getPower());
+        localLop.telemetry.addData("Launcher2 power actual: ", launcher2.getPower());
         localLop.telemetry.addData("Launcher Speed OK? ", isLauncherSpeedGood(launcherSpeed));
 
         dashboardTelemetry.addData("Launcher velocity target", launcherSpeed);
@@ -233,7 +235,7 @@ public class ExtraOpModeFunctions
         directory.mkdir();
         try
         {
-            fileWriter = new FileWriter(directoryPath+"/.csv");
+            fileWriter = new FileWriter(directoryPath+"/START_ROTATION.csv");
             fileWriter.write(angle.toString());
             fileWriter.close();
         }
@@ -397,6 +399,13 @@ public class ExtraOpModeFunctions
 
     }
 
+    boolean runLauncherBoolean = false;
+
+    public void stopLauncher()
+    {
+        runLauncherBoolean = false;
+    }
+
     public class SetLauncherAction implements Action
     {
         private double launcherSpeed = 0.0;
@@ -405,24 +414,33 @@ public class ExtraOpModeFunctions
         public SetLauncherAction(double speed)
         {
             launcherSpeed = speed;
+            runLauncherBoolean = true;
         }
         @Override
         public boolean run(@NonNull TelemetryPacket packet)
         {
             setLauncher(launcherSpeed);
-            if(isLauncherSpeedGood(launcherSpeed))
+            boolean speedGood = isLauncherSpeedGood(launcherSpeed);
+            return(runLauncherBoolean);
+            /*
+            if(speedGood)
             {
                 launcherSpeedCount++;
-                if(launcherSpeedCount > 5)
+                localLop.telemetry.addData("SG launcherSpeedCount: ", launcherSpeedCount);
+                if(launcherSpeedCount > 35)
                 {
-                    return(true);
+                    localLop.telemetry.update();
+                    return(false);
                 }
             }
             else
             {
+                localLop.telemetry.addData("SNG launcherSpeedCount: ", launcherSpeedCount);
                 launcherSpeedCount = 0;
             }
-            return(false);
+            localLop.telemetry.update();
+            return(true);
+             */
         }
     }
 

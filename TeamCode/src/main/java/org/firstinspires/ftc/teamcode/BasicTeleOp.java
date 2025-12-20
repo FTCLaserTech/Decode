@@ -62,13 +62,22 @@ public class BasicTeleOp extends LinearOpMode
         //extras.wristMiddle();
         //extras.clawOpen();
 
+        double lightColor = extras.Light_Red;
+
         double previousOrientation = extras.readAutoStartRotation();
         extras.teamColor = extras.readTeamColor();
+        if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
+        {
+            lightColor = extras.Light_Red;
+        }
+        else
+        {
+            lightColor = extras.Light_Blue;
+        }
+        extras.light1.setPosition(lightColor);
+        extras.light2.setPosition(lightColor);
 
-        boolean initArmAtStart = false;
 
-
-        double lightColor = extras.Light_Red;
         boolean targetSearchingMode = false;
         long loopCounter = 0;
 
@@ -76,7 +85,7 @@ public class BasicTeleOp extends LinearOpMode
         telemetry.addData("adjustedAngle: ", Math.toDegrees(drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)));
         telemetry.addData("previousOrientation: ", Math.toDegrees(previousOrientation));
         //telemetry.addData("Odo Orientation: ", drive.odo.getHeading());
-        telemetry.addData("Init Complete", initArmAtStart);
+        telemetry.addLine("Init Complete");
 
         telemetry.update();
 
@@ -92,11 +101,15 @@ public class BasicTeleOp extends LinearOpMode
                 if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
                 {
                     extras.teamColor = ExtraOpModeFunctions.TeamColor.BLUE;
+                    lightColor = extras.Light_Blue;
                 }
                 else
                 {
                     extras.teamColor = ExtraOpModeFunctions.TeamColor.RED;
+                    lightColor = extras.Light_Red;
                 }
+                extras.light1.setPosition(lightColor);
+                extras.light2.setPosition(lightColor);
             }
             telemetry.addData("Team Color: ", extras.teamColor);
 
@@ -224,10 +237,11 @@ public class BasicTeleOp extends LinearOpMode
 
             //adjustedAngle = 0;
             adjustedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+            telemetry.addData("IMUAngle: ", Math.toDegrees(adjustedAngle));
             if(extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
             {
                 //adjustedAngle = adjustedAngle + PI/2 + previousOrientation;
-                adjustedAngle = adjustedAngle - PI/2 + previousOrientation;
+                adjustedAngle = adjustedAngle - PI/2 - previousOrientation;
             }
             else  // team color is blue
             {
@@ -252,6 +266,8 @@ public class BasicTeleOp extends LinearOpMode
                     ),
                     -(gamepad1.right_stick_x * rotationMultiplier)
             ));
+
+
             if(gamepad2.yWasPressed())
             {
                 //extras.s1down();
@@ -294,8 +310,7 @@ public class BasicTeleOp extends LinearOpMode
 
             //telemetry.addData("x", drive.pose.position.x);
             //telemetry.addData("y", drive.pose.position.y);
-            telemetry.addData("heading", drive.localizer.getPose().heading);
-
+            //telemetry.addData("heading", drive.localizer.getPose().heading);
             telemetry.addData("adjustedAngle: ", Math.toDegrees(adjustedAngle));
             telemetry.addData("previousOrientation: ", Math.toDegrees(previousOrientation));
             //telemetry.addData("ODO adjusted angle", adjustedAngle);

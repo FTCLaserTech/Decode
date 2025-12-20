@@ -4,14 +4,17 @@ import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.SECONDS;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Config
@@ -54,11 +57,16 @@ public class DepotMain extends LinearOpMode
 
         // AFTER START IS PRESSED
 
-        Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(-30),25,Math.toRadians(autoFun.redBlueR(initialRotation,145)));
-        Pose2d toSpike3 = new Pose2d(autoFun.redBlueT(-50),20,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(-45),20,Math.toRadians(autoFun.redBlueR(initialRotation,135)));
+        Pose2d toSpike3 = new Pose2d(autoFun.redBlueT(-50),10,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
         Pose2d pickupSpike3 = new Pose2d(autoFun.redBlueT(-50),-17,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
-        Pose2d toSpike2 = new Pose2d(autoFun.redBlueT(-75),20,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d nearGate = new Pose2d(autoFun.redBlueT(-50),-5,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d toGate = new Pose2d(autoFun.redBlueT(-60),-20,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d toSpike2 = new Pose2d(autoFun.redBlueT(-75),10,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
         Pose2d pickupSpike2 = new Pose2d(autoFun.redBlueT(-75),-23,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d park = new Pose2d(autoFun.redBlueT(-60),-10,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d toSpike1 = new Pose2d(autoFun.redBlueT(-95),10,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d pickupSpike1 = new Pose2d(autoFun.redBlueT(-95),-23,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
 
         extras.saveTeamColor(extras.teamColor);
 
@@ -66,8 +74,10 @@ public class DepotMain extends LinearOpMode
         vision.limelight.start();
 
         // Turn on shooter to the expected speed
-        double launcherSpeed = 1350.0;
+        double launcherSpeed = 1400.0;
         extras.setLauncher(launcherSpeed);
+
+        //safeWaitSeconds(autoFun.startDelay);
 
         //
         // shoot preload
@@ -78,34 +88,18 @@ public class DepotMain extends LinearOpMode
                 .build();
 
         Actions.runBlocking(new ParallelAction(
-                new SequentialAction(ToInitialPosition,
+                new SequentialAction(
+                        ToInitialPosition,
+                        new InstantAction(() -> extras.intakeForward()),
+                        new InstantAction(() -> extras.ballStopOff()),
+                        new SleepAction(1.0),
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.ballStopOn())),
                 extras.setLauncherAction(launcherSpeed)
-                )));
-
-        /*
-        // power up and aim the shooter
-        ElapsedTime timer = new ElapsedTime(SECONDS);
-        timer.reset();
-        ExtraOpModeFunctions.TrackDepotState shooterReady = ExtraOpModeFunctions.TrackDepotState.NOTFOUND;
-        while (!isStopRequested() && (shooterReady != ExtraOpModeFunctions.TrackDepotState.ONTARGET) && (timer.time() < 2))
-        {
-            shooterReady = extras.trackDepot();
-            telemetry.update();
-        }
-         */
-
-        safeWaitSeconds(autoFun.startDelay);
-
-        // shoot the artifacts
-        safeWaitSeconds(1);
-        extras.intakeForward();
-        extras.ballStopOff();
-        // wait for shooting to finish
-        safeWaitSeconds(1.0);
-        extras.ballStopOn();
+                ));
 
         //
-        // pickup and launch spike 3
+        // pickup spike 3, open the gate, launch spike 3
         //
         Action GoToSpike3 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toSpike3.position, toSpike3.heading)
@@ -117,28 +111,29 @@ public class DepotMain extends LinearOpMode
                 .build();
         Actions.runBlocking(PickupSpike3);
         extras.intakeOff();
-        Action BackToLaunchSpot = drive.actionBuilder(drive.localizer.getPose())
+        Action NearGate = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(nearGate.position, nearGate.heading)
+                .build();
+        Actions.runBlocking(NearGate);
+        Action OpenGate = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toGate.position, toGate.heading)
+                .build();
+        Actions.runBlocking(OpenGate);
+
+        Action BackToLaunchSpot1 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
-        Actions.runBlocking(BackToLaunchSpot);
 
-        /*
-        timer.reset();
-        shooterReady = ExtraOpModeFunctions.TrackDepotState.NOTFOUND;
-        while (!isStopRequested() && (shooterReady != ExtraOpModeFunctions.TrackDepotState.ONTARGET) && (timer.time() < 2))
-        {
-            shooterReady = extras.trackDepot();
-            telemetry.update();
-        }
-         */
-
-        // shoot the artifacts
-        //safeWaitSeconds(1);
-        extras.intakeForward();
-        extras.ballStopOff();
-        // wait for shooting to finish
-        safeWaitSeconds(1);
-        extras.ballStopOn();
+        Actions.runBlocking(new ParallelAction(
+                new SequentialAction(
+                        BackToLaunchSpot1,
+                        new InstantAction(() -> extras.intakeForward()),
+                        new InstantAction(() -> extras.ballStopOff()),
+                        new SleepAction(1.0),
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.ballStopOn())),
+                extras.setLauncherAction(launcherSpeed)
+        ));
 
         //
         // pickup and launch spike 2
@@ -153,30 +148,56 @@ public class DepotMain extends LinearOpMode
                 .build();
         Actions.runBlocking(PickupSpike2);
         extras.intakeOff();
+
         Action BackToLaunchSpot2 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
-        Actions.runBlocking(BackToLaunchSpot2);
 
-        /*
-        timer.reset();
-        shooterReady = ExtraOpModeFunctions.TrackDepotState.NOTFOUND;
-        while (!isStopRequested() && (shooterReady != ExtraOpModeFunctions.TrackDepotState.ONTARGET) && (timer.time() < 2))
-        {
-            shooterReady = extras.trackDepot();
-            telemetry.update();
-        }
-         */
+        Actions.runBlocking(new ParallelAction(
+                new SequentialAction(
+                        BackToLaunchSpot2,
+                        new InstantAction(() -> extras.intakeForward()),
+                        new InstantAction(() -> extras.ballStopOff()),
+                        new SleepAction(1.0),
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.ballStopOn())),
+                extras.setLauncherAction(launcherSpeed)
+        ));
 
-        // shoot the artifacts
-        //safeWaitSeconds(1);
+        // pickup and launch spike 1
+        Action GoToSpike1 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toSpike1.position, toSpike1.heading)
+                .build();
+        Actions.runBlocking(GoToSpike1);
         extras.intakeForward();
-        extras.ballStopOff();
-        // wait for shooting to finish
-        safeWaitSeconds(1);
-        extras.ballStopOn();
+        Action PickupSpike1 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(pickupSpike1.position, pickupSpike1.heading)
+                .build();
+        Actions.runBlocking(PickupSpike1);
+        extras.intakeOff();
 
-        safeWaitSeconds(2);
+        Action BackToLaunchSpot3 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .build();
+
+        Actions.runBlocking(new ParallelAction(
+                new SequentialAction(
+                        BackToLaunchSpot3,
+                        new InstantAction(() -> extras.intakeForward()),
+                        new InstantAction(() -> extras.ballStopOff()),
+                        new SleepAction(1.0),
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.ballStopOn())),
+                extras.setLauncherAction(launcherSpeed)
+        ));
+
+
+        Action Park = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(park.position, park.heading)
+                .build();
+        Actions.runBlocking(Park);
+
+        safeWaitSeconds(1);
 
         // turn the intake and shooter off
         extras.ballStopOn();
@@ -184,6 +205,7 @@ public class DepotMain extends LinearOpMode
 
         // Save the ending location
         //extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);
+        extras.saveAutoStartRotation(drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2);
     }
 
     public void safeWaitSeconds(double time)
