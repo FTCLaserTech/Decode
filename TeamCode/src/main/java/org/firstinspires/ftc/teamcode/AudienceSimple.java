@@ -4,7 +4,11 @@ import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.SECONDS;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -61,38 +65,29 @@ public class AudienceSimple extends LinearOpMode
 
         extras.saveTeamColor(extras.teamColor);
 
+        safeWaitSeconds(autoFun.startDelay);
         // turn on the LimeLight
         vision.limelight.start();
 
         // Turn on shooter to the expected speed
-        extras.setLauncher(1800.0);
+        double launcherSpeed = 1800.0;
+        extras.setLauncher(launcherSpeed);
+
 
         // drive off the line and rotate towards the depot
         Action ToInitialPosition = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
-        Actions.runBlocking(ToInitialPosition);
-
-        /*
-        // power up and aim the shooter
-        ElapsedTime timer = new ElapsedTime(SECONDS);
-        timer.reset();
-        ExtraOpModeFunctions.TrackDepotState shooterReady = ExtraOpModeFunctions.TrackDepotState.NOTFOUND;
-        while (!isStopRequested() && (shooterReady != ExtraOpModeFunctions.TrackDepotState.ONTARGET) && (timer.time() < 10))
-        {
-            shooterReady = extras.trackDepot();
-            telemetry.update();
-        }
-        */
-
-        safeWaitSeconds(autoFun.startDelay);
-
-        // shoot the artifacts
-        safeWaitSeconds(3);
-        extras.intakeForward();
-        extras.ballStopOff();
-        // wait for shooting to finish
-        safeWaitSeconds(3);
+        Actions.runBlocking(new ParallelAction(
+                new SequentialAction(
+                        ToInitialPosition,
+                        new InstantAction(() -> extras.intakeForward()),
+                        new InstantAction(() -> extras.ballStopOff()),
+                        new SleepAction(1.0),
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.ballStopOn())),
+                extras.setLauncherAction(launcherSpeed)
+        ));
 
         // drive off the line
         Action ToPark = drive.actionBuilder(drive.localizer.getPose())
