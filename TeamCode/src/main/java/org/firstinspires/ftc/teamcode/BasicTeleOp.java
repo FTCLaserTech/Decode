@@ -82,11 +82,18 @@ public class BasicTeleOp extends LinearOpMode
         long loopCounter = 0;
 
         telemetry.addData("Team Color: ", extras.teamColor);
-        telemetry.addData("adjustedAngle: ", Math.toDegrees(drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)));
-        telemetry.addData("previousOrientation: ", Math.toDegrees(previousOrientation));
-        //telemetry.addData("Odo Orientation: ", drive.odo.getHeading());
-        telemetry.addLine("Init Complete");
 
+        PinpointLocalizer ppLocalizer = (PinpointLocalizer) drive.localizer;
+        double ppYaw = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
+        double imuYaw = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        telemetry.addData("ppYaw r: ", ppYaw);
+        telemetry.addData("imuYaw r: ", imuYaw);
+        telemetry.addData("savedAngle r: ", previousOrientation);
+        telemetry.addData("ppYaw d: ", Math.toDegrees(ppYaw));
+        telemetry.addData("imuYaw d: ", Math.toDegrees(imuYaw));
+        telemetry.addData("savedAngle d: ", Math.toDegrees(previousOrientation));
+
+        telemetry.addLine("Init Complete");
         telemetry.update();
 
         waitForStart();

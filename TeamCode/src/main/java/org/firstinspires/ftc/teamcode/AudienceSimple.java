@@ -104,8 +104,21 @@ public class AudienceSimple extends LinearOpMode
 
         // Save the ending location
         //extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);
-        extras.saveAutoStartRotation(drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2);
+        PinpointLocalizer ppLocalizer = (PinpointLocalizer) drive.localizer;
+        double ppYaw = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
+        double imuYaw = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double savedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2;
+        extras.saveAutoStartRotation(savedAngle);
 
+        telemetry.addData("ppYaw r: ", ppYaw);
+        telemetry.addData("imuYaw r: ", imuYaw);
+        telemetry.addData("savedAngle r: ", savedAngle);
+        telemetry.addData("ppYaw d: ", Math.toDegrees(ppYaw));
+        telemetry.addData("imuYaw d: ", Math.toDegrees(imuYaw));
+        telemetry.addData("savedAngle d: ", Math.toDegrees(savedAngle));
+        telemetry.update();
+
+        safeWaitSeconds(10.0);
     }
 
     public void safeWaitSeconds(double time)
