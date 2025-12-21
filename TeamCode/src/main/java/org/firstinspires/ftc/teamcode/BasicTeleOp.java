@@ -47,9 +47,10 @@ public class BasicTeleOp extends LinearOpMode
         double stickSideways;
         double stickForwardRotated;
         double stickSidewaysRotated;
-        double adjustedAngle;
-        double speedMultiplier;
-        double rotationMultiplier;
+        double imuHeading = 0.0;
+        double adjustedHeading = 0.0;
+        double speedMultiplier = 1.0;
+        double rotationMultiplier = 1.0;
 
         double turretPower = 0.0;
         double launcherSpeed = 0.0;
@@ -229,7 +230,6 @@ public class BasicTeleOp extends LinearOpMode
                 extras.ballStopOn();
             }
 
-
             // DRIVE CONTROL STARTS HERE
             if (gamepad1.left_bumper)
             {
@@ -242,29 +242,14 @@ public class BasicTeleOp extends LinearOpMode
                 rotationMultiplier = 1.0;
             }
 
-            //adjustedAngle = 0;
-            adjustedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-            telemetry.addData("IMUAngle: ", Math.toDegrees(adjustedAngle));
-            if(extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
-            {
-                //adjustedAngle = adjustedAngle + PI/2 + previousOrientation;
-                adjustedAngle = adjustedAngle - PI/2 - previousOrientation;
-            }
-            else  // team color is blue
-            {
-                //adjustedAngle = adjustedAngle - PI/2 + previousOrientation;
-                adjustedAngle = adjustedAngle + PI/2 + previousOrientation;
-            }
-
-            //drive.odo.update();
-            //adjustedAngle = drive.odo.getHeading() + (Math.PI / 2);
-            //adjustedAngle = drive.odo.getHeading() + previousOrientation;
-            //adjustedAngle = previousOrientation;
+            imuHeading = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+            telemetry.addData("IMU Heading: ", Math.toDegrees(adjustedHeading));
+            adjustedHeading = imuHeading - PI/2 - previousOrientation;
 
             stickSideways = gamepad1.left_stick_x * speedMultiplier;
             stickForward = -gamepad1.left_stick_y * speedMultiplier;
-            stickSidewaysRotated = (stickSideways * Math.cos(-adjustedAngle)) - (stickForward * Math.sin(-adjustedAngle));
-            stickForwardRotated = (stickSideways * Math.sin(-adjustedAngle)) + (stickForward * Math.cos(-adjustedAngle));
+            stickSidewaysRotated = (stickSideways * Math.cos(-adjustedHeading)) - (stickForward * Math.sin(-adjustedHeading));
+            stickForwardRotated = (stickSideways * Math.sin(-adjustedHeading)) + (stickForward * Math.cos(-adjustedHeading));
 
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
@@ -273,7 +258,6 @@ public class BasicTeleOp extends LinearOpMode
                     ),
                     -(gamepad1.right_stick_x * rotationMultiplier)
             ));
-
 
             if(gamepad2.yWasPressed())
             {
@@ -318,9 +302,9 @@ public class BasicTeleOp extends LinearOpMode
             //telemetry.addData("x", drive.pose.position.x);
             //telemetry.addData("y", drive.pose.position.y);
             //telemetry.addData("heading", drive.localizer.getPose().heading);
-            telemetry.addData("adjustedAngle: ", Math.toDegrees(adjustedAngle));
+            telemetry.addData("adjustedHeading: ", Math.toDegrees(adjustedHeading));
             telemetry.addData("previousOrientation: ", Math.toDegrees(previousOrientation));
-            //telemetry.addData("ODO adjusted angle", adjustedAngle);
+            //telemetry.addData("ODO adjusted angle", adjustedHeading);
             telemetry.addData("IMU angle", Math.toDegrees(drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)));
 
             //Pose2D pos = drive.odo.getPosition();
