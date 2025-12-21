@@ -127,7 +127,7 @@ public class AudienceSimple extends LinearOpMode
         chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
         //savedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2;
-        savedAngle = chYawFinal - chYawInitial + initialRotation - 270.0;
+        savedAngle = chYawFinal - chYawInitial + Math.toRadians(initialRotation) - Math.toRadians(270.0);
         extras.saveAutoStartRotation(savedAngle);
 
         telemetry.addData("ppYawI r: ", ppYawInitial);
