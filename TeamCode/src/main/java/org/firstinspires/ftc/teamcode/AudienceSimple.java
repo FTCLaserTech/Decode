@@ -36,6 +36,13 @@ public class AudienceSimple extends LinearOpMode
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
         AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
 
+        PinpointLocalizer ppLocalizer = (PinpointLocalizer) drive.localizer;
+        double ppYawInitial = 0.0;
+        double ppYawFinal = 0.0;
+        double chYawInitial = 0.0;
+        double chYawFinal = 0.0;
+        double savedAngle = 0.0;
+
         telemetry.addLine("Initialized");
         //telemetry.addData("x", drive.pose.position.x);
         //telemetry.addData("y", drive.pose.position.y);
@@ -51,6 +58,18 @@ public class AudienceSimple extends LinearOpMode
         {
             autoFun.autoInitFunction();
             safeWaitSeconds(0.01);
+
+            ppYawInitial = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
+            chYawInitial = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+            savedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2;
+            extras.saveAutoStartRotation(savedAngle);
+
+            telemetry.addData("ppYaw r: ", ppYawInitial);
+            telemetry.addData("imuYaw r: ", chYawInitial);
+            telemetry.addData("savedAngle r: ", savedAngle);
+            telemetry.addData("ppYaw d: ", Math.toDegrees(ppYawInitial));
+            telemetry.addData("imuYaw d: ", Math.toDegrees(chYawInitial));
+            telemetry.addData("savedAngle d: ", Math.toDegrees(savedAngle));
 
             telemetry.update();
         }
@@ -104,17 +123,20 @@ public class AudienceSimple extends LinearOpMode
 
         // Save the ending location
         //extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);
-        PinpointLocalizer ppLocalizer = (PinpointLocalizer) drive.localizer;
-        double ppYaw = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
-        double imuYaw = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-        double savedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2;
+        ppYawFinal = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
+        chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        savedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2;
         extras.saveAutoStartRotation(savedAngle);
 
-        telemetry.addData("ppYaw r: ", ppYaw);
-        telemetry.addData("imuYaw r: ", imuYaw);
+        telemetry.addData("ppYawI r: ", ppYawInitial);
+        telemetry.addData("ppYawF r: ", ppYawFinal);
+        telemetry.addData("chYawI r: ", chYawInitial);
+        telemetry.addData("chYawF r: ", chYawFinal);
+        telemetry.addData("ppYawI d: ", Math.toDegrees(ppYawInitial));
+        telemetry.addData("ppYawF d: ", Math.toDegrees(ppYawFinal));
+        telemetry.addData("chYawI d: ", Math.toDegrees(chYawInitial));
+        telemetry.addData("chYawF d: ", Math.toDegrees(chYawFinal));
         telemetry.addData("savedAngle r: ", savedAngle);
-        telemetry.addData("ppYaw d: ", Math.toDegrees(ppYaw));
-        telemetry.addData("imuYaw d: ", Math.toDegrees(imuYaw));
         telemetry.addData("savedAngle d: ", Math.toDegrees(savedAngle));
         telemetry.update();
 
