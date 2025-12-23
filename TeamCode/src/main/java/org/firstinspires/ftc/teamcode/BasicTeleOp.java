@@ -32,6 +32,7 @@ public class BasicTeleOp extends LinearOpMode
         datalog = new ExtraOpModeFunctions.Datalog("datalog_01");
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
+        sleep(300);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
 
         Targeting targeting = Targeting.AUTO;
@@ -243,7 +244,7 @@ public class BasicTeleOp extends LinearOpMode
             }
 
             imuHeading = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-            adjustedHeading = imuHeading - PI/2 + previousOrientation;
+            adjustedHeading = imuHeading - previousOrientation - PI/2;
 
             stickSideways = gamepad1.left_stick_x * speedMultiplier;
             stickForward = -gamepad1.left_stick_y * speedMultiplier;

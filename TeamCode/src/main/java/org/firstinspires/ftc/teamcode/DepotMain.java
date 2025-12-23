@@ -32,6 +32,7 @@ public class DepotMain extends LinearOpMode
         Pose2d initPose = new Pose2d(0,0,Math.toRadians(initialRotation));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
+        safeWaitSeconds(0.3);
         VisionFunctions vision = new VisionFunctions(hardwareMap, this);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
         AutoFunctions autoFun = new AutoFunctions(this, extras, vision);

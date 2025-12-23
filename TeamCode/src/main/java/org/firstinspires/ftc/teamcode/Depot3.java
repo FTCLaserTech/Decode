@@ -32,6 +32,7 @@ public class Depot3 extends LinearOpMode
         Pose2d initPose = new Pose2d(0,0,Math.toRadians(initialRotation));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
+        safeWaitSeconds(0.3);
         VisionFunctions vision = new VisionFunctions(hardwareMap, this);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
         AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
@@ -63,10 +64,9 @@ public class Depot3 extends LinearOpMode
             chYawInitial = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
             telemetry.addData("ppYaw r: ", ppYawInitial);
-            telemetry.addData("imuYaw r: ", chYawInitial);
+            telemetry.addData("chYaw r: ", chYawInitial);
             telemetry.addData("ppYaw d: ", Math.toDegrees(ppYawInitial));
-            telemetry.addData("imuYaw d: ", Math.toDegrees(chYawInitial));
-            telemetry.addData("savedAngle d: ", Math.toDegrees(savedAngle));
+            telemetry.addData("chYaw d: ", Math.toDegrees(chYawInitial));
 
             telemetry.update();
         }
@@ -120,8 +120,8 @@ public class Depot3 extends LinearOpMode
         chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
         //savedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2;
-        savedAngle = chYawFinal - chYawInitial + Math.toRadians(initialRotation) - Math.toRadians(270.0);
-        extras.saveAutoStartRotation(savedAngle);
+        //savedAngle = chYawFinal - chYawInitial + Math.toRadians(initialRotation) - Math.toRadians(270.0);
+        savedAngle = chYawInitial;
 
         telemetry.addData("ppYawI r: ", ppYawInitial);
         telemetry.addData("ppYawF r: ", ppYawFinal);
@@ -135,7 +135,9 @@ public class Depot3 extends LinearOpMode
         telemetry.addData("savedAngle d: ", Math.toDegrees(savedAngle));
         telemetry.update();
 
-        safeWaitSeconds(5.0);
+        safeWaitSeconds(2.0);
+
+        extras.saveAutoStartRotation(savedAngle);
 
     }
 
