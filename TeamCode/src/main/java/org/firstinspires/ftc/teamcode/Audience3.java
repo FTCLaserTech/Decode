@@ -22,7 +22,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Autonomous(group = "a")
 
-public class AudienceSimple extends LinearOpMode
+public class Audience3 extends LinearOpMode
 {
     @Override
 
@@ -61,12 +61,9 @@ public class AudienceSimple extends LinearOpMode
 
             ppYawInitial = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
             chYawInitial = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-            savedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2;
-            extras.saveAutoStartRotation(savedAngle);
 
             telemetry.addData("ppYaw r: ", ppYawInitial);
             telemetry.addData("imuYaw r: ", chYawInitial);
-            telemetry.addData("savedAngle r: ", savedAngle);
             telemetry.addData("ppYaw d: ", Math.toDegrees(ppYawInitial));
             telemetry.addData("imuYaw d: ", Math.toDegrees(chYawInitial));
             telemetry.addData("savedAngle d: ", Math.toDegrees(savedAngle));
@@ -76,7 +73,7 @@ public class AudienceSimple extends LinearOpMode
 
         // AFTER START IS PRESSED
 
-        Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(10),0,Math.toRadians(autoFun.redBlueR(initialRotation,90)));
+        Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(10),0,Math.toRadians(autoFun.redBlueR(initialRotation,125)));
         Pose2d toParkPosition = new Pose2d(autoFun.redBlueT(0),-30,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
         Pose2d toFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-30,Math.toRadians(270));
         Pose2d pickUpFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-40,Math.toRadians(270));
@@ -119,7 +116,9 @@ public class AudienceSimple extends LinearOpMode
         // turn the intake and shooter off
         extras.intakeOff();
         extras.ballStopOn();
-        extras.setLauncher(0.0);
+        extras.launcher1.setPower(0.0);
+        extras.launcher2.setPower(0.0);
+        //extras.setLauncher(0.0);
 
         // Save the ending location
         //extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);

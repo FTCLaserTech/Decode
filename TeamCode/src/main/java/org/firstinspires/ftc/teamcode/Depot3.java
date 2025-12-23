@@ -22,7 +22,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Autonomous(group = "a")
 
-public class DepotSimple extends LinearOpMode
+public class Depot3 extends LinearOpMode
 {
     @Override
 
@@ -35,6 +35,13 @@ public class DepotSimple extends LinearOpMode
         VisionFunctions vision = new VisionFunctions(hardwareMap, this);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
         AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
+
+        PinpointLocalizer ppLocalizer = (PinpointLocalizer) drive.localizer;
+        double ppYawInitial = 0.0;
+        double ppYawFinal = 0.0;
+        double chYawInitial = 0.0;
+        double chYawFinal = 0.0;
+        double savedAngle = 0.0;
 
         telemetry.addLine("Initialized");
         //telemetry.addData("x", drive.pose.position.x);
@@ -52,12 +59,21 @@ public class DepotSimple extends LinearOpMode
             autoFun.autoInitFunction();
             safeWaitSeconds(0.01);
 
+            ppYawInitial = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
+            chYawInitial = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+            telemetry.addData("ppYaw r: ", ppYawInitial);
+            telemetry.addData("imuYaw r: ", chYawInitial);
+            telemetry.addData("ppYaw d: ", Math.toDegrees(ppYawInitial));
+            telemetry.addData("imuYaw d: ", Math.toDegrees(chYawInitial));
+            telemetry.addData("savedAngle d: ", Math.toDegrees(savedAngle));
+
             telemetry.update();
         }
 
         // AFTER START IS PRESSED
 
-        Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(-25),20,Math.toRadians(autoFun.redBlueR(initialRotation,145)));
+        Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(-25),20,Math.toRadians(autoFun.redBlueR(initialRotation,150)));
         Pose2d toSpike3 = new Pose2d(autoFun.redBlueT(0),-30,Math.toRadians(autoFun.redBlueR(initialRotation,180)));
         Pose2d toFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-30,Math.toRadians(270));
         Pose2d pickUpFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-40,Math.toRadians(270));
@@ -67,6 +83,8 @@ public class DepotSimple extends LinearOpMode
 
         // turn on the LimeLight
         vision.limelight.start();
+
+        safeWaitSeconds(autoFun.startDelay);
 
         // Turn on shooter to the expected speed
         double launcherSpeed = 1400.0;
@@ -87,19 +105,37 @@ public class DepotSimple extends LinearOpMode
                 extras.setLauncherAction(launcherSpeed)
         ));
 
-        safeWaitSeconds(autoFun.startDelay);
-
-
         safeWaitSeconds(2);
 
         // turn the intake and shooter off
         extras.intakeOff();
         extras.ballStopOn();
-        extras.setLauncher(0.0);
+        //extras.setLauncher(0.0);
+        extras.launcher1.setPower(0.0);
+        extras.launcher2.setPower(0.0);
 
         // Save the ending location
         //extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);
-        extras.saveAutoStartRotation(drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2);
+        ppYawFinal = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
+        chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+        //savedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2;
+        savedAngle = chYawFinal - chYawInitial + Math.toRadians(initialRotation) - Math.toRadians(270.0);
+        extras.saveAutoStartRotation(savedAngle);
+
+        telemetry.addData("ppYawI r: ", ppYawInitial);
+        telemetry.addData("ppYawF r: ", ppYawFinal);
+        telemetry.addData("chYawI r: ", chYawInitial);
+        telemetry.addData("chYawF r: ", chYawFinal);
+        telemetry.addData("ppYawI d: ", Math.toDegrees(ppYawInitial));
+        telemetry.addData("ppYawF d: ", Math.toDegrees(ppYawFinal));
+        telemetry.addData("chYawI d: ", Math.toDegrees(chYawInitial));
+        telemetry.addData("chYawF d: ", Math.toDegrees(chYawFinal));
+        telemetry.addData("savedAngle r: ", savedAngle);
+        telemetry.addData("savedAngle d: ", Math.toDegrees(savedAngle));
+        telemetry.update();
+
+        safeWaitSeconds(5.0);
 
     }
 

@@ -357,7 +357,8 @@ public class ExtraOpModeFunctions
         if(freezeRange == false)
         {
             // range to speed function
-            shooterTargetVelocity = 1049 + (12.8 * targetRange) - (0.0294 * targetRange * targetRange);
+            //shooterTargetVelocity = 1049 + (12.8 * targetRange) - (0.0294 * targetRange * targetRange);
+            shooterTargetVelocity = 985 + (13.2 * targetRange) - (0.024 * targetRange * targetRange);
         }
         return(shooterTargetVelocity);
     }

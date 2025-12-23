@@ -88,10 +88,10 @@ public class BasicTeleOp extends LinearOpMode
         double ppYaw = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
         double imuYaw = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         telemetry.addData("ppYaw r: ", ppYaw);
-        telemetry.addData("imuYaw r: ", imuYaw);
-        telemetry.addData("savedAngle r: ", previousOrientation);
+        telemetry.addData("chYaw r: ", imuYaw);
         telemetry.addData("ppYaw d: ", Math.toDegrees(ppYaw));
-        telemetry.addData("imuYaw d: ", Math.toDegrees(imuYaw));
+        telemetry.addData("chYaw d: ", Math.toDegrees(imuYaw));
+        telemetry.addData("savedAngle r: ", previousOrientation);
         telemetry.addData("savedAngle d: ", Math.toDegrees(previousOrientation));
 
         telemetry.addLine("Init Complete");
@@ -243,8 +243,7 @@ public class BasicTeleOp extends LinearOpMode
             }
 
             imuHeading = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-            telemetry.addData("IMU Heading: ", Math.toDegrees(adjustedHeading));
-            adjustedHeading = imuHeading - PI/2 - previousOrientation;
+            adjustedHeading = imuHeading - PI/2 + previousOrientation;
 
             stickSideways = gamepad1.left_stick_x * speedMultiplier;
             stickForward = -gamepad1.left_stick_y * speedMultiplier;
@@ -302,10 +301,11 @@ public class BasicTeleOp extends LinearOpMode
             //telemetry.addData("x", drive.pose.position.x);
             //telemetry.addData("y", drive.pose.position.y);
             //telemetry.addData("heading", drive.localizer.getPose().heading);
+            telemetry.addData("IMU Heading: ", Math.toDegrees(imuHeading));
             telemetry.addData("adjustedHeading: ", Math.toDegrees(adjustedHeading));
             telemetry.addData("previousOrientation: ", Math.toDegrees(previousOrientation));
             //telemetry.addData("ODO adjusted angle", adjustedHeading);
-            telemetry.addData("IMU angle", Math.toDegrees(drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)));
+            //telemetry.addData("IMU angle", Math.toDegrees(drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)));
 
             //Pose2D pos = drive.odo.getPosition();
             //String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
