@@ -44,6 +44,8 @@ public class Audience6 extends LinearOpMode
         double chYawFinal = 0.0;
         double savedAngle = 0.0;
 
+        drive.lazyImu.get().resetYaw();
+
         telemetry.addLine("Initialized");
         //telemetry.addData("x", drive.pose.position.x);
         //telemetry.addData("y", drive.pose.position.y);

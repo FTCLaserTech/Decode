@@ -326,7 +326,7 @@ public class ExtraOpModeFunctions
     {
         double turretPower = 0.0;
 
-        depotHeading = aprilTagPose.bearing;
+        depotHeading = aprilTagPose.bearing - 1;
         localLop.telemetry.addLine("Auto Aim Turret");
         localLop.telemetry.addData("depot heading: ", depotHeading);
         localLop.telemetry.addData("depot elevation: ", aprilTagPose.elevation);

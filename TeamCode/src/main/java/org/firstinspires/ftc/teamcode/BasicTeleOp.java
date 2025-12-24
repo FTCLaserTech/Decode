@@ -244,7 +244,7 @@ public class BasicTeleOp extends LinearOpMode
             }
 
             imuHeading = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-            adjustedHeading = imuHeading - previousOrientation - PI/2;
+            adjustedHeading = imuHeading - previousOrientation + PI/2;
 
             stickSideways = gamepad1.left_stick_x * speedMultiplier;
             stickForward = -gamepad1.left_stick_y * speedMultiplier;

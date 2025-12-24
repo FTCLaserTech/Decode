@@ -47,9 +47,6 @@ public class Audience3 extends LinearOpMode
         drive.lazyImu.get().resetYaw();
 
         telemetry.addLine("Initialized");
-        //telemetry.addData("x", drive.pose.position.x);
-        //telemetry.addData("y", drive.pose.position.y);
-        //telemetry.addData("heading", drive.pose.heading);
         telemetry.update();
 
         VisionFunctions.ObeliskPattern obelisk;
@@ -91,7 +88,6 @@ public class Audience3 extends LinearOpMode
         double launcherSpeed = 1800.0;
         extras.setLauncher(launcherSpeed);
 
-
         // drive off the line and rotate towards the depot
         Action ToInitialPosition = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
@@ -113,8 +109,6 @@ public class Audience3 extends LinearOpMode
                 .build();
         Actions.runBlocking(ToPark);
 
-        safeWaitSeconds(2);
-
         // turn the intake and shooter off
         extras.intakeOff();
         extras.ballStopOn();
@@ -123,28 +117,7 @@ public class Audience3 extends LinearOpMode
         //extras.setLauncher(0.0);
 
         // Save the ending location
-        //extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);
-        ppYawFinal = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
-        chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-
-        //savedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2;
-        //savedAngle = chYawFinal - chYawInitial + Math.toRadians(initialRotation) - Math.toRadians(270.0);
         savedAngle = chYawInitial;
-
-        telemetry.addData("ppYawI r: ", ppYawInitial);
-        telemetry.addData("ppYawF r: ", ppYawFinal);
-        telemetry.addData("chYawI r: ", chYawInitial);
-        telemetry.addData("chYawF r: ", chYawFinal);
-        telemetry.addData("ppYawI d: ", Math.toDegrees(ppYawInitial));
-        telemetry.addData("ppYawF d: ", Math.toDegrees(ppYawFinal));
-        telemetry.addData("chYawI d: ", Math.toDegrees(chYawInitial));
-        telemetry.addData("chYawF d: ", Math.toDegrees(chYawFinal));
-        telemetry.addData("savedAngle r: ", savedAngle);
-        telemetry.addData("savedAngle d: ", Math.toDegrees(savedAngle));
-        telemetry.update();
-
-        safeWaitSeconds(2.0);
-
         extras.saveAutoStartRotation(savedAngle);
     }
 

@@ -44,6 +44,8 @@ public class DepotMain extends LinearOpMode
         double chYawFinal = 0.0;
         double savedAngle = 0.0;
 
+        drive.lazyImu.get().resetYaw();
+
         telemetry.addLine("Initialized");
         //telemetry.addData("x", drive.pose.position.x);
         //telemetry.addData("y", drive.pose.position.y);
@@ -131,7 +133,7 @@ public class DepotMain extends LinearOpMode
                 .strafeToLinearHeading(toGate.position, toGate.heading)
                 .build();
         Actions.runBlocking(OpenGate);
-
+        //safeWaitSeconds(0.0);
         Action BackToLaunchSpot1 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
