@@ -73,11 +73,11 @@ public class Depot9 extends LinearOpMode
 
         Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(-45),20,Math.toRadians(autoFun.redBlueR(initialRotation,135)));
         Pose2d toSpike3 = new Pose2d(autoFun.redBlueT(-48),10,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
-        Pose2d pickupSpike3 = new Pose2d(autoFun.redBlueT(-48),-17,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d pickupSpike3 = new Pose2d(autoFun.redBlueT(-48),-15,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
         //Pose2d nearGate = new Pose2d(autoFun.redBlueT(-48),-5,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
         //Pose2d toGate = new Pose2d(autoFun.redBlueT(-62),-20,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
         Pose2d toSpike2 = new Pose2d(autoFun.redBlueT(-72),10,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
-        Pose2d pickupSpike2 = new Pose2d(autoFun.redBlueT(-72),-23,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d pickupSpike2 = new Pose2d(autoFun.redBlueT(-72),-15,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
         //Pose2d toSpike1 = new Pose2d(autoFun.redBlueT(-98),10,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
         //Pose2d pickupSpike1 = new Pose2d(autoFun.redBlueT(-98),-23,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
         Pose2d park = new Pose2d(autoFun.redBlueT(-60),-10,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
