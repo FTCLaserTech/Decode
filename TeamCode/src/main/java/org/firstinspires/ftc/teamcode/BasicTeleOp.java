@@ -191,7 +191,7 @@ public class BasicTeleOp extends LinearOpMode
                 turretPower = 0.0;
             }
             // now set the turret power
-            extras.turret.setPower(turretPower * 0.5);
+            extras.turret.setPower(turretPower * 0.6);
             telemetry.addData("turret power: ", extras.turret.getPower());
 
             // check if the launcher speed is in range and adjust if needed

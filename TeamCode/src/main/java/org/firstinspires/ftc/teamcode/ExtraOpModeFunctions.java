@@ -454,7 +454,7 @@ public class ExtraOpModeFunctions
     {
         // fitting a parabola through 3 points
         double x1 = turretGoodAngle;  // this is the minimum angle window
-        double y1 = 0.13;  // this point sets the minimum speed close to
+        double y1 = 0.13;  // this point sets the minimum speed
         double x2 = 12.0;  // this angle has the maximum speed
         double y2 = 0.5;  // this is the maximum speed - a servo max is 1
         double x3 = -x1;
