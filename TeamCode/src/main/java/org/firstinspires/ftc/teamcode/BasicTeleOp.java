@@ -2,10 +2,10 @@ package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
+import static java.lang.Math.atan2;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -14,7 +14,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 //imports from the Mecanum website
@@ -53,6 +52,15 @@ public class BasicTeleOp extends LinearOpMode
         double speedMultiplier = 1.0;
         double rotationMultiplier = 1.0;
 
+        double turretPosition = 0.5;
+        double MAX_TURRETANGLE = Math.toRadians(40.0);
+        double MIN_TURRETANGLE = Math.toRadians(-40.0);
+        double MAX_SERVO = 1.0;
+        double GOAL_X_RED = 66;
+        double GOAL_Y_RED = -66;
+        double GOAL_X_BLUE = -66;
+        double GOAL_Y_BLUE = -66;
+
         double turretPower = 0.0;
         double launcherSpeed = 0.0;
 
@@ -79,7 +87,6 @@ public class BasicTeleOp extends LinearOpMode
         extras.light1.setPosition(lightColor);
         extras.light2.setPosition(lightColor);
 
-
         boolean targetSearchingMode = false;
         long loopCounter = 0;
 
@@ -99,6 +106,9 @@ public class BasicTeleOp extends LinearOpMode
         telemetry.update();
 
         waitForStart();
+
+        Pose2d startPose = new Pose2d(0,0,Math.toRadians(270));
+        drive.localizer.setPose(startPose);
 
         extras.vision.limelight.start();
 
@@ -149,50 +159,100 @@ public class BasicTeleOp extends LinearOpMode
             }
             telemetry.addData("Launcher On: ", launcherOn);
 
-            // Look for the Depot
-            depotFound = extras.lookForDeopt();
+            //////////////
+            // start of aiming
 
-            if ((targeting == Targeting.AUTO) && (depotFound))
+            // false = odometry
+            // treu = limelight
+            if(true) // limelight
             {
-                turretPower = extras.autoAimTurret();
-                telemetry.addData("AutoTurret Aim OK? ", extras.isTurretAimGood());
+                // Look for the Depot
+                depotFound = extras.lookForDeopt();
 
-                launcherSpeed = extras.autoLauncherSpeed();
-            }
-            else // manual targeting
-            {
-                // manual turret
-                // joystick for rotate
-                turretPower = gamepad2.left_stick_x * 0.5;
-
-                // manual speed
-                // buttons for range
-                if (gamepad2.dpadUpWasPressed())
+                if ((targeting == Targeting.AUTO) && (depotFound))
                 {
-                    launcherSpeed = launcherSpeed + 20.0;
-                    //launcherSpeed = launcherSpeed + 0.05;
-                }
-                if (gamepad2.dpadDownWasPressed())
-                {
-                    launcherSpeed = launcherSpeed - 20.0;
-                    //launcherSpeed = launcherSpeed - 0.05;
-                }
-            }
+                    turretPower = extras.autoAimTurret();
+                    telemetry.addData("AutoTurret Aim OK? ", extras.isTurretAimGood());
 
-            // check if the turret is at a limit and stop it if it is
-            telemetry.addData("CW Limit: ", extras.turretLimitCW.isPressed());
-            telemetry.addData("CCW Limit: ", extras.turretLimitCCW.isPressed());
-            if ((extras.turretLimitCW.isPressed()) && (turretPower > 0))
-            {
-                turretPower = 0.0;
+                    launcherSpeed = extras.autoLauncherSpeed();
+                }
+                else // manual targeting
+                {
+                    // manual turret
+                    // joystick for rotate
+                    turretPower = gamepad2.left_stick_x * 0.5;
+                }
+
+                // check if the turret is at a limit and stop it if it is
+                telemetry.addData("CW Limit: ", extras.turretLimitCW.isPressed());
+                telemetry.addData("CCW Limit: ", extras.turretLimitCCW.isPressed());
+                if ((extras.turretLimitCW.isPressed()) && (turretPower > 0))
+                {
+                    turretPower = 0.0;
+                } else if ((extras.turretLimitCCW.isPressed()) && (turretPower < 0))
+                {
+                    turretPower = 0.0;
+                }
+                // now set the turret power
+                extras.turretCR.setPower(turretPower * 0.6);
+                telemetry.addData("turret power: ", extras.turretCR.getPower());
             }
-            else if ((extras.turretLimitCCW.isPressed()) && (turretPower < 0))
+            else // odometry
             {
-                turretPower = 0.0;
+                double driveHeading = drive.localizer.getPose().heading.toDouble();
+                double launcherHeading = driveHeading - Math.PI;
+                double goalHeading = 0;
+                double turretAngle = 0;
+                if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
+                {
+                    goalHeading = atan2(GOAL_Y_RED - drive.localizer.getPose().position.y, GOAL_X_RED - drive.localizer.getPose().position.x);
+                    turretAngle = goalHeading - launcherHeading;
+                }
+                else
+                {
+                    goalHeading = atan2(GOAL_Y_BLUE - drive.localizer.getPose().position.y, GOAL_X_BLUE - drive.localizer.getPose().position.x);
+                    turretAngle = Math.toRadians(180) - (launcherHeading - goalHeading);
+                }
+                if(turretAngle > Math.PI)
+                {
+                    turretAngle = turretAngle - 2*PI;
+                }
+                else if(turretAngle < -Math.PI)
+                {
+                    turretAngle = turretAngle + 2*PI;
+                }
+
+                telemetry.addData("drive x", drive.localizer.getPose().position.x);
+                telemetry.addData("drive y", drive.localizer.getPose().position.y);
+                telemetry.addData("drive heading", driveHeading );
+                telemetry.addData("goal heading", goalHeading );
+                telemetry.addData("turret angle", Math.toDegrees(turretAngle));
+
+                if (targeting == Targeting.AUTO)
+                {
+                    ;
+                }
+                else // manual targeting
+                {
+                    double turretStick = gamepad2.left_stick_x * 0.05;
+                    turretAngle = turretAngle + turretStick;
+                }
+
+                if(turretAngle > MAX_TURRETANGLE)
+                {
+                    turretAngle = MAX_TURRETANGLE;
+                }
+                else if(turretAngle < MIN_TURRETANGLE)
+                {
+                    turretAngle = MIN_TURRETANGLE;
+                }
+
+                turretPosition = turretAngle * ((MAX_SERVO - 0.5)/MAX_TURRETANGLE) + 0.5;
+                //extras.turretS.setPosition(turretPosition);
+                telemetry.addData("turret voltage", turretPosition);
             }
-            // now set the turret power
-            extras.turret.setPower(turretPower * 0.6);
-            telemetry.addData("turret power: ", extras.turret.getPower());
+            // end of aiming
+            //////////////
 
             // check if the launcher speed is in range and adjust if needed
             if (launcherSpeed > extras.maxLauncherTPS)
@@ -225,7 +285,8 @@ public class BasicTeleOp extends LinearOpMode
             else if (gamepad1.left_trigger > 0)
             {
                 extras.intakeForward();
-            } else
+            }
+            else
             {
                 extras.intakeOff();
                 extras.ballStopOn();
@@ -298,10 +359,9 @@ public class BasicTeleOp extends LinearOpMode
                 extras.saveAutoStartRotation(previousOrientation);
             }
 
-
-            //telemetry.addData("x", drive.pose.position.x);
-            //telemetry.addData("y", drive.pose.position.y);
-            //telemetry.addData("heading", drive.localizer.getPose().heading);
+            //telemetry.addData("pp x", ppLocalizer.driver.getPosX(DistanceUnit.INCH));
+            //telemetry.addData("pp y", ppLocalizer.driver.getPosY(DistanceUnit.INCH));
+            //telemetry.addData("pp heading", ppLocalizer.driver.getHeading(AngleUnit.DEGREES));
             telemetry.addData("IMU Heading: ", Math.toDegrees(imuHeading));
             telemetry.addData("adjustedHeading: ", Math.toDegrees(adjustedHeading));
             telemetry.addData("previousOrientation: ", Math.toDegrees(previousOrientation));

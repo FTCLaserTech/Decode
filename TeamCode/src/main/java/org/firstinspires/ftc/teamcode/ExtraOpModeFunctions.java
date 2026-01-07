@@ -64,7 +64,8 @@ public class ExtraOpModeFunctions
     public DcMotorEx launcher2;
     public DcMotorEx intake;
     public Servo ballStop;
-    public CRServo turret;
+    public CRServo turretCR;
+    public Servo turretS;
     public TouchSensor turretLimitCW;  // Digital channel Object
     public TouchSensor turretLimitCCW;  // Digital channel Object
     public Servo light1;
@@ -104,8 +105,10 @@ public class ExtraOpModeFunctions
         localLop = linearOpMode;
         vision = new VisionFunctions(hardwareMap, localLop);
 
-        turret = hardwareMap.get(CRServo.class, "turret");
-        turret.setDirection(DcMotorSimple.Direction.REVERSE);
+        turretCR = hardwareMap.get(CRServo.class, "turretCR");
+        turretCR.setDirection(DcMotorSimple.Direction.REVERSE);
+        turretS = hardwareMap.get(Servo.class, "turretS");
+        turretS.setDirection(Servo.Direction.REVERSE);
         turretLimitCW = hardwareMap.get(TouchSensor.class, "turretLimitCW");
         turretLimitCCW = hardwareMap.get(TouchSensor.class, "turretLimitCCW");
 
