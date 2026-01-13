@@ -292,6 +292,24 @@ public class BasicTeleOp extends LinearOpMode
                 extras.ballStopOn();
             }
 
+            if(gamepad2.dpad_left)
+            {
+                extras.turretmoveForward();
+            }
+            else
+            {
+                extras.turretmoveOff();
+            }
+
+            if(gamepad2.right_bumper)
+            {
+                extras.turretmoveReverse();
+            }
+            else
+            {
+                extras.turretmoveOff();
+            }
+
             // DRIVE CONTROL STARTS HERE
             if (gamepad1.left_bumper)
             {
