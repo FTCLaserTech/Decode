@@ -18,7 +18,11 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDir
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
@@ -381,7 +385,7 @@ public class VisionFunctions {
     }   // end method readBlueAprilTag_cam()
 
     /**
-     * Read the Depot AprilTag with the camera
+     * Read the Depot AprilTag with the limelight
      */
     public AprilTagPoseFtc readDepotAprilTag_ll(int idColor)
     {
@@ -402,7 +406,7 @@ public class VisionFunctions {
     }   // end method readDepotAprilTag_ll()
 
     /**
-     * Read the Red AprilTag with the camera
+     * Read the Red AprilTag with the limelight
      */
     public AprilTagPoseFtc readRedAprilTag_ll()
     {
@@ -411,13 +415,28 @@ public class VisionFunctions {
     }   // end method readRedAprilTag_ll()/**
 
     /**
-     * Read the Blue AprilTag with the camera
+     * Read the Blue AprilTag with the limelight
      */
     public AprilTagPoseFtc readBlueAprilTag_ll()
     {
         localLop.telemetry.addLine("Blue Limelight ");
         return readDepotAprilTag_ll(20);
     }   // end method readBlueAprilTag_ll()
+
+    public Pose3D getRobotFieldPosition(double yaw)
+    {
+        limelight.updateRobotOrientation(yaw);
+        LLResult llResult = limelight.getLatestResult();
+        if (llResult.isValid())
+        {
+            return(llResult.getBotpose());
+        }
+        else
+        {
+            //return null;
+            return new Pose3D(new Position(DistanceUnit.INCH,0,0,0,0),new YawPitchRollAngles(AngleUnit.RADIANS,0,0,0,0));
+        }
+    }
 
     public AprilTagPoseFtc pose3D_to_AprilTagPoseFtc(Pose3D pose3d)
     {

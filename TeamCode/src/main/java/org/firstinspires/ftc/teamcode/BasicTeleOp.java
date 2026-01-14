@@ -12,9 +12,11 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 //imports from the Mecanum website
 
@@ -34,7 +36,7 @@ public class BasicTeleOp extends LinearOpMode
         sleep(300);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
 
-        Targeting targeting = Targeting.AUTO;
+        Targeting targeting = Targeting.MANUAL;
 
         //TrajectoryBook book = new TrajectoryBook(drive, extras);
 
@@ -52,14 +54,16 @@ public class BasicTeleOp extends LinearOpMode
         double speedMultiplier = 1.0;
         double rotationMultiplier = 1.0;
 
+        double turretAngle = 0;
         double turretPosition = 0.5;
         double MAX_TURRETANGLE = Math.toRadians(40.0);
         double MIN_TURRETANGLE = Math.toRadians(-40.0);
         double MAX_SERVO = 1.0;
-        double GOAL_X_RED = 66;
-        double GOAL_Y_RED = -66;
-        double GOAL_X_BLUE = -66;
-        double GOAL_Y_BLUE = -66;
+        double MAX_TURRETENCODER = 1955.0;
+        double GOAL_X_RED = 62;
+        double GOAL_Y_RED = -62;
+        double GOAL_X_BLUE = 62;
+        double GOAL_Y_BLUE = 62;
 
         double turretPower = 0.0;
         double launcherSpeed = 0.0;
@@ -114,6 +118,8 @@ public class BasicTeleOp extends LinearOpMode
 
         while (!isStopRequested())
         {
+            imuHeading = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
             // change team color if needed
             if (gamepad2.xWasPressed())
             {
@@ -127,6 +133,8 @@ public class BasicTeleOp extends LinearOpMode
                     extras.teamColor = ExtraOpModeFunctions.TeamColor.RED;
                     lightColor = extras.Light_Red;
                 }
+                extras.saveTeamColor(extras.teamColor);
+
                 extras.light1.setPosition(lightColor);
                 extras.light2.setPosition(lightColor);
             }
@@ -163,8 +171,8 @@ public class BasicTeleOp extends LinearOpMode
             // start of aiming
 
             // false = odometry
-            // treu = limelight
-            if(true) // limelight
+            // true = limelight
+            if(false) // limelight
             {
                 // Look for the Depot
                 depotFound = extras.lookForDeopt();
@@ -202,16 +210,13 @@ public class BasicTeleOp extends LinearOpMode
                 double driveHeading = drive.localizer.getPose().heading.toDouble();
                 double launcherHeading = driveHeading - Math.PI;
                 double goalHeading = 0;
-                double turretAngle = 0;
                 if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
                 {
                     goalHeading = atan2(GOAL_Y_RED - drive.localizer.getPose().position.y, GOAL_X_RED - drive.localizer.getPose().position.x);
-                    turretAngle = goalHeading - launcherHeading;
                 }
                 else
                 {
                     goalHeading = atan2(GOAL_Y_BLUE - drive.localizer.getPose().position.y, GOAL_X_BLUE - drive.localizer.getPose().position.x);
-                    turretAngle = Math.toRadians(180) - (launcherHeading - goalHeading);
                 }
                 if(turretAngle > Math.PI)
                 {
@@ -226,15 +231,14 @@ public class BasicTeleOp extends LinearOpMode
                 telemetry.addData("drive y", drive.localizer.getPose().position.y);
                 telemetry.addData("drive heading", driveHeading );
                 telemetry.addData("goal heading", goalHeading );
-                telemetry.addData("turret angle", Math.toDegrees(turretAngle));
 
                 if (targeting == Targeting.AUTO)
                 {
-                    ;
+                    turretAngle = goalHeading - launcherHeading;
                 }
                 else // manual targeting
                 {
-                    double turretStick = gamepad2.left_stick_x * 0.05;
+                    double turretStick = gamepad2.left_stick_x * 0.01;
                     turretAngle = turretAngle + turretStick;
                 }
 
@@ -247,9 +251,24 @@ public class BasicTeleOp extends LinearOpMode
                     turretAngle = MIN_TURRETANGLE;
                 }
 
-                turretPosition = turretAngle * ((MAX_SERVO - 0.5)/MAX_TURRETANGLE) + 0.5;
+                //turretPosition = turretAngle * ((MAX_SERVO - 0.5)/MAX_TURRETANGLE) + 0.5;
                 //extras.turretS.setPosition(turretPosition);
-                telemetry.addData("turret voltage", turretPosition);
+
+                turretPosition = turretAngle * ((MAX_TURRETENCODER)/MAX_TURRETANGLE);
+                extras.turretMotor.setTargetPosition((int)turretPosition);
+                //extras.turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                extras.turretMotor.setPower(1.0);
+                telemetry.addData("turret angle", Math.toDegrees(turretAngle));
+                telemetry.addData("turret position", turretPosition);
+                telemetry.addData("turret encoder", extras.turretMotor.getCurrentPosition());
+
+                Pose3D pose3D = extras.vision.getRobotFieldPosition(imuHeading);
+                telemetry.addData("x", pose3D.getPosition().x);
+                telemetry.addData("y", pose3D.getPosition().y);
+                telemetry.addData("z", pose3D.getPosition().z);
+                telemetry.addData("roll", pose3D.getOrientation().getRoll(AngleUnit.DEGREES));
+                telemetry.addData("pitch", pose3D.getOrientation().getPitch(AngleUnit.DEGREES));
+                telemetry.addData("yaw", pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
             }
             // end of aiming
             //////////////
@@ -292,23 +311,20 @@ public class BasicTeleOp extends LinearOpMode
                 extras.ballStopOn();
             }
 
-            if(gamepad2.dpad_left)
+            /*
+            if(gamepad2.left_bumper)
             {
-                extras.turretmoveForward();
+                extras.turretMotorForward();
+            }
+            else if(gamepad2.right_bumper)
+            {
+                extras.turretMotorReverse();
             }
             else
             {
-                extras.turretmoveOff();
+                extras.turretMotorOff();
             }
-
-            if(gamepad2.right_bumper)
-            {
-                extras.turretmoveReverse();
-            }
-            else
-            {
-                extras.turretmoveOff();
-            }
+             */
 
             // DRIVE CONTROL STARTS HERE
             if (gamepad1.left_bumper)
@@ -322,7 +338,6 @@ public class BasicTeleOp extends LinearOpMode
                 rotationMultiplier = 1.0;
             }
 
-            imuHeading = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
             adjustedHeading = imuHeading - previousOrientation + PI/2;
 
             stickSideways = gamepad1.left_stick_x * speedMultiplier;

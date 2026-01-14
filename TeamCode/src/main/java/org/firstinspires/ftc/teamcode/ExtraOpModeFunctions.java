@@ -60,7 +60,7 @@ public class ExtraOpModeFunctions
 
     public static final double PI = 3.14159265;
 
-    public DcMotorEx turretmove;
+    public DcMotorEx turretMotor;
     public DcMotorEx launcher1;
     public DcMotorEx launcher2;
     public DcMotorEx intake;
@@ -135,11 +135,12 @@ public class ExtraOpModeFunctions
         intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intake.setVelocity(0.0);
 
-        turretmove = hardwareMap.get(DcMotorEx.class, "turretmove");
-        turretmove.setDirection(DcMotorEx.Direction.FORWARD);
-        turretmove.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        turretmove.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        turretmove.setVelocity(0.0);
+        turretMotor = hardwareMap.get(DcMotorEx.class, "turretMotor");
+        turretMotor.setDirection(DcMotorEx.Direction.FORWARD);
+        turretMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        turretMotor.setTargetPosition(0);
+        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //turretMotor.setVelocity(0.0);
 
         ballStop = hardwareMap.get(Servo.class, "ballStop");
 
@@ -156,20 +157,22 @@ public class ExtraOpModeFunctions
         controller.setGoal(new KineticState(0.0, 0.0));
     }
 
-    public void turretmoveForward()
+    public void turretMotorForward()
     {
-        turretmove.setPower(1.0);
+        turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        turretMotor.setPower(0.2);
     }
 
-
-    public void turretmoveOff()
+    public void turretMotorOff()
     {
-        turretmove.setPower(0.0);
+        turretMotor.setPower(0.0);
+        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void turretmoveReverse()
+    public void turretMotorReverse()
     {
-        turretmove.setPower(-1.0);
+        turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        turretMotor.setPower(-0.2);
     }
 
     public void intakeForward()
