@@ -351,6 +351,12 @@ public class ExtraOpModeFunctions
         return(true);
     }
 
+    public AprilTagPoseFtc getAprilTagPose()
+    {
+        return(aprilTagPose);
+    }
+
+
     public double autoAimTurret()
     {
         double turretPower = 0.0;
@@ -378,18 +384,33 @@ public class ExtraOpModeFunctions
         return(aimGood);
     }
 
-    public double autoLauncherSpeed()
+    public double limelightLauncherSpeed()
     {
         double shooterTargetVelocity = 0.0;
         targetRange = aprilTagPose.range;
-        localLop.telemetry.addData("targetRange: ", targetRange);
         if(freezeRange == false)
         {
-            // range to speed function
-            //shooterTargetVelocity = 1049 + (12.8 * targetRange) - (0.0294 * targetRange * targetRange);
-            shooterTargetVelocity = 985 + (13.2 * targetRange) - (0.024 * targetRange * targetRange);
+            shooterTargetVelocity = distanceToLauncherSpeed(targetRange);
         }
         return(shooterTargetVelocity);
+    }
+
+    public double odometryLauncherSpeed(double goalDistance)
+    {
+        double shooterTargetVelocity = 0.0;
+        if(freezeRange == false)
+        {
+            shooterTargetVelocity = distanceToLauncherSpeed(goalDistance);
+        }
+        return(shooterTargetVelocity);
+    }
+
+    public double distanceToLauncherSpeed(double distance)
+    {
+        // range to speed function
+        //shooterTargetVelocity = 1049 + (12.8 * targetRange) - (0.0294 * targetRange * targetRange);
+        //return( 985 + (13.2 * distance) - (0.024 * distance * distance) );
+        return( 1155 + (5 * distance) + (0.00964 * distance * distance) );
     }
 
     public boolean isLauncherSpeedGood(double shooterTargetVelocity)

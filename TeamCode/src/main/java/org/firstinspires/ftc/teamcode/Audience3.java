@@ -72,8 +72,10 @@ public class Audience3 extends LinearOpMode
 
         // AFTER START IS PRESSED
 
-        Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(10),0,Math.toRadians(autoFun.redBlueR(initialRotation,125)));
-        Pose2d toParkPosition = new Pose2d(autoFun.redBlueT(0),-30,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d startPose = new Pose2d(-62, autoFun.redBlueT(-13.5), Math.toRadians(autoFun.redBlueT(initialRotation)));
+        drive.localizer.setPose(startPose);
+        Pose2d toInitialLaunchPosition = new Pose2d(-50,autoFun.redBlueT(-14),Math.toRadians(autoFun.redBlueT(145)));
+        Pose2d toParkPosition = new Pose2d(-60,autoFun.redBlueT(-35),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d toFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-30,Math.toRadians(270));
         Pose2d pickUpFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-40,Math.toRadians(270));
         Pose2d backToLaunchZone = new Pose2d(autoFun.redBlueT(0),0,Math.toRadians(270));

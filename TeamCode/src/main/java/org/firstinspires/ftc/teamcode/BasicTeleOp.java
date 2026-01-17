@@ -5,6 +5,7 @@ import static java.lang.Math.abs;
 import static java.lang.Math.atan2;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.lang.Math.sqrt;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
@@ -60,10 +61,14 @@ public class BasicTeleOp extends LinearOpMode
         double MIN_TURRETANGLE = Math.toRadians(-40.0);
         double MAX_SERVO = 1.0;
         double MAX_TURRETENCODER = 1955.0;
-        double GOAL_X_RED = 62;
-        double GOAL_Y_RED = -62;
-        double GOAL_X_BLUE = 62;
-        double GOAL_Y_BLUE = 62;
+        double GOAL_X_RED = 59; //62
+        double GOAL_Y_RED = -56; //-62
+        double GOAL_X_BLUE = 59; //62
+        double GOAL_Y_BLUE = 56; //62
+        double APRIL_TAG_X_RED = 59;
+        double APRIL_TAG_Y_RED = -56;
+        double APRIL_TAG_X_BLUE = 59;
+        double APRIL_TAG_Y_BLUE = 56;
 
         double turretPower = 0.0;
         double launcherSpeed = 0.0;
@@ -170,19 +175,24 @@ public class BasicTeleOp extends LinearOpMode
             //////////////
             // start of aiming
 
+            // Look for the Depot
+            depotFound = extras.lookForDeopt();
+            if (depotFound)
+            {
+                telemetry.addData("limelightTargetRange: ", extras.getAprilTagPose().range);
+            }
+
             // false = odometry
             // true = limelight
             if(false) // limelight
             {
-                // Look for the Depot
-                depotFound = extras.lookForDeopt();
 
                 if ((targeting == Targeting.AUTO) && (depotFound))
                 {
                     turretPower = extras.autoAimTurret();
                     telemetry.addData("AutoTurret Aim OK? ", extras.isTurretAimGood());
 
-                    launcherSpeed = extras.autoLauncherSpeed();
+                    launcherSpeed = extras.limelightLauncherSpeed();
                 }
                 else // manual targeting
                 {
@@ -207,39 +217,58 @@ public class BasicTeleOp extends LinearOpMode
             }
             else // odometry
             {
+                double drivePositionX = drive.localizer.getPose().position.x;
+                double drivePositionY = drive.localizer.getPose().position.y;
                 double driveHeading = drive.localizer.getPose().heading.toDouble();
                 double launcherHeading = driveHeading - Math.PI;
+                double goalDistance = 0;
                 double goalHeading = 0;
                 if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
                 {
-                    goalHeading = atan2(GOAL_Y_RED - drive.localizer.getPose().position.y, GOAL_X_RED - drive.localizer.getPose().position.x);
+                    goalDistance = sqrt((APRIL_TAG_X_RED - drivePositionX) * (APRIL_TAG_X_RED - drivePositionX) + ( APRIL_TAG_Y_RED - drivePositionY) * (APRIL_TAG_Y_RED - drivePositionY) + (29.5-14) * (29.5-14))-5.875;
+                    goalHeading = atan2(GOAL_Y_RED - drivePositionY, GOAL_X_RED - drivePositionX);
                 }
                 else
                 {
-                    goalHeading = atan2(GOAL_Y_BLUE - drive.localizer.getPose().position.y, GOAL_X_BLUE - drive.localizer.getPose().position.x);
-                }
-                if(turretAngle > Math.PI)
-                {
-                    turretAngle = turretAngle - 2*PI;
-                }
-                else if(turretAngle < -Math.PI)
-                {
-                    turretAngle = turretAngle + 2*PI;
+                    goalDistance = sqrt((APRIL_TAG_X_BLUE - drivePositionX) * (APRIL_TAG_X_BLUE - drivePositionX) + ( APRIL_TAG_Y_BLUE - drivePositionY) * (APRIL_TAG_Y_BLUE - drivePositionY) + (29.5-14) * (29.5-14))-5.875;
+                    goalHeading = atan2(GOAL_Y_BLUE - drivePositionY, GOAL_X_BLUE - drivePositionX);
                 }
 
-                telemetry.addData("drive x", drive.localizer.getPose().position.x);
-                telemetry.addData("drive y", drive.localizer.getPose().position.y);
+                telemetry.addData("drive x", drivePositionX);
+                telemetry.addData("drive y", drivePositionY);
                 telemetry.addData("drive heading", driveHeading );
                 telemetry.addData("goal heading", goalHeading );
+                telemetry.addData("goal distance", goalDistance );
 
                 if (targeting == Targeting.AUTO)
                 {
                     turretAngle = goalHeading - launcherHeading;
+                    if(turretAngle > Math.PI)
+                    {
+                        turretAngle = turretAngle - 2*PI;
+                    }
+                    else if(turretAngle < -Math.PI)
+                    {
+                        turretAngle = turretAngle + 2*PI;
+                    }
+
+                    launcherSpeed = extras.odometryLauncherSpeed(goalDistance);
                 }
                 else // manual targeting
                 {
-                    double turretStick = gamepad2.left_stick_x * 0.01;
+                    // aim
+                    double turretStick = gamepad2.left_stick_x * 0.02;
                     turretAngle = turretAngle + turretStick;
+
+                    // range
+                    if(gamepad2.dpadUpWasPressed())
+                    {
+                        launcherSpeed = launcherSpeed + 10;
+                    }
+                    if(gamepad2.dpadDownWasPressed())
+                    {
+                        launcherSpeed = launcherSpeed - 10;
+                    }
                 }
 
                 if(turretAngle > MAX_TURRETANGLE)
@@ -263,12 +292,12 @@ public class BasicTeleOp extends LinearOpMode
                 telemetry.addData("turret encoder", extras.turretMotor.getCurrentPosition());
 
                 Pose3D pose3D = extras.vision.getRobotFieldPosition(imuHeading);
-                telemetry.addData("x", pose3D.getPosition().x);
-                telemetry.addData("y", pose3D.getPosition().y);
-                telemetry.addData("z", pose3D.getPosition().z);
-                telemetry.addData("roll", pose3D.getOrientation().getRoll(AngleUnit.DEGREES));
-                telemetry.addData("pitch", pose3D.getOrientation().getPitch(AngleUnit.DEGREES));
-                telemetry.addData("yaw", pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
+                telemetry.addData("RFP x", pose3D.getPosition().x*39.3700787);
+                telemetry.addData("RFP y", pose3D.getPosition().y*39.3700787);
+                telemetry.addData("RFP z", pose3D.getPosition().z*39.3700787);
+                telemetry.addData("RFP roll", pose3D.getOrientation().getRoll(AngleUnit.DEGREES));
+                telemetry.addData("RFP pitch", pose3D.getOrientation().getPitch(AngleUnit.DEGREES));
+                telemetry.addData("RFP yaw", pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
             }
             // end of aiming
             //////////////
@@ -294,6 +323,7 @@ public class BasicTeleOp extends LinearOpMode
             // intake and banana control
             if (gamepad1.right_bumper)
             {
+                extras.ballStopOff();
                 extras.intakeReverse();
             }
             else if (gamepad1.right_trigger > 0)
@@ -355,8 +385,8 @@ public class BasicTeleOp extends LinearOpMode
 
             if(gamepad2.yWasPressed())
             {
-                //extras.s1down();
-                telemetry.addData("y Pressed", "s1down");
+                extras.turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                extras.turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
             if(gamepad2.bWasPressed())
             {

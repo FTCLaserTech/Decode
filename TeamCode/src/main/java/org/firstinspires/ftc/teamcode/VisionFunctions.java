@@ -429,7 +429,7 @@ public class VisionFunctions {
         LLResult llResult = limelight.getLatestResult();
         if (llResult.isValid())
         {
-            return(llResult.getBotpose());
+            return(llResult.getBotpose_MT2());
         }
         else
         {
