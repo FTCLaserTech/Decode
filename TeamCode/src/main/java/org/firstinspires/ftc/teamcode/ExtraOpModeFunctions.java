@@ -73,7 +73,7 @@ public class ExtraOpModeFunctions
     public Servo light2;
     public ControlSystem launcherController;
     public static PIDCoefficients launcherVelPidCoefficients =
-            new PIDCoefficients(0.005, 0.0, 0.0);
+            new PIDCoefficients(0.0051, 0.0, 0.0);
     public static BasicFeedforwardParameters launcherFeedforwardParameters =
             new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
