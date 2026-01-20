@@ -283,13 +283,21 @@ public class BasicTeleOp extends LinearOpMode
                 //turretPosition = turretAngle * ((MAX_SERVO - 0.5)/MAX_TURRETANGLE) + 0.5;
                 //extras.turretS.setPosition(turretPosition);
 
-                turretPosition = turretAngle * ((MAX_TURRETENCODER)/MAX_TURRETANGLE);
-                extras.turretMotor.setTargetPosition((int)turretPosition);
-                //extras.turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                extras.turretMotor.setPower(1.0);
-                telemetry.addData("turret angle", Math.toDegrees(turretAngle));
-                telemetry.addData("turret position", turretPosition);
-                telemetry.addData("turret encoder", extras.turretMotor.getCurrentPosition());
+                turretPosition = turretAngle / MAX_TURRETANGLE * MAX_TURRETENCODER;
+
+                if(false)
+                {
+                    extras.turretMotor.setTargetPosition((int) turretPosition);
+                    //extras.turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    extras.turretMotor.setPower(1.0);
+                    telemetry.addData("turret angle", Math.toDegrees(turretAngle));
+                    telemetry.addData("turret position", turretPosition);
+                    telemetry.addData("turret encoder", extras.turretMotor.getCurrentPosition());
+                }
+                else
+                {
+                    extras.setTurret(turretPosition);
+                }
 
                 Pose3D pose3D = extras.vision.getRobotFieldPosition(imuHeading);
                 telemetry.addData("RFP x", pose3D.getPosition().x*39.3700787);

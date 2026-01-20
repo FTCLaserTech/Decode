@@ -71,10 +71,16 @@ public class ExtraOpModeFunctions
     public TouchSensor turretLimitCCW;  // Digital channel Object
     public Servo light1;
     public Servo light2;
-    public ControlSystem controller;
-    public static PIDCoefficients velPidCoefficients =
+    public ControlSystem launcherController;
+    public static PIDCoefficients launcherVelPidCoefficients =
             new PIDCoefficients(0.005, 0.0, 0.0);
-    public static BasicFeedforwardParameters basicFeedforwardParameters =
+    public static BasicFeedforwardParameters launcherFeedforwardParameters =
+            new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
+
+    public ControlSystem turretController;
+    public static PIDCoefficients turretPosPidCoefficients =
+            new PIDCoefficients(0.005, 0.0, 0.0);
+    public static BasicFeedforwardParameters turretFeedforwardParameters =
             new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
     private AprilTagPoseFtc aprilTagPose;
@@ -149,12 +155,17 @@ public class ExtraOpModeFunctions
         light1.setPosition(Light_Green);
         light2.setPosition(Light_Green);
 
-        controller = ControlSystem.builder()
-                .velPid(velPidCoefficients)
-                .basicFF(basicFeedforwardParameters)
+        launcherController = ControlSystem.builder()
+                .velPid(launcherVelPidCoefficients)
+                .basicFF(launcherFeedforwardParameters)
                 .build();
+        launcherController.setGoal(new KineticState(0.0, 0.0));
 
-        controller.setGoal(new KineticState(0.0, 0.0));
+        turretController = ControlSystem.builder()
+                .posPid(turretPosPidCoefficients)
+                .basicFF(turretFeedforwardParameters)
+                .build();
+        turretController.setGoal(new KineticState(0.0, 0.0));
     }
 
     public void turretMotorForward()
@@ -202,28 +213,44 @@ public class ExtraOpModeFunctions
 
     public void setLauncher(double launcherSpeed)
     {
-        controller.setGoal(new KineticState(0, launcherSpeed));
-        double power = controller.calculate(new KineticState(
+        launcherController.setGoal(new KineticState(0, launcherSpeed));
+        double power = launcherController.calculate(new KineticState(
                 launcher1.getCurrentPosition(),
                 launcher1.getVelocity()
         ));
         launcher1.setPower(power);
         launcher2.setPower(power);
-        //launcher1.setVelocity(shooterSpeed);
-        //launcher2.setVelocity(shooterSpeed);
         localLop.telemetry.addData("Launcher velocity target: ", launcherSpeed);
         localLop.telemetry.addData("Launcher power set: ", power);
-        localLop.telemetry.addData("Launcher1 velocity actual: ", launcher1.getVelocity());
-        localLop.telemetry.addData("Launcher2 velocity actual: ", launcher2.getVelocity());
-        localLop.telemetry.addData("Launcher1 power actual: ", launcher1.getPower());
-        localLop.telemetry.addData("Launcher2 power actual: ", launcher2.getPower());
-        localLop.telemetry.addData("Launcher Speed OK? ", isLauncherSpeedGood(launcherSpeed));
+        //localLop.telemetry.addData("Launcher1 velocity actual: ", launcher1.getVelocity());
+        //localLop.telemetry.addData("Launcher2 velocity actual: ", launcher2.getVelocity());
+        //localLop.telemetry.addData("Launcher1 power actual: ", launcher1.getPower());
+        //localLop.telemetry.addData("Launcher2 power actual: ", launcher2.getPower());
+        //localLop.telemetry.addData("Launcher Speed OK? ", isLauncherSpeedGood(launcherSpeed));
 
-        dashboardTelemetry.addData("Launcher velocity target", launcherSpeed);
-        dashboardTelemetry.addData("Launcher power set", power);
-        dashboardTelemetry.addData("Launcher1 velocity actual", launcher1.getVelocity());
-        dashboardTelemetry.addData("Launcher2 velocity actual", launcher2.getVelocity());
-        dashboardTelemetry.update();
+        //dashboardTelemetry.addData("Launcher velocity target", launcherSpeed);
+        //dashboardTelemetry.addData("Launcher power set", power);
+        //dashboardTelemetry.addData("Launcher1 velocity actual", launcher1.getVelocity());
+        //dashboardTelemetry.addData("Launcher2 velocity actual", launcher2.getVelocity());
+        //dashboardTelemetry.update();
+    }
+
+    public void setTurret(double turretPosition)
+    {
+        turretController.setGoal(new KineticState(turretPosition));
+
+        turretMotor.setPower(turretController.calculate(new KineticState(
+                turretMotor.getCurrentPosition(),
+                turretMotor.getVelocity())));
+
+        localLop.telemetry.addData("Turret position target: ", turretPosition);
+        localLop.telemetry.addData("Turret position actual: ", turretMotor.getCurrentPosition());
+
+        //dashboardTelemetry.addData("Launcher velocity target", launcherSpeed);
+        //dashboardTelemetry.addData("Launcher power set", power);
+        //dashboardTelemetry.addData("Launcher1 velocity actual", launcher1.getVelocity());
+        //dashboardTelemetry.addData("Launcher2 velocity actual", launcher2.getVelocity());
+        //dashboardTelemetry.update();
     }
 
     public double getLauncherSpeed()
