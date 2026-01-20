@@ -72,11 +72,15 @@ public class Depot3 extends LinearOpMode
 
         // AFTER START IS PRESSED
 
-        Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(-25),20,Math.toRadians(autoFun.redBlueR(initialRotation,150)));
+        Pose2d startPose = new Pose2d(61, autoFun.redBlueT(-37), Math.toRadians(autoFun.redBlueT(initialRotation)));
+        drive.localizer.setPose(startPose);
+        Pose2d toInitialLaunchPosition = new Pose2d(12,autoFun.redBlueT(-17),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d toSpike3 = new Pose2d(autoFun.redBlueT(0),-30,Math.toRadians(autoFun.redBlueR(initialRotation,180)));
         Pose2d toFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-30,Math.toRadians(270));
         Pose2d pickUpFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-40,Math.toRadians(270));
         Pose2d backToLaunchZone = new Pose2d(autoFun.redBlueT(0),0,Math.toRadians(270));
+        Pose2d park = new Pose2d(55, autoFun.redBlueT(-35),Math.toRadians(autoFun.redBlueT(initialRotation)));
+
 
         extras.saveTeamColor(extras.teamColor);
 
@@ -103,6 +107,13 @@ public class Depot3 extends LinearOpMode
                         new InstantAction(() -> extras.ballStopOn())),
                 extras.setLauncherAction(launcherSpeed)
         ));
+
+        Action Park = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(park.position, park.heading)
+                .build();
+        Actions.runBlocking(Park);
+
+        safeWaitSeconds(1);
 
         // turn the intake and shooter off
         extras.intakeOff();

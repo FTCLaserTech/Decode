@@ -71,16 +71,18 @@ public class Depot9 extends LinearOpMode
 
         // AFTER START IS PRESSED
 
-        Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(-45),20,Math.toRadians(autoFun.redBlueR(initialRotation,135)));
-        Pose2d toSpike3 = new Pose2d(autoFun.redBlueT(-48),10,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
-        Pose2d pickupSpike3 = new Pose2d(autoFun.redBlueT(-48),-15,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
-        //Pose2d nearGate = new Pose2d(autoFun.redBlueT(-48),-5,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
-        //Pose2d toGate = new Pose2d(autoFun.redBlueT(-62),-20,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
-        Pose2d toSpike2 = new Pose2d(autoFun.redBlueT(-72),10,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
-        Pose2d pickupSpike2 = new Pose2d(autoFun.redBlueT(-72),-15,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
-        //Pose2d toSpike1 = new Pose2d(autoFun.redBlueT(-98),10,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
-        //Pose2d pickupSpike1 = new Pose2d(autoFun.redBlueT(-98),-23,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
-        Pose2d park = new Pose2d(autoFun.redBlueT(-60),-10,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d startPose = new Pose2d(61, autoFun.redBlueT(-37), Math.toRadians(autoFun.redBlueT(initialRotation)));
+        drive.localizer.setPose(startPose);
+        Pose2d toInitialLaunchPosition = new Pose2d(12,autoFun.redBlueT(-17),Math.toRadians(autoFun.redBlueT(270)));
+        Pose2d toSpike3 = new Pose2d(autoFun.redBlueT(12),-31,Math.toRadians(autoFun.redBlueR(initialRotation,270)));
+        Pose2d pickupSpike3 = new Pose2d(autoFun.redBlueT(-12),-50,Math.toRadians(autoFun.redBlueR(initialRotation,270)));
+        Pose2d nearGate = new Pose2d(autoFun.redBlueT(-1),-31,Math.toRadians(autoFun.redBlueR(initialRotation,270)));
+        Pose2d toGate = new Pose2d(autoFun.redBlueT(-1),-54,Math.toRadians(autoFun.redBlueR(initialRotation,270)));
+        Pose2d toSpike2 = new Pose2d(autoFun.redBlueT(-12),-31,Math.toRadians(autoFun.redBlueR(initialRotation,270)));
+        Pose2d pickupSpike2 = new Pose2d(autoFun.redBlueT(-12),-50,Math.toRadians(autoFun.redBlueR(initialRotation,270)));
+        Pose2d toSpike1 = new Pose2d(autoFun.redBlueT(-34),-31,Math.toRadians(autoFun.redBlueR(initialRotation,270)));
+        Pose2d pickupSpike1 = new Pose2d(autoFun.redBlueT(-34),-50,Math.toRadians(autoFun.redBlueR(initialRotation,270)));
+        Pose2d park = new Pose2d(autoFun.redBlueT(-1),-52,Math.toRadians(autoFun.redBlueR(initialRotation,270)));
 
         extras.saveTeamColor(extras.teamColor);
 

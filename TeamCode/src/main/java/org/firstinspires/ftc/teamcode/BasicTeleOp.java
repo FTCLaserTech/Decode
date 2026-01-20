@@ -33,9 +33,9 @@ public class BasicTeleOp extends LinearOpMode
         ExtraOpModeFunctions.Datalog datalog;
         datalog = new ExtraOpModeFunctions.Datalog("datalog_01");
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
-        sleep(300);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
+
+        MecanumDrive drive = new MecanumDrive(hardwareMap, extras.readPosition());
 
         Targeting targeting = Targeting.MANUAL;
 
@@ -117,7 +117,8 @@ public class BasicTeleOp extends LinearOpMode
 
         waitForStart();
 
-        Pose2d startPose = new Pose2d(0,0,Math.toRadians(270));
+        //Pose2d startPose = new Pose2d(0,0,Math.toRadians(270));
+        Pose2d startPose = extras.readPosition();
         drive.localizer.setPose(startPose);
 
         extras.vision.limelight.start();

@@ -13,6 +13,7 @@ import com.acmerobotics.dashboard.config.Config;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
@@ -34,6 +35,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Locale;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
@@ -145,7 +147,8 @@ public class ExtraOpModeFunctions
         turretMotor.setDirection(DcMotorEx.Direction.FORWARD);
         turretMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         turretMotor.setTargetPosition(0);
-        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         //turretMotor.setVelocity(0.0);
 
         ballStop = hardwareMap.get(Servo.class, "ballStop");
@@ -317,6 +320,47 @@ public class ExtraOpModeFunctions
             e.printStackTrace();
         }
         return(angle);
+    }
+    public void savePosition(Pose2d pose2d)
+    {
+        Writer fileWriter;
+        String directoryPath = Environment.getExternalStorageDirectory().getPath()+"/"+BASE_FOLDER_NAME;
+        File directory = new File(directoryPath);
+        directory.mkdir();
+        try
+        {
+            fileWriter = new FileWriter(directoryPath+"/SAVED_POSITION.csv");
+            String data = String.format(Locale.US, "{%.3f,%.3f,%.3f}", pose2d.position.x,pose2d.position.y,pose2d.heading.toDouble());
+            fileWriter.write(data);
+            fileWriter.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+    public Pose2d readPosition()
+    {
+        double x = 0;
+        double y = 0;
+        double angle = 0;
+        String directoryPath = Environment.getExternalStorageDirectory().getPath()+"/"+BASE_FOLDER_NAME;
+        File directory = new File(directoryPath);
+        directory.mkdir();
+        try
+        {
+            BufferedReader br = new BufferedReader(new FileReader(directoryPath+"/SAVED_POSITION.csv"));
+            String[] pos = br.readLine().split(",");
+            x = Double.parseDouble(pos[1]);
+            y = Double.parseDouble(pos[1]);
+            angle = Double.parseDouble(pos[1]);
+            br.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return(new Pose2d(x,y,angle));
     }
     public void saveTeamColor(TeamColor teamColor)
     {

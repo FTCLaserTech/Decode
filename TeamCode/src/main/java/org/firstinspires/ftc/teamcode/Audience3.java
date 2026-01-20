@@ -120,7 +120,8 @@ public class Audience3 extends LinearOpMode
 
         // Save the ending location
         savedAngle = chYawInitial;
-        extras.saveAutoStartRotation(savedAngle);
+        //extras.saveAutoStartRotation(savedAngle);
+        extras.savePosition(drive.localizer.getPose());
     }
 
     public void safeWaitSeconds(double time)
