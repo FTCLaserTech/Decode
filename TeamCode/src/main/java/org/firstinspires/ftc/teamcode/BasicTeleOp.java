@@ -57,10 +57,16 @@ public class BasicTeleOp extends LinearOpMode
 
         double turretAngle = 0;
         double turretPosition = 0.5;
-        double MAX_TURRETANGLE = Math.toRadians(40.0);
-        double MIN_TURRETANGLE = Math.toRadians(-40.0);
+        double MAX_TURRETANGLE = Math.toRadians(155.0);
+        double MIN_TURRETANGLE = Math.toRadians(-155.0);
         double MAX_SERVO = 1.0;
-        double MAX_TURRETENCODER = 1955.0;
+
+        double turretMotorEncoder = 384.5;  // PPR at the output shaft per motor data sheet
+        double turretBaseTeeth = 200.0;
+        double driveTeeth = 50.0;
+        double MAX_TURRETENCODER = turretMotorEncoder * (turretBaseTeeth/driveTeeth) * (MAX_TURRETANGLE/Math.toRadians(360));
+        //double MAX_TURRETENCODER = 1955.0;
+
         double GOAL_X_RED = 59; //62
         double GOAL_Y_RED = -56; //-62
         double GOAL_X_BLUE = 59; //62
@@ -75,11 +81,6 @@ public class BasicTeleOp extends LinearOpMode
 
         boolean launcherOn = true;
         boolean depotFound = false;
-
-        //drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        //extras.wristMiddle();
-        //extras.clawOpen();
 
         double lightColor = extras.Light_Red;
 
@@ -159,19 +160,6 @@ public class BasicTeleOp extends LinearOpMode
             }
             telemetry.addData("Targeting Mode: ", targeting);
 
-            // launcher on/off function
-            if (gamepad1.aWasPressed())
-            {
-                if (launcherOn == true)
-                {
-                    launcherOn = false;
-                } else
-                {
-                    launcherOn = true;
-                }
-            }
-            telemetry.addData("Launcher On: ", launcherOn);
-
             //////////////
             // start of aiming
 
@@ -186,7 +174,6 @@ public class BasicTeleOp extends LinearOpMode
             // true = limelight
             if(false) // limelight
             {
-
                 if ((targeting == Targeting.AUTO) && (depotFound))
                 {
                     turretPower = extras.autoAimTurret();
@@ -391,17 +378,34 @@ public class BasicTeleOp extends LinearOpMode
                     -(gamepad1.right_stick_x * rotationMultiplier)
             ));
 
+            // launcher on/off function
+            if (gamepad1.aWasPressed())
+            {
+                if (launcherOn == true)
+                {
+                    launcherOn = false;
+                } else
+                {
+                    launcherOn = true;
+                }
+            }
+            telemetry.addData("Launcher On: ", launcherOn);
+
+            // reset the turret motor encoder
             if(gamepad2.yWasPressed())
             {
                 extras.turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 extras.turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
+
+            // freeze the launcher motor speed
             if(gamepad2.bWasPressed())
             {
                 extras.freezeRange = true;
                 telemetry.addData("b Pressed", "s2up");
             }
 
+            // unfreeze the launcher motor speed
             if(gamepad2.aWasPressed())
             {
                 extras.freezeRange = false;
