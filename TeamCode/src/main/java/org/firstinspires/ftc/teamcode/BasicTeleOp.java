@@ -57,14 +57,14 @@ public class BasicTeleOp extends LinearOpMode
 
         double turretAngle = 0;
         double turretPosition = 0.5;
-        double MAX_TURRETANGLE = Math.toRadians(40.0);
-        double MIN_TURRETANGLE = Math.toRadians(-40.0);
+        double MAX_TURRETANGLE = Math.toRadians(155.0);
+        double MIN_TURRETANGLE = Math.toRadians(-155.0);
         double MAX_SERVO = 1.0;
 
-        double turretMotorEncoder = 5281.1;  // PPR at the output shaft per motor data sheet
-        double turretBaseTeeth = 200;
-        double driveTeeth = 60;
-        double MAX_TURRETENCODER = turretMotorEncoder * (turretBaseTeeth/driveTeeth) * (MAX_TURRETANGLE/360);
+        double turretMotorEncoder = 384.5;  // PPR at the output shaft per motor data sheet
+        double turretBaseTeeth = 200.0;
+        double driveTeeth = 50.0;
+        double MAX_TURRETENCODER = turretMotorEncoder * (turretBaseTeeth/driveTeeth) * (MAX_TURRETANGLE/Math.toRadians(360));
         //double MAX_TURRETENCODER = 1955.0;
 
         double GOAL_X_RED = 59; //62
@@ -274,6 +274,7 @@ public class BasicTeleOp extends LinearOpMode
                 extras.turretMotor.setTargetPosition((int)turretPosition);
                 extras.turretMotor.setPower(1.0);
 
+                telemetry.addData("MAX_TURRETENCODER", MAX_TURRETENCODER);
                 telemetry.addData("turret angle", Math.toDegrees(turretAngle));
                 telemetry.addData("turret position", turretPosition);
                 telemetry.addData("turret encoder", extras.turretMotor.getCurrentPosition());
