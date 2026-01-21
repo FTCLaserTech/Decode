@@ -19,11 +19,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Config
-@Disabled
+//@Disabled
 
 @Autonomous(group = "a")
 
-public class Audience6 extends LinearOpMode
+public class Audience9 extends LinearOpMode
 {
     @Override
 
@@ -76,10 +76,16 @@ public class Audience6 extends LinearOpMode
 
         // AFTER START IS PRESSED
 
-        Pose2d toInitialLaunchPosition = new Pose2d(autoFun.redBlueT(10),0,Math.toRadians(autoFun.redBlueR(initialRotation,70)));
-        Pose2d toLoadingZone = new Pose2d(autoFun.redBlueT(30),-30,Math.toRadians(270));
-        Pose2d pickUpLoadingZone = new Pose2d(autoFun.redBlueT(30),-40,Math.toRadians(270));
-        Pose2d toParkPosition = new Pose2d(autoFun.redBlueT(0),-30,Math.toRadians(autoFun.redBlueR(initialRotation,0)));
+        Pose2d startPose = new Pose2d(-62, autoFun.redBlueT(-13.5), Math.toRadians(autoFun.redBlueT(initialRotation)));
+        drive.localizer.setPose(startPose);
+        Pose2d toInitialLaunchPosition = new Pose2d(-50,autoFun.redBlueT(-14),Math.toRadians(autoFun.redBlueT(145)));
+        Pose2d toSpike1 = new Pose2d(-34,-31,Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d pickupSpike1 = new Pose2d(-36,-50,Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d toCorner = new Pose2d(-55,-57,Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d pickupCorner = new Pose2d(-55,-59,Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d toCorner2 = new Pose2d(-55,-55,Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d pickupCorner2 = new Pose2d(-55,-59,Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d toParkPosition = new Pose2d(-60,autoFun.redBlueT(-35),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d backToLaunchZone = new Pose2d(autoFun.redBlueT(0),0,Math.toRadians(270));
 
         extras.saveTeamColor(extras.teamColor);
@@ -107,6 +113,74 @@ public class Audience6 extends LinearOpMode
                         new InstantAction(() -> extras.ballStopOn())),
                 extras.setLauncherAction(launcherSpeed)
         ));
+
+        // pickup and launch spike 1
+        Action GoToSpike1 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toSpike1.position, toSpike1.heading)
+                .build();
+        Actions.runBlocking(GoToSpike1);
+        extras.intakeForward();
+        Action PickupSpike1 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(pickupSpike1.position, pickupSpike1.heading)
+                .build();
+        Actions.runBlocking(PickupSpike1);
+        extras.intakeOff();
+
+        Action BackToLaunchSpot3 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .build();
+
+        Actions.runBlocking(new ParallelAction(
+                new SequentialAction(
+                        BackToLaunchSpot3,
+                        new InstantAction(() -> extras.intakeForward()),
+                        new InstantAction(() -> extras.ballStopOff()),
+                        new SleepAction(1.0),
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.ballStopOn())),
+                extras.setLauncherAction(launcherSpeed)
+        ));
+
+        // pickup and launch Corner
+        Action GoToCorner = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toCorner.position, toCorner.heading)
+                .build();
+        Actions.runBlocking(GoToCorner);
+        extras.intakeForward();
+        Action PickupCorner = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                .build();
+        Actions.runBlocking(PickupCorner);
+        extras.intakeOff();
+
+
+        // pickup and launch Corner
+        Action GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toCorner2.position, toCorner2.heading)
+                .build();
+        Actions.runBlocking(GoToCorner2);
+        extras.intakeForward();
+        Action PickupCorner2 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(pickupCorner2.position, pickupCorner2.heading)
+                .build();
+        Actions.runBlocking(PickupCorner2);
+        extras.intakeOff();
+
+        Action BackToLaunchSpot2 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .build();
+
+        Actions.runBlocking(new ParallelAction(
+                new SequentialAction(
+                        BackToLaunchSpot3,
+                        new InstantAction(() -> extras.intakeForward()),
+                        new InstantAction(() -> extras.ballStopOff()),
+                        new SleepAction(1.0),
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.ballStopOn())),
+                extras.setLauncherAction(launcherSpeed)
+        ));
+
 
         // drive off the line
         Action ToPark = drive.actionBuilder(drive.localizer.getPose())
