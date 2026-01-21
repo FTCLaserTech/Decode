@@ -19,6 +19,8 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
+import java.util.Locale;
+
 //imports from the Mecanum website
 
 
@@ -35,7 +37,8 @@ public class BasicTeleOp extends LinearOpMode
 
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, extras.readPosition());
+        //MecanumDrive drive = new MecanumDrive(hardwareMap, extras.readPosition());
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
 
         Targeting targeting = Targeting.MANUAL;
 
@@ -117,9 +120,10 @@ public class BasicTeleOp extends LinearOpMode
 
         waitForStart();
 
-        //Pose2d startPose = new Pose2d(0,0,Math.toRadians(270));
-        Pose2d startPose = extras.readPosition();
+        Pose2d startPose = new Pose2d(0,0,Math.toRadians(270));
+        //Pose2d startPose = extras.readPosition();
         drive.localizer.setPose(startPose);
+        //drive.localizer.setPose(PoseStorage.currentPose);
 
         extras.vision.limelight.start();
 
@@ -222,9 +226,9 @@ public class BasicTeleOp extends LinearOpMode
                     goalHeading = atan2(GOAL_Y_BLUE - drivePositionY, GOAL_X_BLUE - drivePositionX);
                 }
 
-                telemetry.addData("drive x", drivePositionX);
-                telemetry.addData("drive y", drivePositionY);
-                telemetry.addData("drive heading", driveHeading );
+                telemetry.addData("RR drive x", drivePositionX);
+                telemetry.addData("RR drive y", drivePositionY);
+                telemetry.addData("RR drive heading", driveHeading );
                 telemetry.addData("goal heading", goalHeading );
                 telemetry.addData("goal distance", goalDistance );
 
@@ -287,13 +291,24 @@ public class BasicTeleOp extends LinearOpMode
                     extras.setTurret(turretPosition);
                 }
 
-                Pose3D pose3D = extras.vision.getRobotFieldPosition(imuHeading);
-                telemetry.addData("RFP x", pose3D.getPosition().x*39.3700787);
-                telemetry.addData("RFP y", pose3D.getPosition().y*39.3700787);
-                telemetry.addData("RFP z", pose3D.getPosition().z*39.3700787);
-                telemetry.addData("RFP roll", pose3D.getOrientation().getRoll(AngleUnit.DEGREES));
-                telemetry.addData("RFP pitch", pose3D.getOrientation().getPitch(AngleUnit.DEGREES));
-                telemetry.addData("RFP yaw", pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
+                // get and print Megatag
+                Pose3D pose3D = extras.vision.getRobotFieldPositionMT();
+                String data = String.format(Locale.US, "MT1 X: %.2f, Y: %.2f, H: %.2f, R: %.1f, P: %.1f,Y: %.1f",
+                        pose3D.getPosition().x*39.3700787, pose3D.getPosition().y*39.3700787, pose3D.getPosition().z*39.3700787,
+                        pose3D.getOrientation().getRoll(AngleUnit.DEGREES), pose3D.getOrientation().getPitch(AngleUnit.DEGREES), pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
+
+                // get and print Megatag2
+                pose3D = extras.vision.getRobotFieldPositionMT2(imuHeading);
+                data = String.format(Locale.US, "MT2 X: %.2f, Y: %.2f, H: %.2f, R: %.1f, P: %.1f,Y: %.1f",
+                        pose3D.getPosition().x*39.3700787, pose3D.getPosition().y*39.3700787, pose3D.getPosition().z*39.3700787,
+                        pose3D.getOrientation().getRoll(AngleUnit.DEGREES), pose3D.getOrientation().getPitch(AngleUnit.DEGREES), pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
+
+                //telemetry.addData("RFP x", pose3D.getPosition().x*39.3700787);
+                //telemetry.addData("RFP y", pose3D.getPosition().y*39.3700787);
+                //telemetry.addData("RFP z", pose3D.getPosition().z*39.3700787);
+                //telemetry.addData("RFP roll", pose3D.getOrientation().getRoll(AngleUnit.DEGREES));
+                //telemetry.addData("RFP pitch", pose3D.getOrientation().getPitch(AngleUnit.DEGREES));
+                //telemetry.addData("RFP yaw", pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
             }
             // end of aiming
             //////////////

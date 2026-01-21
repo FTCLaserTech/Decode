@@ -423,7 +423,20 @@ public class VisionFunctions {
         return readDepotAprilTag_ll(20);
     }   // end method readBlueAprilTag_ll()
 
-    public Pose3D getRobotFieldPosition(double yaw)
+    public Pose3D getRobotFieldPositionMT()
+    {
+        LLResult llResult = limelight.getLatestResult();
+        if (llResult.isValid())
+        {
+            return(llResult.getBotpose());
+        }
+        else
+        {
+            //return null;
+            return new Pose3D(new Position(DistanceUnit.INCH,0,0,0,0),new YawPitchRollAngles(AngleUnit.RADIANS,0,0,0,0));
+        }
+    }
+    public Pose3D getRobotFieldPositionMT2(double yaw)
     {
         limelight.updateRobotOrientation(yaw);
         LLResult llResult = limelight.getLatestResult();
