@@ -74,7 +74,7 @@ public class Depot3 extends LinearOpMode
 
         Pose2d startPose = new Pose2d(61, autoFun.redBlueT(-37), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
-        Pose2d toInitialLaunchPosition = new Pose2d(12,autoFun.redBlueT(-17),Math.toRadians(autoFun.redBlueT(270)));
+        Pose2d toInitialLaunchPosition = new Pose2d(12,autoFun.redBlueT(-17),Math.toRadians(autoFun.redBlueT(135)));
         Pose2d toSpike3 = new Pose2d(autoFun.redBlueT(0),-30,Math.toRadians(autoFun.redBlueR(initialRotation,180)));
         Pose2d toFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-30,Math.toRadians(270));
         Pose2d pickUpFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-40,Math.toRadians(270));

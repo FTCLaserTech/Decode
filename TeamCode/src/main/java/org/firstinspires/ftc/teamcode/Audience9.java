@@ -29,7 +29,7 @@ public class Audience9 extends LinearOpMode
 
     public void runOpMode() throws InterruptedException
     {
-        double initialRotation = 270;
+        double initialRotation = 180;
         Pose2d initPose = new Pose2d(0,0,Math.toRadians(initialRotation));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
@@ -78,13 +78,13 @@ public class Audience9 extends LinearOpMode
 
         Pose2d startPose = new Pose2d(-62, autoFun.redBlueT(-13.5), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
-        Pose2d toInitialLaunchPosition = new Pose2d(-50,autoFun.redBlueT(-14),Math.toRadians(autoFun.redBlueT(145)));
-        Pose2d toSpike1 = new Pose2d(-34,-31,Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d pickupSpike1 = new Pose2d(-36,-50,Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d toCorner = new Pose2d(-55,-57,Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d pickupCorner = new Pose2d(-55,-59,Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d toCorner2 = new Pose2d(-55,-55,Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d pickupCorner2 = new Pose2d(-55,-59,Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d toInitialLaunchPosition = new Pose2d(-50,autoFun.redBlueT(-14),Math.toRadians(autoFun.redBlueT(155)));
+        Pose2d toSpike1 = new Pose2d(-34,autoFun.redBlueT(-30),Math.toRadians(autoFun.redBlueT(270)));
+        Pose2d pickupSpike1 = new Pose2d(-36,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(270)));
+        Pose2d toCorner = new Pose2d(-61,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(270)));
+        Pose2d pickupCorner = new Pose2d(-61,autoFun.redBlueT(-59),Math.toRadians(autoFun.redBlueT(270)));
+        Pose2d toCorner2 = new Pose2d(-61,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(270)));
+        Pose2d pickupCorner2 = new Pose2d(-61,autoFun.redBlueT(-59),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d toParkPosition = new Pose2d(-60,autoFun.redBlueT(-35),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d backToLaunchZone = new Pose2d(autoFun.redBlueT(0),0,Math.toRadians(270));
 
@@ -216,7 +216,7 @@ public class Audience9 extends LinearOpMode
         telemetry.addData("savedAngle d: ", Math.toDegrees(savedAngle));
         telemetry.update();
 
-        safeWaitSeconds(10.0);
+        safeWaitSeconds(1.0);
     }
 
     public void safeWaitSeconds(double time)

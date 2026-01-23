@@ -28,7 +28,7 @@ public class Audience3 extends LinearOpMode
 
     public void runOpMode() throws InterruptedException
     {
-        double initialRotation = 270;
+        double initialRotation = 180;
         Pose2d initPose = new Pose2d(0,0,Math.toRadians(initialRotation));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
@@ -74,7 +74,7 @@ public class Audience3 extends LinearOpMode
 
         Pose2d startPose = new Pose2d(-62, autoFun.redBlueT(-13.5), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
-        Pose2d toInitialLaunchPosition = new Pose2d(-50,autoFun.redBlueT(-14),Math.toRadians(autoFun.redBlueT(145)));
+        Pose2d toInitialLaunchPosition = new Pose2d(-50,autoFun.redBlueT(-14),Math.toRadians(autoFun.redBlueT(155)));
         Pose2d toParkPosition = new Pose2d(-60,autoFun.redBlueT(-35),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d toFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-30,Math.toRadians(270));
         Pose2d pickUpFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-40,Math.toRadians(270));
@@ -120,7 +120,7 @@ public class Audience3 extends LinearOpMode
 
         // Save the ending location
         savedAngle = chYawInitial;
-        //extras.saveAutoStartRotation(savedAngle);
+        extras.saveAutoStartRotation(savedAngle);
 
         Pose2d pose2d = drive.localizer.getPose();
         telemetry.addData("pp x", pose2d.position.x);
@@ -129,7 +129,7 @@ public class Audience3 extends LinearOpMode
         telemetry.update();
         //extras.savePosition(pose2d);
         PoseStorage.currentPose = pose2d;
-        safeWaitSeconds(10);
+        safeWaitSeconds(1);
     }
 
     public void safeWaitSeconds(double time)

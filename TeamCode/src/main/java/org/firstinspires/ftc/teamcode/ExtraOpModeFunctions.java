@@ -97,7 +97,7 @@ public class ExtraOpModeFunctions
     double lightColor = Light_Red;
 
 
-    double maxLauncherRPM = 6000.0;  //RPM
+    double maxLauncherRPM = 4500.0;  //RPM
     double launcherTicksPerRev = 28.0;
     double maxLauncherTPS = launcherTicksPerRev * maxLauncherRPM / 60; // 2800
     //private double shooterTargetVelocity = 0.0;
@@ -147,8 +147,8 @@ public class ExtraOpModeFunctions
         turretMotor.setDirection(DcMotorEx.Direction.FORWARD);
         turretMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         turretMotor.setTargetPosition(0);
-        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         //turretMotor.setVelocity(0.0);
 
         ballStop = hardwareMap.get(Servo.class, "ballStop");
@@ -211,7 +211,7 @@ public class ExtraOpModeFunctions
 
     public void ballStopOff()
     {
-        ballStop.setPosition(0.5);
+        ballStop.setPosition(0.3);
     }
 
     public void setLauncher(double launcherSpeed)
@@ -245,9 +245,6 @@ public class ExtraOpModeFunctions
         turretMotor.setPower(turretController.calculate(new KineticState(
                 turretMotor.getCurrentPosition(),
                 turretMotor.getVelocity())));
-
-        localLop.telemetry.addData("Turret position target: ", turretPosition);
-        localLop.telemetry.addData("Turret position actual: ", turretMotor.getCurrentPosition());
 
         //dashboardTelemetry.addData("Launcher velocity target", launcherSpeed);
         //dashboardTelemetry.addData("Launcher power set", power);
@@ -481,7 +478,8 @@ public class ExtraOpModeFunctions
         // range to speed function
         //shooterTargetVelocity = 1049 + (12.8 * targetRange) - (0.0294 * targetRange * targetRange);
         //return( 985 + (13.2 * distance) - (0.024 * distance * distance) );
-        return( 1155 + (5 * distance) + (0.00964 * distance * distance) );
+        return( 1047 + (7.09 * distance) - (0.00119 * distance * distance) );
+        //( 1155 + (5 * distance) + (0.00964 * distance * distance) );
     }
 
     public boolean isLauncherSpeedGood(double shooterTargetVelocity)

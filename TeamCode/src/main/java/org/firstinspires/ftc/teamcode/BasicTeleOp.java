@@ -40,7 +40,7 @@ public class BasicTeleOp extends LinearOpMode
         //MecanumDrive drive = new MecanumDrive(hardwareMap, extras.readPosition());
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
 
-        Targeting targeting = Targeting.MANUAL;
+        Targeting targeting = Targeting.AUTO;
 
         //TrajectoryBook book = new TrajectoryBook(drive, extras);
 
@@ -60,8 +60,8 @@ public class BasicTeleOp extends LinearOpMode
 
         double turretAngle = 0;
         double turretPosition = 0.5;
-        double MAX_TURRETANGLE = Math.toRadians(155.0);
-        double MIN_TURRETANGLE = Math.toRadians(-155.0);
+        double MAX_TURRETANGLE = Math.toRadians(45.0);
+        double MIN_TURRETANGLE = Math.toRadians(-45.0);
         double MAX_SERVO = 1.0;
 
         double turretMotorEncoder = 384.5;  // PPR at the output shaft per motor data sheet
@@ -122,8 +122,8 @@ public class BasicTeleOp extends LinearOpMode
 
         Pose2d startPose = new Pose2d(0,0,Math.toRadians(270));
         //Pose2d startPose = extras.readPosition();
-        drive.localizer.setPose(startPose);
-        //drive.localizer.setPose(PoseStorage.currentPose);
+        //drive.localizer.setPose(startPose);
+        drive.localizer.setPose(PoseStorage.currentPose);
 
         extras.vision.limelight.start();
 
@@ -186,7 +186,7 @@ public class BasicTeleOp extends LinearOpMode
 
                     launcherSpeed = extras.limelightLauncherSpeed();
                 }
-                else // manual targeting
+                else // manual targeting for limelight
                 {
                     // manual turret
                     // joystick for rotate
@@ -277,19 +277,19 @@ public class BasicTeleOp extends LinearOpMode
 
                 turretPosition = turretAngle / MAX_TURRETANGLE * MAX_TURRETENCODER;
 
-                if(false)
-                {
+                if(true)
+                { // control hub pid
                     extras.turretMotor.setTargetPosition((int) turretPosition);
                     //extras.turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     extras.turretMotor.setPower(1.0);
-                    telemetry.addData("turret angle", Math.toDegrees(turretAngle));
-                    telemetry.addData("turret position", turretPosition);
-                    telemetry.addData("turret encoder", extras.turretMotor.getCurrentPosition());
                 }
                 else
-                {
+                { // nextftc pid
                     extras.setTurret(turretPosition);
                 }
+                telemetry.addData("turret angle", Math.toDegrees(turretAngle));
+                telemetry.addData("Turret position target: ", turretPosition);
+                telemetry.addData("Turret position actual: ", extras.turretMotor.getCurrentPosition());
 
                 // get and print Megatag
                 Pose3D pose3D = extras.vision.getRobotFieldPositionMT();
@@ -329,7 +329,7 @@ public class BasicTeleOp extends LinearOpMode
             }
             extras.setLauncher(launcherSpeed);
 
-            extras.setLights();
+            //extras.setLights();
 
             // intake and banana control
             if (gamepad1.right_bumper)
@@ -411,7 +411,9 @@ public class BasicTeleOp extends LinearOpMode
             if(gamepad2.yWasPressed())
             {
                 extras.turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                //extras.turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 extras.turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                turretAngle = 0.0;
             }
 
             // freeze the launcher motor speed
@@ -429,6 +431,25 @@ public class BasicTeleOp extends LinearOpMode
             }
             telemetry.addData("freezeRange", extras.freezeRange);
 
+            // unfreeze the launcher motor speed
+            if(gamepad1.xWasPressed())
+            {
+                if(gamepad1.start)
+                {
+                    drive.localizer.setPose(new Pose2d(0, 0, Math.toRadians(270)));
+                }
+                else
+                {
+                    if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
+                    {
+                        drive.localizer.setPose(new Pose2d(-61, 62, Math.toRadians(270)));
+                    } else
+                    {
+                        drive.localizer.setPose(new Pose2d(-62, -61, Math.toRadians(90)));
+                    }
+                }
+            }
+            telemetry.addData("freezeRange", extras.freezeRange);
 
             // RESET IMU
             if ((gamepad1.back) && (gamepad1.b))
