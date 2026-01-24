@@ -78,7 +78,7 @@ public class AudienceCorner extends LinearOpMode
         Pose2d startPose = new Pose2d(-62, autoFun.redBlueT(-13.5), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
         Pose2d toInitialLaunchPosition = new Pose2d(-50,autoFun.redBlueT(-14),Math.toRadians(autoFun.redBlueT(155)));
-        Pose2d toCorner = new Pose2d(-62,autoFun.redBlueT(-52),Math.toRadians(autoFun.redBlueT(270)));
+        Pose2d toCorner = new Pose2d(-62,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d pickupCorner = new Pose2d(-62,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d toCorner2 = new Pose2d(-61,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d pickupCorner2 = new Pose2d(-61,autoFun.redBlueT(-59),Math.toRadians(autoFun.redBlueT(270)));
@@ -96,7 +96,7 @@ public class AudienceCorner extends LinearOpMode
         extras.setLauncher(launcherSpeed);
 
 
-        // drive off the line and rotate towards the depot
+        // shoot the 3 preload
         Action ToInitialPosition = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
@@ -111,7 +111,7 @@ public class AudienceCorner extends LinearOpMode
                 extras.setLauncherAction(launcherSpeed)
         ));
 
-        // pickup and launch Corner
+        // pickup and launch Corner first time
         extras.intakeForward();
         Action GoToCorner = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
@@ -134,8 +134,30 @@ public class AudienceCorner extends LinearOpMode
                 extras.setLauncherAction(launcherSpeed)
         ));
 
+        // pickup and launch Corner second time
+        extras.intakeForward();
+        Action GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toCorner.position, toCorner.heading)
+                .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                .strafeToLinearHeading(toCorner.position, toCorner.heading)
+                .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                .strafeToLinearHeading(toCorner.position, toCorner.heading)
+                .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .build();
+        Actions.runBlocking(GoToCorner2);
 
-        // drive off the line
+        Actions.runBlocking(new ParallelAction(
+                new SequentialAction(
+                        new InstantAction(() -> extras.intakeForward()),
+                        new InstantAction(() -> extras.ballStopOff()),
+                        new SleepAction(1.0),
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.ballStopOn())),
+                extras.setLauncherAction(launcherSpeed)
+        ));
+
+        // Park
         Action ToPark = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
                 .build();
