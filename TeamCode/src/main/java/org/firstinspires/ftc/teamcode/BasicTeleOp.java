@@ -115,6 +115,10 @@ public class BasicTeleOp extends LinearOpMode
         telemetry.addData("savedAngle r: ", previousOrientation);
         telemetry.addData("savedAngle d: ", Math.toDegrees(previousOrientation));
 
+        Pose2d storedPose = PoseStorage.currentPose;
+        telemetry.addData("spx: ", storedPose.position.x);
+        telemetry.addData("spy: ", storedPose.position.y);
+        telemetry.addData("sph: ", Math.toDegrees(storedPose.heading.toDouble()));
         telemetry.addLine("Init Complete");
         telemetry.update();
 
@@ -123,7 +127,7 @@ public class BasicTeleOp extends LinearOpMode
         Pose2d startPose = new Pose2d(0,0,Math.toRadians(270));
         //Pose2d startPose = extras.readPosition();
         //drive.localizer.setPose(startPose);
-        drive.localizer.setPose(PoseStorage.currentPose);
+        drive.localizer.setPose(storedPose);
 
         extras.vision.limelight.start();
 

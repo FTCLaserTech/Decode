@@ -123,8 +123,11 @@ public class Depot3 extends LinearOpMode
         extras.launcher2.setPower(0.0);
 
         // Save the ending location
-        savedAngle = chYawInitial;
+        chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        savedAngle = chYawFinal - chYawInitial;
         extras.saveAutoStartRotation(savedAngle);
+        PoseStorage.currentPose = drive.localizer.getPose();
+
     }
 
     public void safeWaitSeconds(double time)

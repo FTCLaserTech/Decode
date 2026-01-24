@@ -74,14 +74,14 @@ public class DepotMain extends LinearOpMode
         Pose2d startPose = new Pose2d(61, autoFun.redBlueT(-37), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
         Pose2d toInitialLaunchPosition = new Pose2d(12,autoFun.redBlueT(-17),Math.toRadians(autoFun.redBlueT(135)));
-        Pose2d toSpike3 = new Pose2d(12,autoFun.redBlueT(-31),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d toSpike3 = new Pose2d(12,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupSpike3 = new Pose2d(12,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d nearGate = new Pose2d(0,autoFun.redBlueT(-31),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d toGate = new Pose2d(0,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d toSpike2 = new Pose2d(-12,autoFun.redBlueT(-31),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d nearGate = new Pose2d(0.5,autoFun.redBlueT(-31),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d toGate = new Pose2d(0.5,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d toSpike2 = new Pose2d(-12,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupSpike2 = new Pose2d(-12,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d toSpike1 = new Pose2d(-34,autoFun.redBlueT(-31),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d pickupSpike1 = new Pose2d(-36,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d toSpike1 = new Pose2d(-34,autoFun.redBlueT(-30),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d pickupSpike1 = new Pose2d(-36,autoFun.redBlueT(-51),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d park = new Pose2d(-1,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(initialRotation)));
 
         extras.saveTeamColor(extras.teamColor);
@@ -226,11 +226,12 @@ public class DepotMain extends LinearOpMode
         // Save the ending location
         //extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);
         ppYawFinal = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
-        chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
-        //savedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2;
-        savedAngle = chYawFinal - chYawInitial + Math.toRadians(initialRotation) - Math.toRadians(270.0);
+        chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        savedAngle = chYawFinal - chYawInitial;
         extras.saveAutoStartRotation(savedAngle);
+        PoseStorage.currentPose = drive.localizer.getPose();
+
     }
 
     public void safeWaitSeconds(double time)

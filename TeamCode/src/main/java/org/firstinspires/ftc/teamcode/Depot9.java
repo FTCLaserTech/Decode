@@ -212,7 +212,6 @@ public class Depot9 extends LinearOpMode
 
  */
 
-
         Action Park = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(park.position, park.heading)
                 .build();
@@ -228,12 +227,12 @@ public class Depot9 extends LinearOpMode
 
         // Save the ending location
         //extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);
-        ppYawFinal = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
+        //ppYawFinal = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
         chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-
-        //savedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2;
-        savedAngle = chYawFinal - chYawInitial + Math.toRadians(initialRotation) - Math.toRadians(270.0);
+        savedAngle = chYawFinal - chYawInitial;
         extras.saveAutoStartRotation(savedAngle);
+        PoseStorage.currentPose = drive.localizer.getPose();
+
     }
 
     public void safeWaitSeconds(double time)

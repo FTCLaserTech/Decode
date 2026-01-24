@@ -121,18 +121,11 @@ public class Audience3 extends LinearOpMode
         // Save the ending location
         //savedAngle = chYawInitial;
 
-        savedAngle = chYawFinal - chYawInitial + Math.toRadians(initialRotation) - Math.toRadians(270.0);
-        // may need to adjust initial rotation based on red/blue?
-
+        chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        savedAngle = chYawFinal - chYawInitial;
         extras.saveAutoStartRotation(savedAngle);
+        PoseStorage.currentPose = drive.localizer.getPose();
 
-        Pose2d pose2d = drive.localizer.getPose();
-        telemetry.addData("pp x", pose2d.position.x);
-        telemetry.addData("pp y", pose2d.position.y);
-        telemetry.addData("pp heading", pose2d.heading.toDouble());
-        telemetry.update();
-        //extras.savePosition(pose2d);
-        PoseStorage.currentPose = pose2d;
         safeWaitSeconds(1);
     }
 
