@@ -119,7 +119,11 @@ public class Audience3 extends LinearOpMode
         //extras.setLauncher(0.0);
 
         // Save the ending location
-        savedAngle = chYawInitial;
+        //savedAngle = chYawInitial;
+
+        savedAngle = chYawFinal - chYawInitial + Math.toRadians(initialRotation) - Math.toRadians(270.0);
+        // may need to adjust initial rotation based on red/blue?
+
         extras.saveAutoStartRotation(savedAngle);
 
         Pose2d pose2d = drive.localizer.getPose();

@@ -212,6 +212,8 @@ public class BasicTeleOp extends LinearOpMode
                 double drivePositionX = drive.localizer.getPose().position.x;
                 double drivePositionY = drive.localizer.getPose().position.y;
                 double driveHeading = drive.localizer.getPose().heading.toDouble();
+                // or use control hub IMU if pinpoint IMU is drifting?
+
                 double launcherHeading = driveHeading - Math.PI;
                 double goalDistance = 0;
                 double goalHeading = 0;
