@@ -124,6 +124,8 @@ public class AudienceCorner extends LinearOpMode
                 .build();
         Actions.runBlocking(GoToCorner);
 
+        // RaceAction will stop all actions when any one completes
+
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
                         new InstantAction(() -> extras.intakeForward()),

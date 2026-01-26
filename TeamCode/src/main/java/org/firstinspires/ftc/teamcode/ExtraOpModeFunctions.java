@@ -21,6 +21,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -44,8 +45,6 @@ import dev.nextftc.control.feedforward.BasicFeedforwardParameters;
 
 
 @Config
-
-
 public class ExtraOpModeFunctions
 {
     public LinearOpMode localLop = null;
@@ -71,8 +70,9 @@ public class ExtraOpModeFunctions
     public Servo turretS;
     public TouchSensor turretLimitCW;  // Digital channel Object
     public TouchSensor turretLimitCCW;  // Digital channel Object
-    public Servo light1;
-    public Servo light2;
+    public DigitalChannel beamBreak1;
+    public DigitalChannel beamBreak2;
+    public Lights lights;
     public ControlSystem launcherController;
     public static PIDCoefficients launcherVelPidCoefficients =
             new PIDCoefficients(0.0051, 0.0, 0.0);
@@ -88,13 +88,6 @@ public class ExtraOpModeFunctions
     private AprilTagPoseFtc aprilTagPose;
     private boolean aimGood = false;
     private boolean rangeGood = false;
-
-    public static double Light_Green = 0.500;
-    public static double Light_Red = 0.280;
-    public static double Light_Blue = 0.611;
-    public static double Light_Purple = 0.666;
-    public static double Light_Yellow = 0.388;
-    double lightColor = Light_Red;
 
 
     double maxLauncherRPM = 4500.0;  //RPM
@@ -143,6 +136,11 @@ public class ExtraOpModeFunctions
         intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intake.setVelocity(0.0);
 
+        beamBreak1 = hardwareMap.get(DigitalChannel.class, "beamBreak1");
+        beamBreak1.setMode(DigitalChannel.Mode.INPUT);
+        beamBreak2 = hardwareMap.get(DigitalChannel.class, "beamBreak2");
+        beamBreak2.setMode(DigitalChannel.Mode.INPUT);
+
         turretMotor = hardwareMap.get(DcMotorEx.class, "turretMotor");
         turretMotor.setDirection(DcMotorEx.Direction.FORWARD);
         turretMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -152,11 +150,6 @@ public class ExtraOpModeFunctions
         //turretMotor.setVelocity(0.0);
 
         ballStop = hardwareMap.get(Servo.class, "ballStop");
-
-        light1 = hardwareMap.get(Servo.class, "light1");
-        light2 = hardwareMap.get(Servo.class, "light2");
-        light1.setPosition(Light_Green);
-        light2.setPosition(Light_Green);
 
         launcherController = ControlSystem.builder()
                 .velPid(launcherVelPidCoefficients)
@@ -169,24 +162,6 @@ public class ExtraOpModeFunctions
                 .basicFF(turretFeedforwardParameters)
                 .build();
         turretController.setGoal(new KineticState(0.0, 0.0));
-    }
-
-    public void turretMotorForward()
-    {
-        turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        turretMotor.setPower(0.2);
-    }
-
-    public void turretMotorOff()
-    {
-        turretMotor.setPower(0.0);
-        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-
-    public void turretMotorReverse()
-    {
-        turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        turretMotor.setPower(-0.2);
     }
 
     public void intakeForward()
@@ -242,15 +217,13 @@ public class ExtraOpModeFunctions
     {
         turretController.setGoal(new KineticState(turretPosition));
 
-        turretMotor.setPower(turretController.calculate(new KineticState(
+        double power = turretController.calculate(new KineticState(
                 turretMotor.getCurrentPosition(),
-                turretMotor.getVelocity())));
+                turretMotor.getVelocity()));
+        turretMotor.setPower(power);
 
-        //dashboardTelemetry.addData("Launcher velocity target", launcherSpeed);
-        //dashboardTelemetry.addData("Launcher power set", power);
-        //dashboardTelemetry.addData("Launcher1 velocity actual", launcher1.getVelocity());
-        //dashboardTelemetry.addData("Launcher2 velocity actual", launcher2.getVelocity());
-        //dashboardTelemetry.update();
+        localLop.telemetry.addData("NXFTC turretPower", power);
+
     }
 
     public double getLauncherSpeed()
@@ -495,30 +468,6 @@ public class ExtraOpModeFunctions
         return(rangeGood);
     }
 
-    public void setLights()
-    {
-        if (aimGood && rangeGood)
-        {
-            lightColor = Light_Green;
-        }
-        else if (aimGood)
-        {
-            lightColor = Light_Purple;
-        }
-        else if (rangeGood)
-        {
-            lightColor = Light_Blue;
-        }
-        else
-        {
-            lightColor = Light_Blue;
-        }
-
-        light1.setPosition(lightColor);
-        light2.setPosition(lightColor);
-
-    }
-
     boolean runLauncherBoolean = false;
 
     public void stopLauncher()
@@ -635,6 +584,70 @@ public class ExtraOpModeFunctions
         public void writeLine()
         {
             datalogger.writeLine();
+        }
+    }
+
+    public class Lights
+    {
+        private Servo light1;
+        private Servo light2;
+        private boolean flashing = false;
+        private final long flashPeriod = 250;
+
+        public static final double Light_Green = 0.500;
+        public static final double Light_Red = 0.280;
+        public static final double Light_Blue = 0.611;
+        public static final double Light_Purple = 0.666;
+        public static final double Light_Yellow = 0.388;
+        public static final double Light_Off = 0.000;
+        public double lightColor = Light_Green;
+
+        public Lights(HardwareMap hm)
+        {
+            this.light1 = hm.get(Servo.class, "light1");
+            this.light2 = hm.get(Servo.class, "light2");
+            this.setLightColor(Light_Green);
+        }
+        public void setLightColor(double lightColor)
+        {
+            this.lightColor = lightColor;
+        }
+
+        public void flashingOn()
+        {
+            if(flashing == false)
+            {
+                flashing = true;
+            }
+        }
+        public void flashingOff()
+        {
+            if(flashing == true)
+            {
+                flashing = false;
+            }
+        }
+        public void update(long timems)
+        {
+            if(flashing)
+            {
+                long timeRound = timems - (timems%flashPeriod);
+                if((timeRound/flashPeriod)%2 == 0)
+                {
+                    light1.setPosition(lightColor);
+                    light2.setPosition(lightColor);
+                }
+                else
+                {
+                    light1.setPosition(Light_Off);
+                    light2.setPosition(Light_Off);
+                }
+            }
+            else
+            {
+                light1.setPosition(lightColor);
+                light2.setPosition(lightColor);
+            }
         }
     }
 

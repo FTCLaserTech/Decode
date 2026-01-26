@@ -85,20 +85,18 @@ public class BasicTeleOp extends LinearOpMode
         boolean launcherOn = true;
         boolean depotFound = false;
 
-        double lightColor = extras.Light_Red;
-
         double previousOrientation = extras.readAutoStartRotation();
+
         extras.teamColor = extras.readTeamColor();
         if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
         {
-            lightColor = extras.Light_Red;
+            extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Red);
         }
         else
         {
-            lightColor = extras.Light_Blue;
+            extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Blue);
         }
-        extras.light1.setPosition(lightColor);
-        extras.light2.setPosition(lightColor);
+        extras.lights.update((long)getRuntime()*1000);
 
         boolean targetSearchingMode = false;
         long loopCounter = 0;
@@ -140,18 +138,13 @@ public class BasicTeleOp extends LinearOpMode
             {
                 if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
                 {
-                    extras.teamColor = ExtraOpModeFunctions.TeamColor.BLUE;
-                    lightColor = extras.Light_Blue;
+                    extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Red);
                 }
                 else
                 {
-                    extras.teamColor = ExtraOpModeFunctions.TeamColor.RED;
-                    lightColor = extras.Light_Red;
+                    extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Blue);
                 }
-                extras.saveTeamColor(extras.teamColor);
-
-                extras.light1.setPosition(lightColor);
-                extras.light2.setPosition(lightColor);
+                extras.lights.update((long)getRuntime()*1000);
             }
             telemetry.addData("Team Color: ", extras.teamColor);
 
@@ -292,22 +285,15 @@ public class BasicTeleOp extends LinearOpMode
                 else
                 { // nextftc pid
                     extras.setTurret(turretPosition);
+
+                    extras.dashboardTelemetry.addData("Turret position target", turretPosition);
+                    extras.dashboardTelemetry.addData("Turret position actual", extras.turretMotor.getCurrentPosition());
+                    extras.dashboardTelemetry.addData("Turret power set", extras.turretMotor.getPower());
                 }
+
                 telemetry.addData("turret angle", Math.toDegrees(turretAngle));
                 telemetry.addData("Turret position target: ", turretPosition);
                 telemetry.addData("Turret position actual: ", extras.turretMotor.getCurrentPosition());
-
-                // get and print Megatag
-                Pose3D pose3D = extras.vision.getRobotFieldPositionMT();
-                String data = String.format(Locale.US, "MT1 X: %.2f, Y: %.2f, H: %.2f, R: %.1f, P: %.1f,Y: %.1f",
-                        pose3D.getPosition().x*39.3700787, pose3D.getPosition().y*39.3700787, pose3D.getPosition().z*39.3700787,
-                        pose3D.getOrientation().getRoll(AngleUnit.DEGREES), pose3D.getOrientation().getPitch(AngleUnit.DEGREES), pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
-
-                // get and print Megatag2
-                pose3D = extras.vision.getRobotFieldPositionMT2(imuHeading);
-                data = String.format(Locale.US, "MT2 X: %.2f, Y: %.2f, H: %.2f, R: %.1f, P: %.1f,Y: %.1f",
-                        pose3D.getPosition().x*39.3700787, pose3D.getPosition().y*39.3700787, pose3D.getPosition().z*39.3700787,
-                        pose3D.getOrientation().getRoll(AngleUnit.DEGREES), pose3D.getOrientation().getPitch(AngleUnit.DEGREES), pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
 
                 //telemetry.addData("RFP x", pose3D.getPosition().x*39.3700787);
                 //telemetry.addData("RFP y", pose3D.getPosition().y*39.3700787);
@@ -315,8 +301,7 @@ public class BasicTeleOp extends LinearOpMode
                 //telemetry.addData("RFP roll", pose3D.getOrientation().getRoll(AngleUnit.DEGREES));
                 //telemetry.addData("RFP pitch", pose3D.getOrientation().getPitch(AngleUnit.DEGREES));
                 //telemetry.addData("RFP yaw", pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
-            }
-            // end of aiming
+            } // end of odometery
             //////////////
 
             // check if the launcher speed is in range and adjust if needed
@@ -335,7 +320,19 @@ public class BasicTeleOp extends LinearOpMode
             }
             extras.setLauncher(launcherSpeed);
 
-            //extras.setLights();
+
+            // get and print Megatag
+            Pose3D pose3D = extras.vision.getRobotFieldPositionMT();
+            String data = String.format(Locale.US, "MT1 X: %.2f, Y: %.2f, H: %.2f, R: %.1f, P: %.1f,Y: %.1f",
+                    pose3D.getPosition().x*39.3700787, pose3D.getPosition().y*39.3700787, pose3D.getPosition().z*39.3700787,
+                    pose3D.getOrientation().getRoll(AngleUnit.DEGREES), pose3D.getOrientation().getPitch(AngleUnit.DEGREES), pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
+
+            // get and print Megatag2
+            pose3D = extras.vision.getRobotFieldPositionMT2(imuHeading);
+            data = String.format(Locale.US, "MT2 X: %.2f, Y: %.2f, H: %.2f, R: %.1f, P: %.1f,Y: %.1f",
+                    pose3D.getPosition().x*39.3700787, pose3D.getPosition().y*39.3700787, pose3D.getPosition().z*39.3700787,
+                    pose3D.getOrientation().getRoll(AngleUnit.DEGREES), pose3D.getOrientation().getPitch(AngleUnit.DEGREES), pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
+
 
             // intake and banana control
             if (gamepad1.right_bumper)
@@ -357,21 +354,6 @@ public class BasicTeleOp extends LinearOpMode
                 extras.intakeOff();
                 extras.ballStopOn();
             }
-
-            /*
-            if(gamepad2.left_bumper)
-            {
-                extras.turretMotorForward();
-            }
-            else if(gamepad2.right_bumper)
-            {
-                extras.turretMotorReverse();
-            }
-            else
-            {
-                extras.turretMotorOff();
-            }
-             */
 
             // DRIVE CONTROL STARTS HERE
             if (gamepad1.left_bumper)
@@ -495,8 +477,10 @@ public class BasicTeleOp extends LinearOpMode
             telemetry.addData("Elapsed time: ", getRuntime());
 
             drive.updatePoseEstimate();
+            extras.lights.update((long)getRuntime()*1000);
 
             telemetry.update();
+            extras.dashboardTelemetry.update();
         }
     }
 

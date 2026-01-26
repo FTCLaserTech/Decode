@@ -43,16 +43,16 @@ public class AutoFunctions
             localExtras.saveTeamColor(localExtras.teamColor);
         }
         localLop.telemetry.addData("Team Color - gp1 x: ", localExtras.teamColor);
-        if(localExtras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
+        if (localExtras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
         {
-            localExtras.light1.setPosition(localExtras.Light_Red);
-            localExtras.light2.setPosition(localExtras.Light_Red);
+            localExtras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Red);
         }
         else
         {
-            localExtras.light1.setPosition(localExtras.Light_Blue);
-            localExtras.light2.setPosition(localExtras.Light_Blue);
+            localExtras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Blue);
         }
+        localExtras.lights.update();
+
 
         // load artifacts
         localLop.telemetry.addLine("Load Artifacts - gp1 Left Trigger: ");
