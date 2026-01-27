@@ -326,13 +326,25 @@ public class BasicTeleOp extends LinearOpMode
             String data = String.format(Locale.US, "MT1 X: %.2f, Y: %.2f, H: %.2f, R: %.1f, P: %.1f,Y: %.1f",
                     pose3D.getPosition().x*39.3700787, pose3D.getPosition().y*39.3700787, pose3D.getPosition().z*39.3700787,
                     pose3D.getOrientation().getRoll(AngleUnit.DEGREES), pose3D.getOrientation().getPitch(AngleUnit.DEGREES), pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
+            telemetry.addLine(data);
 
             // get and print Megatag2
             pose3D = extras.vision.getRobotFieldPositionMT2(imuHeading);
             data = String.format(Locale.US, "MT2 X: %.2f, Y: %.2f, H: %.2f, R: %.1f, P: %.1f,Y: %.1f",
                     pose3D.getPosition().x*39.3700787, pose3D.getPosition().y*39.3700787, pose3D.getPosition().z*39.3700787,
                     pose3D.getOrientation().getRoll(AngleUnit.DEGREES), pose3D.getOrientation().getPitch(AngleUnit.DEGREES), pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
+            telemetry.addLine(data);
 
+            telemetry.addData("beamBreak1: ", extras.beamBreak1);
+            telemetry.addData("beamBreak2: ", extras.beamBreak2);
+            if((extras.beamBreak1.getState() == true) || (extras.beamBreak2.getState() == true))
+            {
+                extras.lights.flashingOn();
+            }
+            else
+            {
+                extras.lights.flashingOff();
+            }
 
             // intake and banana control
             if (gamepad1.right_bumper)

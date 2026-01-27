@@ -72,7 +72,7 @@ public class ExtraOpModeFunctions
     public TouchSensor turretLimitCCW;  // Digital channel Object
     public DigitalChannel beamBreak1;
     public DigitalChannel beamBreak2;
-    public Lights lights;
+    public Lights lights = null;
     public ControlSystem launcherController;
     public static PIDCoefficients launcherVelPidCoefficients =
             new PIDCoefficients(0.0051, 0.0, 0.0);
@@ -135,6 +135,8 @@ public class ExtraOpModeFunctions
         intake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intake.setVelocity(0.0);
+
+        lights = new Lights(hardwareMap);
 
         beamBreak1 = hardwareMap.get(DigitalChannel.class, "beamBreak1");
         beamBreak1.setMode(DigitalChannel.Mode.INPUT);

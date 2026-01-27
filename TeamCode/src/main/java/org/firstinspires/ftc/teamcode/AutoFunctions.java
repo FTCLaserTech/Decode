@@ -51,7 +51,7 @@ public class AutoFunctions
         {
             localExtras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Blue);
         }
-        localExtras.lights.update();
+        localExtras.lights.update(0);
 
 
         // load artifacts
