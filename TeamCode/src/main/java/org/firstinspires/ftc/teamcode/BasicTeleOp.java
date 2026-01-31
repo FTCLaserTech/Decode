@@ -138,11 +138,13 @@ public class BasicTeleOp extends LinearOpMode
             {
                 if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
                 {
-                    extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Red);
+                    extras.teamColor = ExtraOpModeFunctions.TeamColor.BLUE;
+                    extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Blue);
                 }
                 else
                 {
-                    extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Blue);
+                    extras.teamColor = ExtraOpModeFunctions.TeamColor.RED;
+                    extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Red);
                 }
                 extras.lights.update((long)getRuntime()*1000);
             }

@@ -118,8 +118,8 @@ public class AudienceCorner extends LinearOpMode
                 .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
                 .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                .strafeToLinearHeading(toCorner.position, toCorner.heading)
-                .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
+                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
         Actions.runBlocking(GoToCorner);
@@ -141,8 +141,8 @@ public class AudienceCorner extends LinearOpMode
         Action GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
                 .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
-                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                .strafeToLinearHeading(toCorner.position, toCorner.heading)
+                .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 //.strafeToLinearHeading(toCorner.position, toCorner.heading)
                 //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
