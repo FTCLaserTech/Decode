@@ -81,7 +81,7 @@ public class ExtraOpModeFunctions
 
     public ControlSystem turretController;
     public static PIDCoefficients turretPosPidCoefficients =
-            new PIDCoefficients(0.005, 0.0, 0.0);
+            new PIDCoefficients(0.01, 0.0, 0.0);
     public static BasicFeedforwardParameters turretFeedforwardParameters =
             new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
@@ -148,7 +148,7 @@ public class ExtraOpModeFunctions
         turretMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         turretMotor.setTargetPosition(0);
         //turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         //turretMotor.setVelocity(0.0);
 
         ballStop = hardwareMap.get(Servo.class, "ballStop");
@@ -222,6 +222,12 @@ public class ExtraOpModeFunctions
         double power = turretController.calculate(new KineticState(
                 turretMotor.getCurrentPosition(),
                 turretMotor.getVelocity()));
+        if(power>0.7){
+            power = 0.7;
+        }
+        if(power<-0.7){
+            power = -0.7;
+        }
         turretMotor.setPower(power);
 
         localLop.telemetry.addData("NXFTC turretPower", power);
@@ -629,12 +635,18 @@ public class ExtraOpModeFunctions
                 flashing = false;
             }
         }
-        public void update(long timems)
+        public void lightsUpdate(long timems)
         {
+            localLop.telemetry.addData("lights flashing: ", flashing);
             if(flashing)
             {
-                long timeRound = timems - (timems%flashPeriod);
-                if((timeRound/flashPeriod)%2 == 0)
+                //long timeRound = timems - (timems%flashPeriod);
+                long timeRound = (long) (timems/flashPeriod);
+                localLop.telemetry.addData("timems: ", timems);
+                localLop.telemetry.addData("timeRound: ", timeRound);
+                localLop.telemetry.addData("timeRound %2: ", (timeRound%2));
+
+                if((timeRound%2) == 0)
                 {
                     light1.setPosition(lightColor);
                     light2.setPosition(lightColor);

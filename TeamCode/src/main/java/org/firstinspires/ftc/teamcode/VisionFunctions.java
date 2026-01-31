@@ -5,6 +5,7 @@ package org.firstinspires.ftc.teamcode;
 import android.util.Size;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -28,6 +29,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -423,17 +426,44 @@ public class VisionFunctions {
         return readDepotAprilTag_ll(20);
     }   // end method readBlueAprilTag_ll()
 
-    public Pose3D getRobotFieldPositionMT()
+    Deque<Double> xpos = new ArrayDeque<>();
+    Deque<Double> ypos = new ArrayDeque<>();
+    Deque<Double> rotation = new ArrayDeque<>();
+
+    public Pose2d getRobotFieldPositionMT()
     {
         LLResult llResult = limelight.getLatestResult();
         if (llResult.isValid())
         {
-            return(llResult.getBotpose());
+            if (xpos.size() > 25)
+            {
+                xpos.pollFirst();
+                ypos.pollFirst();
+                rotation.pollFirst();
+            }
+            Pose3D pose3D = llResult.getBotpose();
+            xpos.add(pose3D.getPosition().x * 39.3700787);
+            ypos.add(pose3D.getPosition().y * 39.3700787);
+            rotation.add(pose3D.getOrientation().getYaw(AngleUnit.RADIANS));
+
+            double sumx = 0;
+            for (double num : xpos) {
+                sumx += num;
+            }
+            double sumy = 0;
+            for (double num : ypos) {
+                sumy += num;
+            }
+            double sumr = 0;
+            for (double num : rotation) {
+                sumr += num;
+            }
+            return new Pose2d(sumx/xpos.size(),sumy/ypos.size(),sumr/rotation.size());
         }
         else
         {
             //return null;
-            return new Pose3D(new Position(DistanceUnit.INCH,0,0,0,0),new YawPitchRollAngles(AngleUnit.RADIANS,0,0,0,0));
+            return new Pose2d(0,0,0);
         }
     }
     public Pose3D getRobotFieldPositionMT2(double yaw)

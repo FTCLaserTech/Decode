@@ -17,7 +17,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 import java.util.Locale;
 
@@ -60,8 +59,8 @@ public class BasicTeleOp extends LinearOpMode
 
         double turretAngle = 0;
         double turretPosition = 0.5;
-        double MAX_TURRETANGLE = Math.toRadians(45.0);
-        double MIN_TURRETANGLE = Math.toRadians(-45.0);
+        double MAX_TURRETANGLE = Math.toRadians(40.0);
+        double MIN_TURRETANGLE = Math.toRadians(-40.0);
         double MAX_SERVO = 1.0;
 
         double turretMotorEncoder = 384.5;  // PPR at the output shaft per motor data sheet
@@ -96,11 +95,12 @@ public class BasicTeleOp extends LinearOpMode
         {
             extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Blue);
         }
-        extras.lights.update((long)getRuntime()*1000);
+        extras.lights.lightsUpdate((long)(getRuntime()*1000.0));
 
         boolean targetSearchingMode = false;
         long loopCounter = 0;
 
+        telemetry.setMsTransmissionInterval(50);
         telemetry.addData("Team Color: ", extras.teamColor);
 
         PinpointLocalizer ppLocalizer = (PinpointLocalizer) drive.localizer;
@@ -146,7 +146,7 @@ public class BasicTeleOp extends LinearOpMode
                     extras.teamColor = ExtraOpModeFunctions.TeamColor.RED;
                     extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Red);
                 }
-                extras.lights.update((long)getRuntime()*1000);
+                extras.lights.lightsUpdate((long)(getRuntime()*1000.0));
             }
             telemetry.addData("Team Color: ", extras.teamColor);
 
@@ -277,8 +277,9 @@ public class BasicTeleOp extends LinearOpMode
                 //extras.turretS.setPosition(turretPosition);
 
                 turretPosition = turretAngle / MAX_TURRETANGLE * MAX_TURRETENCODER;
+                telemetry.addData("turret angle", Math.toDegrees(turretAngle));
 
-                if(true)
+                if(false)
                 { // control hub pid
                     extras.turretMotor.setTargetPosition((int) turretPosition);
                     //extras.turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -288,12 +289,9 @@ public class BasicTeleOp extends LinearOpMode
                 { // nextftc pid
                     extras.setTurret(turretPosition);
 
-                    extras.dashboardTelemetry.addData("Turret position target", turretPosition);
-                    extras.dashboardTelemetry.addData("Turret position actual", extras.turretMotor.getCurrentPosition());
                     extras.dashboardTelemetry.addData("Turret power set", extras.turretMotor.getPower());
                 }
 
-                telemetry.addData("turret angle", Math.toDegrees(turretAngle));
                 telemetry.addData("Turret position target: ", turretPosition);
                 telemetry.addData("Turret position actual: ", extras.turretMotor.getCurrentPosition());
 
@@ -324,22 +322,27 @@ public class BasicTeleOp extends LinearOpMode
 
 
             // get and print Megatag
-            Pose3D pose3D = extras.vision.getRobotFieldPositionMT();
-            String data = String.format(Locale.US, "MT1 X: %.2f, Y: %.2f, H: %.2f, R: %.1f, P: %.1f,Y: %.1f",
-                    pose3D.getPosition().x*39.3700787, pose3D.getPosition().y*39.3700787, pose3D.getPosition().z*39.3700787,
-                    pose3D.getOrientation().getRoll(AngleUnit.DEGREES), pose3D.getOrientation().getPitch(AngleUnit.DEGREES), pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
+            Pose2d limelightrobotposition = extras.vision.getRobotFieldPositionMT();
+            String data = String.format(Locale.US, "MT1 X: %.2f, Y: %.2f, Y: %.1f",
+                    limelightrobotposition.position.x, limelightrobotposition.position.y, Math.toDegrees(limelightrobotposition.heading.toDouble()));
             telemetry.addLine(data);
+            if (gamepad1.y)
+            {
+                drive.localizer.setPose(limelightrobotposition);
+            }
 
             // get and print Megatag2
+            /*
             pose3D = extras.vision.getRobotFieldPositionMT2(imuHeading);
             data = String.format(Locale.US, "MT2 X: %.2f, Y: %.2f, H: %.2f, R: %.1f, P: %.1f,Y: %.1f",
                     pose3D.getPosition().x*39.3700787, pose3D.getPosition().y*39.3700787, pose3D.getPosition().z*39.3700787,
                     pose3D.getOrientation().getRoll(AngleUnit.DEGREES), pose3D.getOrientation().getPitch(AngleUnit.DEGREES), pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
             telemetry.addLine(data);
+            */
 
-            telemetry.addData("beamBreak1: ", extras.beamBreak1);
-            telemetry.addData("beamBreak2: ", extras.beamBreak2);
-            if((extras.beamBreak1.getState() == true) || (extras.beamBreak2.getState() == true))
+            telemetry.addData("beamBreak1: ", extras.beamBreak1.getState());
+            telemetry.addData("beamBreak2: ", extras.beamBreak2.getState());
+            if((extras.beamBreak1.getState() == false) || (extras.beamBreak2.getState() == false))
             {
                 extras.lights.flashingOn();
             }
@@ -491,7 +494,7 @@ public class BasicTeleOp extends LinearOpMode
             telemetry.addData("Elapsed time: ", getRuntime());
 
             drive.updatePoseEstimate();
-            extras.lights.update((long)getRuntime()*1000);
+            extras.lights.lightsUpdate((long)(getRuntime()*1000.0));
 
             telemetry.update();
             extras.dashboardTelemetry.update();
