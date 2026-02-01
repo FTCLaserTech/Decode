@@ -11,7 +11,6 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -23,7 +22,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Autonomous(group = "a")
 
-public class Audience9 extends LinearOpMode
+public class Audience12Angle extends LinearOpMode
 {
     @Override
 
@@ -81,10 +80,10 @@ public class Audience9 extends LinearOpMode
         Pose2d toInitialLaunchPosition = new Pose2d(-50,autoFun.redBlueT(-14),Math.toRadians(autoFun.redBlueT(155)));
         Pose2d toSpike1 = new Pose2d(-34,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d pickupSpike1 = new Pose2d(-36,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(270)));
-        Pose2d toCorner = new Pose2d(-62,autoFun.redBlueT(-52),Math.toRadians(autoFun.redBlueT(270)));
+        Pose2d toCorner = new Pose2d(-59,autoFun.redBlueT(-52),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d pickupCorner = new Pose2d(-62,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(270)));
-        Pose2d toCorner2 = new Pose2d(-61,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(270)));
-        Pose2d pickupCorner2 = new Pose2d(-61,autoFun.redBlueT(-59),Math.toRadians(autoFun.redBlueT(270)));
+        Pose2d toCorner2 = new Pose2d(-59,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(315)));
+        Pose2d pickupCorner2 = new Pose2d(-40,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(315)));
         Pose2d toParkPosition = new Pose2d(-60,autoFun.redBlueT(-35),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d backToLaunchZone = new Pose2d(autoFun.redBlueT(0),0,Math.toRadians(270));
 
@@ -180,6 +179,8 @@ public class Audience9 extends LinearOpMode
         Action GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
                 .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                .strafeToLinearHeading(toCorner2.position, toCorner2.heading)
+                .strafeToLinearHeading(pickupCorner2.position, pickupCorner2.heading)
                 //.strafeToLinearHeading(toCorner.position, toCorner.heading)
                 //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 //.strafeToLinearHeading(toCorner.position, toCorner.heading)
@@ -204,7 +205,7 @@ public class Audience9 extends LinearOpMode
                         new InstantAction(() -> extras.ballStopOn())),
                 extras.setLauncherAction(launcherSpeed)
         ));
-
+/*
         // pickup and launch Corner second time
         extras.intakeForward();
         Action GoToCorner3 = drive.actionBuilder(drive.localizer.getPose())
@@ -235,7 +236,7 @@ public class Audience9 extends LinearOpMode
                 extras.setLauncherAction(launcherSpeed)
         ));
 
-
+*/
         // Park
         Action toParkPosition1 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
@@ -244,8 +245,9 @@ public class Audience9 extends LinearOpMode
                         new ParallelAction(toParkPosition1,
                 new InstantAction(() -> extras.stopLauncher()),
                 new InstantAction(() -> extras.ballStopOn()),
-                new InstantAction(() -> extras.intakeOff()),
-        extras.setLauncherAction(launcherSpeed)
+                new InstantAction(() -> extras.intakeOff())
+
+        //extras.setLauncherAction(launcherSpeed)
         )));
 
         safeWaitSeconds(2);

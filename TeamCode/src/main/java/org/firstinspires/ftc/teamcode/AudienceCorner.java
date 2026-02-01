@@ -116,60 +116,138 @@ public class AudienceCorner extends LinearOpMode
         Action GoToCorner = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
                 .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                .strafeToLinearHeading(toCorner.position, toCorner.heading)
-                .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 //.strafeToLinearHeading(toCorner.position, toCorner.heading)
                 //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
+                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
         Actions.runBlocking(GoToCorner);
 
         // RaceAction will stop all actions when any one completes
 
+        Action ToLaunchPosition1 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .build();
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
+                        new ParallelAction(ToLaunchPosition1,
+                                new SequentialAction(new SleepAction(0.4),
+                                        new InstantAction(() -> extras.intakeOff()))),
                         new InstantAction(() -> extras.intakeForward()),
                         new InstantAction(() -> extras.ballStopOff()),
                         new SleepAction(1.0),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.ballStopOn())),
                 extras.setLauncherAction(launcherSpeed)
-        ));
-
+                ));
         // pickup and launch Corner second time
         extras.intakeForward();
         Action GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
                 .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                .strafeToLinearHeading(toCorner.position, toCorner.heading)
-                .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 //.strafeToLinearHeading(toCorner.position, toCorner.heading)
                 //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
+                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
         Actions.runBlocking(GoToCorner2);
 
+        Action ToLaunchPosition2 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .build();
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
+                        new ParallelAction(ToLaunchPosition2,
+                                new SequentialAction(new SleepAction(0.4),
+                                        new InstantAction(() -> extras.intakeOff()))),
                         new InstantAction(() -> extras.intakeForward()),
                         new InstantAction(() -> extras.ballStopOff()),
                         new SleepAction(1.0),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.ballStopOn())),
                 extras.setLauncherAction(launcherSpeed)
-        ));
+                ));
+        // pickup and launch Corner first time
+        extras.intakeForward();
+        Action GoToCorner3 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toCorner.position, toCorner.heading)
+                .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
+                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
+                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .build();
+        Actions.runBlocking(GoToCorner3);
 
-        // Park
-        Action ToPark = drive.actionBuilder(drive.localizer.getPose())
+        // RaceAction will stop all actions when any one completes
+
+        Action ToLaunchPosition3 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .build();
+        Actions.runBlocking(new ParallelAction(
+                new SequentialAction(
+                        new ParallelAction(ToLaunchPosition3,
+                                new SequentialAction(new SleepAction(0.4),
+                                        new InstantAction(() -> extras.intakeOff()))),
+                        new InstantAction(() -> extras.intakeForward()),
+                        new InstantAction(() -> extras.ballStopOff()),
+                        new SleepAction(1.0),
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.ballStopOn())),
+                extras.setLauncherAction(launcherSpeed)
+                ));
+
+        // pickup and launch Corner first time
+        extras.intakeForward();
+        Action GoToCorner4 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toCorner.position, toCorner.heading)
+                .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
+                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
+                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
+                //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .build();
+        Actions.runBlocking(GoToCorner4);
+
+        // RaceAction will stop all actions when any one completes
+
+        Action ToLaunchPosition4 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .build();
+        Actions.runBlocking(new ParallelAction(
+                new SequentialAction(
+                        new ParallelAction(ToLaunchPosition4,
+                                new SequentialAction(new SleepAction(0.4),
+                                        new InstantAction(() -> extras.intakeOff()))),
+                        new InstantAction(() -> extras.intakeForward()),
+                        new InstantAction(() -> extras.ballStopOff()),
+                        new SleepAction(1.0),
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.ballStopOn())),
+                extras.setLauncherAction(launcherSpeed)
+                ));
+
+                // Park
+                Action toParkPosition1 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
                 .build();
-        Actions.runBlocking(ToPark);
+        Actions.runBlocking(new ParallelAction(
+                new ParallelAction(toParkPosition1,
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.ballStopOn()),
+                        new InstantAction(() -> extras.intakeOff()),
+                        extras.setLauncherAction(launcherSpeed)
+                )));
 
         safeWaitSeconds(2);
 
         // turn the intake and shooter off
-        extras.intakeOff();
-        extras.ballStopOn();
+        //extras.intakeOff();
+        //extras.ballStopOn();
         //extras.setLauncher(0.0);
 
         // Save the ending location

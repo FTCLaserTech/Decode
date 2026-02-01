@@ -485,19 +485,19 @@ public class ExtraOpModeFunctions
 
     public class SetLauncherAction implements Action
     {
-        private double launcherSpeed = 0.0;
+        private double launcherActionSpeed = 0.0;
         private int launcherSpeedCount = 0;
 
         public SetLauncherAction(double speed)
         {
-            launcherSpeed = speed;
+            launcherActionSpeed = speed;
             runLauncherBoolean = true;
         }
         @Override
         public boolean run(@NonNull TelemetryPacket packet)
         {
-            setLauncher(launcherSpeed);
-            boolean speedGood = isLauncherSpeedGood(launcherSpeed);
+            setLauncher(launcherActionSpeed);
+            boolean speedGood = isLauncherSpeedGood(launcherActionSpeed);
             return(runLauncherBoolean);
             /*
             if(speedGood)
