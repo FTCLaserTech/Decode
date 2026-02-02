@@ -499,31 +499,56 @@ public class ExtraOpModeFunctions
             setLauncher(launcherActionSpeed);
             boolean speedGood = isLauncherSpeedGood(launcherActionSpeed);
             return(runLauncherBoolean);
-            /*
-            if(speedGood)
-            {
-                launcherSpeedCount++;
-                localLop.telemetry.addData("SG launcherSpeedCount: ", launcherSpeedCount);
-                if(launcherSpeedCount > 35)
-                {
-                    localLop.telemetry.update();
-                    return(false);
-                }
-            }
-            else
-            {
-                localLop.telemetry.addData("SNG launcherSpeedCount: ", launcherSpeedCount);
-                launcherSpeedCount = 0;
-            }
-            localLop.telemetry.update();
-            return(true);
-             */
         }
     }
 
     public Action setLauncherAction(double speed)
     {
         return(new SetLauncherAction(speed));
+    }
+
+    public boolean isIntakeFull()
+    {
+        localLop.telemetry.addData("beamBreak1: ", beamBreak1.getState());
+        localLop.telemetry.addData("beamBreak2: ", beamBreak2.getState());
+        if((beamBreak1.getState() == false) || (beamBreak2.getState() == false))
+        {
+            lights.flashingOn();
+            return(true);
+        }
+        else
+        {
+            lights.flashingOff();
+            return(false);
+        }
+    }
+
+    public class CheckIntakeAction implements Action
+    {
+        private int intakeFullCount = 0;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet)
+        {
+            if(isIntakeFull())
+            {
+                intakeFullCount++;
+                if(intakeFullCount > 10)
+                {
+                    return(false);
+                }
+            }
+            else
+            {
+                intakeFullCount = 0;
+            }
+            return(true);
+        }
+    }
+
+    public Action checkIntakeAction()
+    {
+        return(new CheckIntakeAction());
     }
 
     public double angleToSpeed(double angle)

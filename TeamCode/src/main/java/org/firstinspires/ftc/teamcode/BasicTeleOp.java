@@ -340,16 +340,8 @@ public class BasicTeleOp extends LinearOpMode
             telemetry.addLine(data);
             */
 
-            telemetry.addData("beamBreak1: ", extras.beamBreak1.getState());
-            telemetry.addData("beamBreak2: ", extras.beamBreak2.getState());
-            if((extras.beamBreak1.getState() == false) || (extras.beamBreak2.getState() == false))
-            {
-                extras.lights.flashingOn();
-            }
-            else
-            {
-                extras.lights.flashingOff();
-            }
+            // check if intake is full
+            extras.isIntakeFull();
 
             // intake and banana control
             if (gamepad1.right_bumper)

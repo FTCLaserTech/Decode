@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -150,13 +151,9 @@ public class Audience12Angle extends LinearOpMode
                 .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 //.strafeToLinearHeading(toCorner.position, toCorner.heading)
                 //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
-                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
-
-        Actions.runBlocking(GoToCorner);
-        //extras.intakeOff();
+        Actions.runBlocking(new RaceAction(GoToCorner,extras.checkIntakeAction()));
 
         Action ToLaunchPosition3 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
@@ -181,8 +178,6 @@ public class Audience12Angle extends LinearOpMode
                 .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 .strafeToLinearHeading(toCorner2.position, toCorner2.heading)
                 .strafeToLinearHeading(pickupCorner2.position, pickupCorner2.heading)
-                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
-                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 //.strafeToLinearHeading(toCorner.position, toCorner.heading)
                 //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
