@@ -23,7 +23,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Autonomous(group = "a")
 
-public class Audience12Angle extends LinearOpMode
+public class Audience12Mixed extends LinearOpMode
 {
     @Override
 
@@ -177,8 +177,8 @@ public class Audience12Angle extends LinearOpMode
         Action GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
                 .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                .strafeToLinearHeading(toCorner2.position, toCorner2.heading)
-                .strafeToLinearHeading(pickupCorner2.position, pickupCorner2.heading)
+                .strafeToLinearHeading(toCorner.position, toCorner2.heading)
+                .strafeToLinearHeading(pickupCorner.position, pickupCorner2.heading)
                 //.strafeToLinearHeading(toCorner.position, toCorner.heading)
                 //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)

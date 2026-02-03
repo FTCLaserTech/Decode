@@ -10,6 +10,7 @@ import static java.lang.Math.sqrt;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -90,10 +91,13 @@ public class BasicTeleOp extends LinearOpMode
         if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
         {
             extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Red);
-        }
+            extras.pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+            extras.blinkinLedDriver.setPattern(extras.pattern);        }
         else
         {
             extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Blue);
+            extras.pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
+            extras.blinkinLedDriver.setPattern(extras.pattern);
         }
         extras.lights.lightsUpdate((long)(getRuntime()*1000.0));
 
@@ -140,11 +144,15 @@ public class BasicTeleOp extends LinearOpMode
                 {
                     extras.teamColor = ExtraOpModeFunctions.TeamColor.BLUE;
                     extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Blue);
+                    extras.pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
+                    extras.blinkinLedDriver.setPattern(extras.pattern);
                 }
                 else
                 {
                     extras.teamColor = ExtraOpModeFunctions.TeamColor.RED;
                     extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Red);
+                    extras.pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+                    extras.blinkinLedDriver.setPattern(extras.pattern);
                 }
                 extras.lights.lightsUpdate((long)(getRuntime()*1000.0));
             }

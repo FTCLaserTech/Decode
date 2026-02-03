@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 //import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
@@ -45,10 +46,14 @@ public class AutoFunctions
         if (localExtras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
         {
             localExtras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Red);
+            localExtras.pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
+            localExtras.blinkinLedDriver.setPattern(localExtras.pattern);
         }
         else
         {
             localExtras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Blue);
+            localExtras.pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
+            localExtras.blinkinLedDriver.setPattern(localExtras.pattern);
         }
         localExtras.lights.lightsUpdate(0);
 

@@ -138,6 +138,9 @@ public class ExtraOpModeFunctions
 
         lights = new Lights(hardwareMap);
 
+        blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
+
+
         beamBreak1 = hardwareMap.get(DigitalChannel.class, "beamBreak1");
         beamBreak1.setMode(DigitalChannel.Mode.INPUT);
         beamBreak2 = hardwareMap.get(DigitalChannel.class, "beamBreak2");
@@ -507,17 +510,28 @@ public class ExtraOpModeFunctions
         return(new SetLauncherAction(speed));
     }
 
+    private int intakeFullCount = 0;
     public boolean isIntakeFull()
     {
         localLop.telemetry.addData("beamBreak1: ", beamBreak1.getState());
         localLop.telemetry.addData("beamBreak2: ", beamBreak2.getState());
+        localLop.telemetry.addData("intakeFullCount: ", intakeFullCount);
         if((beamBreak1.getState() == false) || (beamBreak2.getState() == false))
         {
-            lights.flashingOn();
-            return(true);
+            intakeFullCount++;
+            if(intakeFullCount > 6)
+            {
+                lights.flashingOn();
+                return(true);
+            }
+            else
+            {
+                return(false);
+            }
         }
         else
         {
+            intakeFullCount = 0;
             lights.flashingOff();
             return(false);
         }
@@ -525,24 +539,18 @@ public class ExtraOpModeFunctions
 
     public class CheckIntakeAction implements Action
     {
-        private int intakeFullCount = 0;
 
         @Override
         public boolean run(@NonNull TelemetryPacket packet)
         {
             if(isIntakeFull())
             {
-                intakeFullCount++;
-                if(intakeFullCount > 10)
-                {
-                    return(false);
-                }
+                return(false);
             }
             else
             {
-                intakeFullCount = 0;
+                return(true);
             }
-            return(true);
         }
     }
 
@@ -671,21 +679,28 @@ public class ExtraOpModeFunctions
                 localLop.telemetry.addData("timeRound: ", timeRound);
                 localLop.telemetry.addData("timeRound %2: ", (timeRound%2));
 
-                if((timeRound%2) == 0)
+                if(false)
                 {
-                    light1.setPosition(lightColor);
-                    light2.setPosition(lightColor);
+                    if ((timeRound % 2) == 0)
+                    {
+                        light1.setPosition(lightColor);
+                        light2.setPosition(lightColor);
+                    } else
+                    {
+                        light1.setPosition(Light_Off);
+                        light2.setPosition(Light_Off);
+                    }
                 }
                 else
                 {
-                    light1.setPosition(Light_Off);
-                    light2.setPosition(Light_Off);
+                    light1.setPosition(Light_Green);
+                    light2.setPosition(Light_Green);
                 }
             }
             else
             {
-                light1.setPosition(lightColor);
-                light2.setPosition(lightColor);
+                light1.setPosition(Light_Off);
+                light2.setPosition(Light_Off);
             }
         }
     }
