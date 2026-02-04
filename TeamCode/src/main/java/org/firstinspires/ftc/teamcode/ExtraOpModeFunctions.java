@@ -81,7 +81,7 @@ public class ExtraOpModeFunctions
 
     public ControlSystem turretController;
     public static PIDCoefficients turretPosPidCoefficients =
-            new PIDCoefficients(0.01, 0.0, 0.0);
+            new PIDCoefficients(0.007, 0.0, 0.0);
     public static BasicFeedforwardParameters turretFeedforwardParameters =
             new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 

@@ -150,8 +150,8 @@ public class Audience12Mixed extends LinearOpMode
         Action GoToCorner = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
                 .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                .strafeToLinearHeading(toCorner.position, toCorner.heading)
-                .strafeToLinearHeading(pickupCorner2.position, pickupCorner2.heading)
+                //.strafeToLinearHeading(toCorner2.position, toCorner2.heading)
+                //.strafeToLinearHeading(pickupCorner2.position, pickupCorner2.heading)
                 //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
         Actions.runBlocking(new RaceAction(GoToCorner,extras.checkIntakeAction()));
@@ -177,13 +177,13 @@ public class Audience12Mixed extends LinearOpMode
         Action GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
                 .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                .strafeToLinearHeading(toCorner.position, toCorner2.heading)
-                .strafeToLinearHeading(pickupCorner.position, pickupCorner2.heading)
+                .strafeToLinearHeading(toCorner2.position, toCorner2.heading)
+                .strafeToLinearHeading(pickupCorner2.position, pickupCorner2.heading)
                 //.strafeToLinearHeading(toCorner.position, toCorner.heading)
                 //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
-        Actions.runBlocking(new RaceAction(GoToCorner2,extras.checkIntakeAction()));
+        //Actions.runBlocking(new RaceAction(GoToCorner2,extras.checkIntakeAction()));
         extras.intakeOff();
 
         if(timer.seconds()>4)
@@ -237,13 +237,12 @@ public class Audience12Mixed extends LinearOpMode
 
 
         // Park
+        extras.intakeForward();
         Action toParkPosition1 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
                 .build();
-        extras.intakeForward();
-        Action GoToCornerPark = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
-                .build();
+        extras.intakeOff();
+        /*
         Actions.runBlocking(new ParallelAction(
                         new ParallelAction(toParkPosition1,
                 new InstantAction(() -> extras.stopLauncher()),
@@ -252,6 +251,10 @@ public class Audience12Mixed extends LinearOpMode
 
         //extras.setLauncherAction(launcherSpeed)
         )));
+
+         */
+
+
 
         safeWaitSeconds(2);
 

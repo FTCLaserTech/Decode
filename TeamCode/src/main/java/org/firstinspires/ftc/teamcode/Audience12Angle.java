@@ -186,7 +186,7 @@ public class Audience12Angle extends LinearOpMode
         Actions.runBlocking(new RaceAction(GoToCorner2,extras.checkIntakeAction()));
         extras.intakeOff();
 
-        if(timer.seconds()>4)
+        if(timer.seconds()>3)
         {
             Action ToLaunchPosition4 = drive.actionBuilder(drive.localizer.getPose())
                     .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
@@ -237,17 +237,18 @@ public class Audience12Angle extends LinearOpMode
 
 
         // Park
+        extras.intakeForward();
         Action toParkPosition1 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
                 .build();
         Actions.runBlocking(new ParallelAction(
-                        new ParallelAction(toParkPosition1,
-                new InstantAction(() -> extras.stopLauncher()),
-                new InstantAction(() -> extras.ballStopOn()),
-                new InstantAction(() -> extras.intakeOff())
+                new ParallelAction(toParkPosition1,
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.ballStopOn()),
+                        new InstantAction(() -> extras.intakeOff())
 
-        //extras.setLauncherAction(launcherSpeed)
-        )));
+                        //extras.setLauncherAction(launcherSpeed)
+                )));
 
         safeWaitSeconds(2);
 

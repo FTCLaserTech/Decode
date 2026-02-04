@@ -68,7 +68,7 @@ public class zJustParkAudience extends LinearOpMode
         safeWaitSeconds(3);
 
         // Save the ending location
-        extras.saveAutoStartRotation(drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+        //extras.saveAutoStartRotation(drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
         // Save the team color
         extras.saveTeamColor(extras.teamColor);
     }

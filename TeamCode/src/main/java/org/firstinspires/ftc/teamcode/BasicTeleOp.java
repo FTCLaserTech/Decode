@@ -109,6 +109,8 @@ public class BasicTeleOp extends LinearOpMode
         telemetry.setMsTransmissionInterval(50);
         telemetry.addData("Team Color: ", extras.teamColor);
 
+        Pose2d storedPose = PoseStorage.currentPose;
+        drive.localizer.setPose(storedPose);
         PinpointLocalizer ppLocalizer = (PinpointLocalizer) drive.localizer;
         double ppYaw = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
         double imuYaw = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
@@ -121,7 +123,6 @@ public class BasicTeleOp extends LinearOpMode
         telemetry.addData("savedAngle r: ", previousOrientation);
         telemetry.addData("savedAngle d: ", Math.toDegrees(previousOrientation));
 
-        Pose2d storedPose = PoseStorage.currentPose;
         telemetry.addData("spx: ", storedPose.position.x);
         telemetry.addData("spy: ", storedPose.position.y);
         telemetry.addData("sph: ", Math.toDegrees(storedPose.heading.toDouble()));
@@ -133,7 +134,6 @@ public class BasicTeleOp extends LinearOpMode
         Pose2d startPose = new Pose2d(0,0,Math.toRadians(270));
         //Pose2d startPose = extras.readPosition();
         //drive.localizer.setPose(startPose);
-        drive.localizer.setPose(storedPose);
 
         extras.vision.limelight.start();
 
@@ -231,7 +231,10 @@ public class BasicTeleOp extends LinearOpMode
                 double driveHeading = drive.localizer.getPose().heading.toDouble();
                 // or use control hub IMU if pinpoint IMU is drifting?
 
-                double launcherHeading = driveHeading - Math.PI;
+                //double launcherHeading = driveHeading - Math.PI;
+                double launcherHeading = previousOrientation + (drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - imuYawInitial);
+
+                telemetry.addData("launcherHeading: ", Math.toDegrees(launcherHeading));
                 double goalDistance = 0;
                 double goalHeading = 0;
                 if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
@@ -345,7 +348,7 @@ public class BasicTeleOp extends LinearOpMode
             telemetry.addLine(data);
             telemetry.addData("limelightAngle", Math.toDegrees(limelightrobotposition.heading.toDouble()));
             telemetry.addData("imuAngle", Math.toDegrees(imuHeading));
-            telemetry.addData("turretAngle", Math.toDegrees(turretAngle);
+            telemetry.addData("turretAngle", Math.toDegrees(turretAngle));
 
             if (gamepad1.y)
             {
@@ -485,6 +488,7 @@ public class BasicTeleOp extends LinearOpMode
                 drive.lazyImu.get().resetYaw();
                 sleep(500);
                 previousOrientation = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+                imuYawInitial = previousOrientation;
                 //drive.odo.resetPosAndIMU();
                 //previousOrientation = drive.odo.getHeading()+ PI/2;
                 //extras.saveAutoStartRotation(savedAngle);
@@ -494,8 +498,12 @@ public class BasicTeleOp extends LinearOpMode
             //telemetry.addData("pp x", ppLocalizer.driver.getPosX(DistanceUnit.INCH));
             //telemetry.addData("pp y", ppLocalizer.driver.getPosY(DistanceUnit.INCH));
             //telemetry.addData("pp heading", ppLocalizer.driver.getHeading(AngleUnit.DEGREES));
-            telemetry.addData("IMU delta: ", Math.toDegrees(imuHeading-imuYawInitial));
-            telemetry.addData("PP  delta: ", Math.toDegrees(ppYaw-ppYawInitial));
+            telemetry.addData("IMU now     : ", Math.toDegrees(imuHeading));
+            telemetry.addData("IMU initial : ", Math.toDegrees(imuYawInitial));
+            telemetry.addData("IMU delta   : ", Math.toDegrees(imuHeading-imuYawInitial));
+            telemetry.addData("PP now      : ", Math.toDegrees(ppYaw));
+            telemetry.addData("PP initial  : ", Math.toDegrees(ppYawInitial));
+            telemetry.addData("PP delta    : ", Math.toDegrees(ppYaw-ppYawInitial));
             telemetry.addData("IMU Heading: ", Math.toDegrees(imuHeading));
             telemetry.addData("adjustedHeading: ", Math.toDegrees(adjustedHeading));
             telemetry.addData("previousOrientation: ", Math.toDegrees(previousOrientation));
