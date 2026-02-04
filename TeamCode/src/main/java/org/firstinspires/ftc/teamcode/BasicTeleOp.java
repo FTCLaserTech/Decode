@@ -18,6 +18,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import java.util.Locale;
 
@@ -501,6 +502,11 @@ public class BasicTeleOp extends LinearOpMode
             //telemetry.addData("Position", data);
 
             //telemetry.addLine();
+
+            telemetry.addData("launcher1: ", extras.launcher1.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("launcher2: ", extras.launcher2.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("intake: ", extras.intake.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("turret: ", extras.turretMotor.getCurrent(CurrentUnit.AMPS));
 
             telemetry.addData("Elapsed time: ", getRuntime());
 
