@@ -230,7 +230,8 @@ public class Depot9 extends LinearOpMode
         //ppYawFinal = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
         chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         savedAngle = chYawFinal - chYawInitial;
-        extras.saveAutoStartRotation(savedAngle);
+        //extras.saveAutoStartRotation(savedAngle);
+        PoseStorage.currentAngle = savedAngle;
         PoseStorage.currentPose = drive.localizer.getPose();
 
     }

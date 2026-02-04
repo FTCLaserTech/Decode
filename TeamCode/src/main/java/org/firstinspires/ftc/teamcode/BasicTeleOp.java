@@ -85,7 +85,8 @@ public class BasicTeleOp extends LinearOpMode
         boolean launcherOn = true;
         boolean depotFound = false;
 
-        double previousOrientation = extras.readAutoStartRotation();
+        //double previousOrientation = extras.readAutoStartRotation();
+        double previousOrientation = PoseStorage.currentAngle;
 
         extras.teamColor = extras.readTeamColor();
         if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
@@ -477,7 +478,8 @@ public class BasicTeleOp extends LinearOpMode
                 previousOrientation = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
                 //drive.odo.resetPosAndIMU();
                 //previousOrientation = drive.odo.getHeading()+ PI/2;
-                extras.saveAutoStartRotation(previousOrientation);
+                //extras.saveAutoStartRotation(savedAngle);
+                PoseStorage.currentAngle = previousOrientation;
             }
 
             //telemetry.addData("pp x", ppLocalizer.driver.getPosX(DistanceUnit.INCH));

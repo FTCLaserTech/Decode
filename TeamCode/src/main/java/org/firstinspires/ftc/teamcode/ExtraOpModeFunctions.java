@@ -267,6 +267,7 @@ public class ExtraOpModeFunctions
 
     private static final String BASE_FOLDER_NAME = "Team14631";
     private static final String TEAM_LOG = "Team14631";
+    /*
     public void saveAutoStartRotation(Double angle)
     {
         Writer fileWriter;
@@ -343,6 +344,8 @@ public class ExtraOpModeFunctions
         }
         return(new Pose2d(x,y,angle));
     }
+    */
+
     public void saveTeamColor(TeamColor teamColor)
     {
         Writer fileWriter;

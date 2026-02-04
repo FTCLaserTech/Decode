@@ -11,6 +11,7 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -18,7 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Config
-//@Disabled
+@Disabled
 
 @Autonomous(group = "a")
 
@@ -228,7 +229,9 @@ public class DepotMainMiddle extends LinearOpMode
 
         //savedAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)+ Math.toRadians(initialRotation) - Math.PI/2;
         savedAngle = chYawFinal - chYawInitial + Math.toRadians(initialRotation) - Math.toRadians(270.0);
-        extras.saveAutoStartRotation(savedAngle);
+        //extras.saveAutoStartRotation(savedAngle);
+        PoseStorage.currentAngle = savedAngle;
+        PoseStorage.currentPose = drive.localizer.getPose();
     }
 
     public void safeWaitSeconds(double time)

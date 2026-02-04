@@ -466,9 +466,12 @@ public final class MecanumDrive {
             poseHistory.removeFirst();
         }
 
-        estimatedPoseWriter.write(new PoseMessage(localizer.getPose()));
-        
-        
+        Pose2d pose2d = localizer.getPose();
+        estimatedPoseWriter.write(new PoseMessage(pose2d));
+
+        PoseStorage.currentPose = pose2d;
+        PoseStorage.currentAngle = lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
         return vel;
     }
 

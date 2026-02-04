@@ -256,7 +256,8 @@ public class AudienceCorner extends LinearOpMode
 
         chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         savedAngle = chYawFinal - chYawInitial;
-        extras.saveAutoStartRotation(savedAngle);
+        //extras.saveAutoStartRotation(savedAngle);
+        PoseStorage.currentAngle = savedAngle;
         PoseStorage.currentPose = drive.localizer.getPose();
 
         safeWaitSeconds(1.0);
