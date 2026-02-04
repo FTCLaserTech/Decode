@@ -332,12 +332,15 @@ public class BasicTeleOp extends LinearOpMode
             }
             extras.setLauncher(launcherSpeed);
 
-
             // get and print Megatag
             Pose2d limelightrobotposition = extras.vision.getRobotFieldPositionMT();
             String data = String.format(Locale.US, "MT1 X: %.2f, Y: %.2f, Y: %.1f",
                     limelightrobotposition.position.x, limelightrobotposition.position.y, Math.toDegrees(limelightrobotposition.heading.toDouble()));
             telemetry.addLine(data);
+            telemetry.addData("limelightAngle", limelightrobotposition.heading.toDouble());
+            telemetry.addData("imuAngle", imuHeading);
+            telemetry.addData("turretAngle", turretAngle);
+
             if (gamepad1.y)
             {
                 // math on angle with turret angle and IMU
