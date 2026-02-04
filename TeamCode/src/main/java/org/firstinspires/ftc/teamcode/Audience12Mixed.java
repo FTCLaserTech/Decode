@@ -86,7 +86,7 @@ public class Audience12Mixed extends LinearOpMode
         Pose2d pickupCorner = new Pose2d(-62,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d toCorner2 = new Pose2d(-59,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(0)));
         Pose2d pickupCorner2 = new Pose2d(-40,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(0)));
-        Pose2d toParkPosition = new Pose2d(-60,autoFun.redBlueT(-35),Math.toRadians(autoFun.redBlueT(270)));
+        Pose2d toParkPosition = new Pose2d(-62,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d backToLaunchZone = new Pose2d(autoFun.redBlueT(0),0,Math.toRadians(270));
 
         extras.saveTeamColor(extras.teamColor);
@@ -238,6 +238,10 @@ public class Audience12Mixed extends LinearOpMode
 
         // Park
         Action toParkPosition1 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
+                .build();
+        extras.intakeForward();
+        Action GoToCornerPark = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
                 .build();
         Actions.runBlocking(new ParallelAction(

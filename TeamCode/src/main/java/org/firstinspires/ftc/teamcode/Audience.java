@@ -22,7 +22,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Autonomous(group = "a")
 
-public class Audience15 extends LinearOpMode
+public class Audience extends LinearOpMode
 {
     @Override
 

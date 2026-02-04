@@ -110,6 +110,8 @@ public class BasicTeleOp extends LinearOpMode
         PinpointLocalizer ppLocalizer = (PinpointLocalizer) drive.localizer;
         double ppYaw = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
         double imuYaw = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double ppYawInitial = ppYaw;
+        double imuYawInitial = imuYaw;
         telemetry.addData("ppYaw r: ", ppYaw);
         telemetry.addData("chYaw r: ", imuYaw);
         telemetry.addData("ppYaw d: ", Math.toDegrees(ppYaw));
@@ -135,6 +137,7 @@ public class BasicTeleOp extends LinearOpMode
 
         while (!isStopRequested())
         {
+            ppYaw = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
             imuHeading = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
             // change team color if needed
@@ -336,6 +339,7 @@ public class BasicTeleOp extends LinearOpMode
             telemetry.addLine(data);
             if (gamepad1.y)
             {
+                // math on angle with turret angle and IMU
                 drive.localizer.setPose(limelightrobotposition);
             }
 
@@ -479,6 +483,8 @@ public class BasicTeleOp extends LinearOpMode
             //telemetry.addData("pp x", ppLocalizer.driver.getPosX(DistanceUnit.INCH));
             //telemetry.addData("pp y", ppLocalizer.driver.getPosY(DistanceUnit.INCH));
             //telemetry.addData("pp heading", ppLocalizer.driver.getHeading(AngleUnit.DEGREES));
+            telemetry.addData("IMU delta: ", Math.toDegrees(imuHeading-imuYawInitial));
+            telemetry.addData("PP  delta: ", Math.toDegrees(ppYaw-ppYawInitial));
             telemetry.addData("IMU Heading: ", Math.toDegrees(imuHeading));
             telemetry.addData("adjustedHeading: ", Math.toDegrees(adjustedHeading));
             telemetry.addData("previousOrientation: ", Math.toDegrees(previousOrientation));
