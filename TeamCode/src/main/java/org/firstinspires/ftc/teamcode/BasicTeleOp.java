@@ -142,6 +142,11 @@ public class BasicTeleOp extends LinearOpMode
             ppYaw = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
             imuHeading = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
+            telemetry.addData("launcher1: ", extras.launcher1.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("launcher2: ", extras.launcher2.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("intake: ", extras.intake.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("turret: ", extras.turretMotor.getCurrent(CurrentUnit.AMPS));
+
             // change team color if needed
             if (gamepad2.xWasPressed())
             {
@@ -338,9 +343,9 @@ public class BasicTeleOp extends LinearOpMode
             String data = String.format(Locale.US, "MT1 X: %.2f, Y: %.2f, Y: %.1f",
                     limelightrobotposition.position.x, limelightrobotposition.position.y, Math.toDegrees(limelightrobotposition.heading.toDouble()));
             telemetry.addLine(data);
-            telemetry.addData("limelightAngle", limelightrobotposition.heading.toDouble());
-            telemetry.addData("imuAngle", imuHeading);
-            telemetry.addData("turretAngle", turretAngle);
+            telemetry.addData("limelightAngle", Math.toDegrees(limelightrobotposition.heading.toDouble()));
+            telemetry.addData("imuAngle", Math.toDegrees(imuHeading));
+            telemetry.addData("turretAngle", Math.toDegrees(turretAngle);
 
             if (gamepad1.y)
             {
@@ -502,11 +507,6 @@ public class BasicTeleOp extends LinearOpMode
             //telemetry.addData("Position", data);
 
             //telemetry.addLine();
-
-            telemetry.addData("launcher1: ", extras.launcher1.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("launcher2: ", extras.launcher2.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("intake: ", extras.intake.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("turret: ", extras.turretMotor.getCurrent(CurrentUnit.AMPS));
 
             telemetry.addData("Elapsed time: ", getRuntime());
 
