@@ -65,7 +65,7 @@ public class BasicTeleOp extends LinearOpMode
         double MIN_TURRETANGLE = Math.toRadians(-40.0);
         double MAX_SERVO = 1.0;
 
-        double turretMotorEncoder = 384.5;  // PPR at the output shaft per motor data sheet
+        double turretMotorEncoder = 537.7;  // PPR at the output shaft per motor data sheet
         double turretBaseTeeth = 200.0;
         double driveTeeth = 50.0;
         double MAX_TURRETENCODER = turretMotorEncoder * (turretBaseTeeth/driveTeeth) * (MAX_TURRETANGLE/Math.toRadians(360));

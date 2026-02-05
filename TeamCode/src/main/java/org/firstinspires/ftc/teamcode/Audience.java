@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -132,7 +133,7 @@ public class Audience extends LinearOpMode
         Action ToLaunchPosition2 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
-
+        safeWaitSeconds(0.5);
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
                         ToLaunchPosition2,
@@ -156,12 +157,15 @@ public class Audience extends LinearOpMode
                 //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
 
-        Actions.runBlocking(GoToCorner);
+        //Actions.runBlocking(GoToCorner);
+        Actions.runBlocking(new RaceAction(GoToCorner,extras.checkIntakeAction()));
+
         //extras.intakeOff();
 
         Action ToLaunchPosition3 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
+        safeWaitSeconds(0.5);
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
                         new ParallelAction(ToLaunchPosition3,
@@ -186,12 +190,14 @@ public class Audience extends LinearOpMode
                 //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
-        Actions.runBlocking(GoToCorner2);
+        //Actions.runBlocking(GoToCorner2);
+        Actions.runBlocking(new RaceAction(GoToCorner2,extras.checkIntakeAction()));
         extras.intakeOff();
 
         Action ToLaunchPosition4 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
+        safeWaitSeconds(0.5);
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
                         new ParallelAction(ToLaunchPosition4,
@@ -216,12 +222,14 @@ public class Audience extends LinearOpMode
                 //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
                 //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
-        Actions.runBlocking(GoToCorner3);
+        //Actions.runBlocking(GoToCorner3);
+        Actions.runBlocking(new RaceAction(GoToCorner2,extras.checkIntakeAction()));
         extras.intakeOff();
 
         Action ToLaunchPosition5 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
+        safeWaitSeconds(0.5);
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
                         new ParallelAction(ToLaunchPosition5,

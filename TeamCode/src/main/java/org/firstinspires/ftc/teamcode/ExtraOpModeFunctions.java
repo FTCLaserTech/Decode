@@ -28,6 +28,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 import java.io.BufferedReader;
@@ -81,9 +82,9 @@ public class ExtraOpModeFunctions
 
     public ControlSystem turretController;
     public static PIDCoefficients turretPosPidCoefficients =
-            new PIDCoefficients(0.007, 0.0, 0.0);
-    public static BasicFeedforwardParameters turretFeedforwardParameters =
-            new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
+            new PIDCoefficients(0.003, 0.0, 0.0);
+    //public static BasicFeedforwardParameters turretFeedforwardParameters =
+    //        new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
     private AprilTagPoseFtc aprilTagPose;
     private boolean aimGood = false;
@@ -164,7 +165,7 @@ public class ExtraOpModeFunctions
 
         turretController = ControlSystem.builder()
                 .posPid(turretPosPidCoefficients)
-                .basicFF(turretFeedforwardParameters)
+                //.basicFF(turretFeedforwardParameters)
                 .build();
         turretController.setGoal(new KineticState(0.0, 0.0));
     }
@@ -225,15 +226,18 @@ public class ExtraOpModeFunctions
         double power = turretController.calculate(new KineticState(
                 turretMotor.getCurrentPosition(),
                 turretMotor.getVelocity()));
-        if(power>0.7){
-            power = 0.7;
+        double powerLimit = 1.0;
+        if(power>powerLimit){
+            power = powerLimit;
         }
-        if(power<-0.7){
-            power = -0.7;
+        if(power<-powerLimit){
+            power = -powerLimit;
         }
         turretMotor.setPower(power);
 
-        localLop.telemetry.addData("NXFTC turretPower", power);
+        localLop.telemetry.addData("NXFTC turretPower set", power);
+        localLop.telemetry.addData("NXFTC turretPower get", turretMotor.getPower());
+        localLop.telemetry.addData("NXFTC turret Current", turretMotor.getCurrent(CurrentUnit.AMPS));
 
     }
 
