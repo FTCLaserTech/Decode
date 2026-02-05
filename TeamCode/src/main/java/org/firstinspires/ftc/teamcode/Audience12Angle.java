@@ -250,7 +250,6 @@ public class Audience12Angle extends LinearOpMode
                         //extras.setLauncherAction(launcherSpeed)
                 )));
 
-        safeWaitSeconds(2);
 
         // turn the intake and shooter off
 
@@ -268,7 +267,6 @@ public class Audience12Angle extends LinearOpMode
         PoseStorage.currentAngle = savedAngle;
         PoseStorage.currentPose = drive.localizer.getPose();
 
-        safeWaitSeconds(1.0);
     }
 
     public void safeWaitSeconds(double time)

@@ -517,6 +517,7 @@ public class ExtraOpModeFunctions
         return(new SetLauncherAction(speed));
     }
 
+    private int intakeFullCountMax = 6;
     private int intakeFullCount = 0;
     public boolean isIntakeFull()
     {
@@ -526,7 +527,7 @@ public class ExtraOpModeFunctions
         if((beamBreak1.getState() == false) || (beamBreak2.getState() == false))
         {
             intakeFullCount++;
-            if(intakeFullCount > 6)
+            if(intakeFullCount > intakeFullCountMax)
             {
                 lights.flashingOn();
                 return(true);
@@ -563,6 +564,7 @@ public class ExtraOpModeFunctions
 
     public Action checkIntakeAction()
     {
+        intakeFullCountMax = 12;
         return(new CheckIntakeAction());
     }
 
@@ -663,17 +665,13 @@ public class ExtraOpModeFunctions
 
         public void flashingOn()
         {
-            if(flashing == false)
-            {
-                flashing = true;
-            }
+            light1.setPosition(Light_Green);
+            light2.setPosition(Light_Green);
         }
         public void flashingOff()
         {
-            if(flashing == true)
-            {
-                flashing = false;
-            }
+            light1.setPosition(Light_Off);
+            light2.setPosition(Light_Off);
         }
         public void lightsUpdate(long timems)
         {

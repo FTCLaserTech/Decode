@@ -243,7 +243,6 @@ public class AudienceCorner extends LinearOpMode
                         extras.setLauncherAction(launcherSpeed)
                 )));
 
-        safeWaitSeconds(2);
 
         // turn the intake and shooter off
         //extras.intakeOff();
@@ -260,7 +259,6 @@ public class AudienceCorner extends LinearOpMode
         PoseStorage.currentAngle = savedAngle;
         PoseStorage.currentPose = drive.localizer.getPose();
 
-        safeWaitSeconds(1.0);
     }
 
     public void safeWaitSeconds(double time)

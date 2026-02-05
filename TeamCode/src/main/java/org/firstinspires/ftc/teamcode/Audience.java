@@ -83,8 +83,8 @@ public class Audience extends LinearOpMode
         Pose2d pickupSpike1 = new Pose2d(-36,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d toCorner = new Pose2d(-62,autoFun.redBlueT(-52),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d pickupCorner = new Pose2d(-62,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(270)));
-        Pose2d toCorner2 = new Pose2d(-61,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(270)));
-        Pose2d pickupCorner2 = new Pose2d(-61,autoFun.redBlueT(-59),Math.toRadians(autoFun.redBlueT(270)));
+        Pose2d toCorner2 = new Pose2d(-61,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(180)));
+        Pose2d pickupCorner2 = new Pose2d(-61,autoFun.redBlueT(-59),Math.toRadians(autoFun.redBlueT(180)));
         Pose2d toParkPosition = new Pose2d(-60,autoFun.redBlueT(-35),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d backToLaunchZone = new Pose2d(autoFun.redBlueT(0),0,Math.toRadians(270));
 
@@ -150,17 +150,11 @@ public class Audience extends LinearOpMode
         Action GoToCorner = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
                 .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
-                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
-                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                //.strafeToLinearHeading(pickupCorner2.position, pickupCorner2.heading)
                 .build();
 
         //Actions.runBlocking(GoToCorner);
         Actions.runBlocking(new RaceAction(GoToCorner,extras.checkIntakeAction()));
-
-        //extras.intakeOff();
 
         Action ToLaunchPosition3 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
@@ -184,15 +178,11 @@ public class Audience extends LinearOpMode
         Action GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
                 .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
-                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
-                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                //.strafeToLinearHeading(toCorner2.position, pickupCorner2.heading)
                 .build();
         //Actions.runBlocking(GoToCorner2);
         Actions.runBlocking(new RaceAction(GoToCorner2,extras.checkIntakeAction()));
-        extras.intakeOff();
+        //extras.intakeOff();
 
         Action ToLaunchPosition4 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
@@ -216,15 +206,10 @@ public class Audience extends LinearOpMode
         Action GoToCorner3 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
                 .strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
-                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
-                //.strafeToLinearHeading(pickupCorner.position, pickupCorner.heading)
-                //.strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
         //Actions.runBlocking(GoToCorner3);
-        Actions.runBlocking(new RaceAction(GoToCorner2,extras.checkIntakeAction()));
-        extras.intakeOff();
+        Actions.runBlocking(new RaceAction(GoToCorner3,extras.checkIntakeAction()));
+        //extras.intakeOff();
 
         Action ToLaunchPosition5 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
@@ -256,8 +241,6 @@ public class Audience extends LinearOpMode
         extras.setLauncherAction(launcherSpeed)
         )));
 
-        safeWaitSeconds(2);
-
         // turn the intake and shooter off
 
         extras.intakeOff();
@@ -274,7 +257,6 @@ public class Audience extends LinearOpMode
         PoseStorage.currentAngle = savedAngle;
         PoseStorage.currentPose = drive.localizer.getPose();
 
-        safeWaitSeconds(1.0);
     }
 
     public void safeWaitSeconds(double time)
