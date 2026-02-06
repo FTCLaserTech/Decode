@@ -28,6 +28,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
@@ -38,6 +39,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Locale;
+
+import javax.crypto.ExemptionMechanism;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
@@ -547,7 +550,6 @@ public class ExtraOpModeFunctions
 
     public class CheckIntakeAction implements Action
     {
-
         @Override
         public boolean run(@NonNull TelemetryPacket packet)
         {
@@ -564,8 +566,30 @@ public class ExtraOpModeFunctions
 
     public Action checkIntakeAction()
     {
-        intakeFullCountMax = 12;
+        intakeFullCountMax = 15;
         return(new CheckIntakeAction());
+    }
+
+    boolean continueStorePositionAction = true;
+    private MecanumDrive drive = null;
+    private double chYawInitial = 0.0;
+
+    public class StorePositionAction implements Action
+    {
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet)
+        {
+            PoseStorage.currentAngle = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - chYawInitial;
+            PoseStorage.currentPose = drive.localizer.getPose();
+            return(continueStorePositionAction);
+        }
+    }
+
+    public Action storePositionAction(MecanumDrive mecanumDrive, double initialYaw)
+    {
+        drive = mecanumDrive;
+        chYawInitial = initialYaw;
+        return(new StorePositionAction());
     }
 
     public double angleToSpeed(double angle)
