@@ -88,7 +88,7 @@ public class Audience3 extends LinearOpMode
         vision.limelight.start();
 
         // Turn on shooter to the expected speed
-        double launcherSpeed = 1800.0;
+        double launcherSpeed = 1890.0;
         extras.setLauncher(launcherSpeed);
 
         // drive off the line and rotate towards the depot
@@ -110,13 +110,24 @@ public class Audience3 extends LinearOpMode
         Action ToPark = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
                 .build();
-        Actions.runBlocking(ToPark);
+        //Actions.runBlocking(ToPark);
+        Actions.runBlocking
+        (
+            new ParallelAction
+            (
+                new RaceAction(ToPark,extras.storePositionAction(drive, chYawInitial)),
+                new InstantAction(() -> extras.stopLauncher()),
+                new InstantAction(() -> extras.ballStopOn()),
+                new InstantAction(() -> extras.intakeOff()),
+                extras.setLauncherAction(launcherSpeed)
+            )
+        );
 
         // turn the intake and shooter off
-        extras.intakeOff();
-        extras.ballStopOn();
-        extras.launcher1.setPower(0.0);
-        extras.launcher2.setPower(0.0);
+        //extras.intakeOff();
+        //extras.ballStopOn();
+        //extras.launcher1.setPower(0.0);
+        //extras.launcher2.setPower(0.0);
         //extras.setLauncher(0.0);
 
         // Save the ending location
@@ -125,8 +136,8 @@ public class Audience3 extends LinearOpMode
         chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         savedAngle = chYawFinal - chYawInitial;
         //extras.saveAutoStartRotation(savedAngle);
-        PoseStorage.currentAngle = savedAngle;
-        PoseStorage.currentPose = drive.localizer.getPose();
+        //PoseStorage.currentAngle = savedAngle;
+        //PoseStorage.currentPose = drive.localizer.getPose();
 
         safeWaitSeconds(1);
     }

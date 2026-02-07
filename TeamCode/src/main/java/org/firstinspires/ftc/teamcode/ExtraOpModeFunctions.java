@@ -85,7 +85,7 @@ public class ExtraOpModeFunctions
 
     public ControlSystem turretController;
     public static PIDCoefficients turretPosPidCoefficients =
-            new PIDCoefficients(0.003, 0.0, 0.0);
+            new PIDCoefficients(0.004, 0.0, 0.0);
     //public static BasicFeedforwardParameters turretFeedforwardParameters =
     //        new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
@@ -472,7 +472,8 @@ public class ExtraOpModeFunctions
         // range to speed function
         //shooterTargetVelocity = 1049 + (12.8 * targetRange) - (0.0294 * targetRange * targetRange);
         //return( 985 + (13.2 * distance) - (0.024 * distance * distance) );
-        return( 1047 + (7.09 * distance) - (0.00119 * distance * distance) );
+        return( 917 + (11.6 * distance) - (0.0294 * distance * distance) );
+        //( 1047 + (7.09 * distance) - (0.00119 * distance * distance) );
         //( 1155 + (5 * distance) + (0.00964 * distance * distance) );
     }
 

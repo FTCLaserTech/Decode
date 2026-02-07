@@ -153,18 +153,18 @@ public class BasicTeleOp extends LinearOpMode
                 if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
                 {
                     extras.teamColor = ExtraOpModeFunctions.TeamColor.BLUE;
-                    extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Blue);
+                    //extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Blue);
                     extras.pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
                     extras.blinkinLedDriver.setPattern(extras.pattern);
                 }
                 else
                 {
                     extras.teamColor = ExtraOpModeFunctions.TeamColor.RED;
-                    extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Red);
+                    //extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Red);
                     extras.pattern = RevBlinkinLedDriver.BlinkinPattern.RED;
                     extras.blinkinLedDriver.setPattern(extras.pattern);
                 }
-                extras.lights.lightsUpdate((long)(getRuntime()*1000.0));
+                //extras.lights.lightsUpdate((long)(getRuntime()*1000.0));
             }
             telemetry.addData("Team Color: ", extras.teamColor);
 
@@ -231,8 +231,8 @@ public class BasicTeleOp extends LinearOpMode
                 double driveHeading = drive.localizer.getPose().heading.toDouble();
                 // or use control hub IMU if pinpoint IMU is drifting?
 
-                //double launcherHeading = driveHeading - Math.PI;
-                double launcherHeading = previousOrientation + (drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - imuYawInitial);
+                double launcherHeading = driveHeading - Math.PI;
+                //double launcherHeading = previousOrientation + (drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - imuYawInitial);
 
                 telemetry.addData("launcherHeading: ", Math.toDegrees(launcherHeading));
                 double goalDistance = 0;
@@ -353,7 +353,7 @@ public class BasicTeleOp extends LinearOpMode
             if (gamepad1.y)
             {
                 // math on angle with turret angle and IMU
-                drive.localizer.setPose(limelightrobotposition);
+                //drive.localizer.setPose(limelightrobotposition);
             }
 
             // get and print Megatag2
@@ -519,7 +519,7 @@ public class BasicTeleOp extends LinearOpMode
             telemetry.addData("Elapsed time: ", getRuntime());
 
             drive.updatePoseEstimate();
-            extras.lights.lightsUpdate((long)(getRuntime()*1000.0));
+            //extras.lights.lightsUpdate((long)(getRuntime()*1000.0));
 
             telemetry.update();
             extras.dashboardTelemetry.update();
