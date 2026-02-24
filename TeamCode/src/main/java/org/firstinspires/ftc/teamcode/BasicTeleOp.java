@@ -30,6 +30,9 @@ public class BasicTeleOp extends LinearOpMode
 {
     public enum Targeting{MANUAL,AUTO};
 
+    public static double headingScaler = 2.0;
+    public static double positionScaler = 2.0;
+
     @Override
     public void runOpMode() throws InterruptedException
     {
@@ -61,13 +64,18 @@ public class BasicTeleOp extends LinearOpMode
 
         double turretAngle = 0;
         double turretPosition = 0.5;
-        double MAX_TURRETANGLE = Math.toRadians(40.0);
-        double MIN_TURRETANGLE = Math.toRadians(-40.0);
+        double MAX_TURRETANGLE = Math.toRadians(135.0);
+        double MIN_TURRETANGLE = Math.toRadians(-135.0);
         double MAX_SERVO = 1.0;
+        double lastLauncherHeading = 0.0;
+        double currentLoopTime = 0.0;
+        double lastLoopTime = 0.0;
+        double lastDrivePositionX = 0.0;
+        double lastDrivePositionY = 0.0;
 
         double turretMotorEncoder = 537.7;  // PPR at the output shaft per motor data sheet
-        double turretBaseTeeth = 200.0;
-        double driveTeeth = 50.0;
+        double turretBaseTeeth = 84.0;
+        double driveTeeth = 37.0;
         double MAX_TURRETENCODER = turretMotorEncoder * (turretBaseTeeth/driveTeeth) * (MAX_TURRETANGLE/Math.toRadians(360));
         //double MAX_TURRETENCODER = 1955.0;
 
@@ -139,6 +147,9 @@ public class BasicTeleOp extends LinearOpMode
 
         while (!isStopRequested())
         {
+            lastLoopTime = currentLoopTime;
+            currentLoopTime = getRuntime();
+
             ppYaw = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
             imuHeading = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
@@ -228,11 +239,19 @@ public class BasicTeleOp extends LinearOpMode
             {
                 double drivePositionX = drive.localizer.getPose().position.x;
                 double drivePositionY = drive.localizer.getPose().position.y;
+                double futureDrivePositionX = drivePositionX;
+                double futureDrivePositionY = drivePositionY;
+                //double futureDrivePositionX = drivePositionX + ((drivePositionX-lastDrivePositionX)*positionScaler);
+                //double futureDrivePositionY = drivePositionY + ((drivePositionY-lastDrivePositionY)*positionScaler);
+
                 double driveHeading = drive.localizer.getPose().heading.toDouble();
                 // or use control hub IMU if pinpoint IMU is drifting?
 
                 double launcherHeading = driveHeading - Math.PI;
                 //double launcherHeading = previousOrientation + (drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - imuYawInitial);
+
+                //double futureLauncherHeading = launcherHeading + ((launcherHeading - lastLauncherHeading)*headingScaler);
+                double futureLauncherHeading = launcherHeading;
 
                 telemetry.addData("launcherHeading: ", Math.toDegrees(launcherHeading));
                 double goalDistance = 0;
@@ -248,6 +267,9 @@ public class BasicTeleOp extends LinearOpMode
                     goalHeading = atan2(GOAL_Y_BLUE - drivePositionY, GOAL_X_BLUE - drivePositionX);
                 }
 
+                lastDrivePositionX = drivePositionX;
+                lastDrivePositionY = drivePositionY;
+
                 telemetry.addData("RR drive x", drivePositionX);
                 telemetry.addData("RR drive y", drivePositionY);
                 telemetry.addData("RR drive heading", driveHeading );
@@ -256,7 +278,9 @@ public class BasicTeleOp extends LinearOpMode
 
                 if (targeting == Targeting.AUTO)
                 {
-                    turretAngle = goalHeading - launcherHeading;
+                    turretAngle = goalHeading - futureLauncherHeading;
+                    lastLauncherHeading = launcherHeading;
+
                     if(turretAngle > Math.PI)
                     {
                         turretAngle = turretAngle - 2*PI;

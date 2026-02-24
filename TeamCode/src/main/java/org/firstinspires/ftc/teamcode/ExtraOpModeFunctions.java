@@ -14,6 +14,8 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.arcrobotics.ftclib.controller.PIDController;
+import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
@@ -44,8 +46,11 @@ import javax.crypto.ExemptionMechanism;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
+import dev.nextftc.control.builder.FilterBuilder;
 import dev.nextftc.control.feedback.PIDCoefficients;
 import dev.nextftc.control.feedforward.BasicFeedforwardParameters;
+import dev.nextftc.control.filters.Filter;
+import dev.nextftc.functionalInterfaces.Configurator;
 
 
 @Config
@@ -85,9 +90,12 @@ public class ExtraOpModeFunctions
 
     public ControlSystem turretController;
     public static PIDCoefficients turretPosPidCoefficients =
-            new PIDCoefficients(0.004, 0.0, 0.0);
+            new PIDCoefficients(0.003, 0.0, 0.00001);
     //public static BasicFeedforwardParameters turretFeedforwardParameters =
     //        new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
+
+    private PIDController turretController2;
+
 
     private AprilTagPoseFtc aprilTagPose;
     private boolean aimGood = false;
@@ -171,6 +179,9 @@ public class ExtraOpModeFunctions
                 //.basicFF(turretFeedforwardParameters)
                 .build();
         turretController.setGoal(new KineticState(0.0, 0.0));
+
+        turretController2 = new PIDController(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
+
     }
 
     public void intakeForward()
@@ -225,10 +236,11 @@ public class ExtraOpModeFunctions
     public void setTurret(double turretPosition)
     {
         turretController.setGoal(new KineticState(turretPosition));
+        turretController2.setSetPoint(turretPosition);
 
-        double power = turretController.calculate(new KineticState(
-                turretMotor.getCurrentPosition(),
-                turretMotor.getVelocity()));
+        double power = turretController.calculate(new KineticState(turretMotor.getCurrentPosition(), turretMotor.getVelocity()));
+        //double power = turretController2.calculate(turretMotor.getCurrentPosition());
+
         double powerLimit = 1.0;
         if(power>powerLimit){
             power = powerLimit;

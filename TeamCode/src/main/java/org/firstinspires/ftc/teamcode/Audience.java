@@ -82,13 +82,13 @@ public class Audience extends LinearOpMode
         Pose2d toSpike1 = new Pose2d(-34,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d pickupSpike1 = new Pose2d(-36,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d toCorner = new Pose2d(-62,autoFun.redBlueT(-48),Math.toRadians(autoFun.redBlueT(270)));
-        Pose2d pickupCorner = new Pose2d(-62,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(270)));
-        Pose2d toCorner2 = new Pose2d(-62,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(180)));
+        Pose2d pickupCorner = new Pose2d(-62,autoFun.redBlueT(-62),Math.toRadians(autoFun.redBlueT(270)));
+        Pose2d toCorner2 = new Pose2d(-62,autoFun.redBlueT(-63),Math.toRadians(autoFun.redBlueT(180)));
         Pose2d toSpike2 = new Pose2d(-42,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d pickupSpike2 = new Pose2d(-42,autoFun.redBlueT(-62),Math.toRadians(autoFun.redBlueT(235)));
         Pose2d pickupCorner2 = new Pose2d(-40,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(180)));
         Pose2d AngleCorner = new Pose2d(-40,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(235)));
-        Pose2d toParkPosition = new Pose2d(-52,autoFun.redBlueT(-20),Math.toRadians(autoFun.redBlueT(270)));
+        Pose2d toParkPosition = new Pose2d(-50,autoFun.redBlueT(-27),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d backToLaunchZone = new Pose2d(autoFun.redBlueT(0),0,Math.toRadians(270));
 
         extras.saveTeamColor(extras.teamColor);
@@ -177,8 +177,8 @@ public class Audience extends LinearOpMode
         // pickup and launch Corner second time
         extras.intakeForward();
         Action GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(toSpike2.position, toSpike2.heading)
-                .strafeToLinearHeading(pickupSpike2.position, toCorner2.heading)
+                .strafeToLinearHeading(toSpike1.position, toSpike1.heading)
+                .strafeToLinearHeading(pickupSpike1.position, toCorner2.heading)
                 .strafeToSplineHeading(toCorner2.position, toCorner2.heading)
                 .build();
         //Actions.runBlocking(GoToCorner2);
@@ -204,8 +204,8 @@ public class Audience extends LinearOpMode
         // pickup and launch Corner third time
         extras.intakeForward();
         Action GoToCorner3 = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(toSpike2.position, toSpike2.heading)
-                .strafeToLinearHeading(pickupSpike2.position, toCorner2.heading)
+                .strafeToLinearHeading(toSpike1.position, toSpike1.heading)
+                .strafeToLinearHeading(pickupSpike1.position, toCorner2.heading)
                 .strafeToSplineHeading(toCorner2.position, toCorner2.heading)
                 .build();
         //Actions.runBlocking(GoToCorner3);
