@@ -7,6 +7,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.sqrt;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -24,7 +25,7 @@ import java.util.Locale;
 
 //imports from the Mecanum website
 
-
+@Config
 @TeleOp(group = "A")
 public class BasicTeleOp extends LinearOpMode
 {
@@ -247,11 +248,14 @@ public class BasicTeleOp extends LinearOpMode
                 double driveHeading = drive.localizer.getPose().heading.toDouble();
                 // or use control hub IMU if pinpoint IMU is drifting?
 
+                // pinpoit
                 double launcherHeading = driveHeading - Math.PI;
+                //imu
                 //double launcherHeading = previousOrientation + (drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - imuYawInitial);
 
-                //double futureLauncherHeading = launcherHeading + ((launcherHeading - lastLauncherHeading)*headingScaler);
-                double futureLauncherHeading = launcherHeading;
+                //add filter for discontinuity
+                double futureLauncherHeading = launcherHeading + ((launcherHeading - lastLauncherHeading)*headingScaler);
+                //double futureLauncherHeading = launcherHeading;
 
                 telemetry.addData("launcherHeading: ", Math.toDegrees(launcherHeading));
                 double goalDistance = 0;
@@ -266,6 +270,12 @@ public class BasicTeleOp extends LinearOpMode
                     goalDistance = sqrt((APRIL_TAG_X_BLUE - drivePositionX) * (APRIL_TAG_X_BLUE - drivePositionX) + ( APRIL_TAG_Y_BLUE - drivePositionY) * (APRIL_TAG_Y_BLUE - drivePositionY) + (29.5-14) * (29.5-14))-5.875;
                     goalHeading = atan2(GOAL_Y_BLUE - drivePositionY, GOAL_X_BLUE - drivePositionX);
                 }
+
+                extras.dashboardTelemetry.addData("Drive heading", driveHeading);
+                extras.dashboardTelemetry.addData("Launcher heading", launcherHeading);
+                extras.dashboardTelemetry.addData("Last launcher heading", lastLauncherHeading);
+                extras.dashboardTelemetry.addData("Future launcher heading", futureLauncherHeading);
+                extras.dashboardTelemetry.addData("Goal heading", goalHeading);
 
                 lastDrivePositionX = drivePositionX;
                 lastDrivePositionY = drivePositionY;
@@ -335,6 +345,8 @@ public class BasicTeleOp extends LinearOpMode
                     extras.setTurret(turretPosition);
 
                     extras.dashboardTelemetry.addData("Turret power set", extras.turretMotor.getPower());
+                    extras.dashboardTelemetry.addData("Turret target", turretPosition);
+                    extras.dashboardTelemetry.addData("Turret actual", extras.turretMotor.getCurrentPosition());
                 }
 
                 telemetry.addData("Turret position target: ", turretPosition);

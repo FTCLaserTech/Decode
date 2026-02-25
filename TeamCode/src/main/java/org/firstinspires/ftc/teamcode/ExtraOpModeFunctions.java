@@ -90,7 +90,7 @@ public class ExtraOpModeFunctions
 
     public ControlSystem turretController;
     public static PIDCoefficients turretPosPidCoefficients =
-            new PIDCoefficients(0.003, 0.0, 0.00001);
+            new PIDCoefficients(0.0035, 0.11, 0.0003);
     //public static BasicFeedforwardParameters turretFeedforwardParameters =
     //        new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
@@ -161,9 +161,11 @@ public class ExtraOpModeFunctions
         turretMotor = hardwareMap.get(DcMotorEx.class, "turretMotor");
         turretMotor.setDirection(DcMotorEx.Direction.FORWARD);
         turretMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        turretMotor.setTargetPosition(0);
         //turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turretMotor.setTargetPosition(0);
+        //turretMotor.setPower(1.0);
         //turretMotor.setVelocity(0.0);
 
         ballStop = hardwareMap.get(Servo.class, "ballStop");
@@ -236,10 +238,12 @@ public class ExtraOpModeFunctions
     public void setTurret(double turretPosition)
     {
         turretController.setGoal(new KineticState(turretPosition));
+
+        turretController2.setPID(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
         turretController2.setSetPoint(turretPosition);
 
-        double power = turretController.calculate(new KineticState(turretMotor.getCurrentPosition(), turretMotor.getVelocity()));
-        //double power = turretController2.calculate(turretMotor.getCurrentPosition());
+        //double power = turretController.calculate(new KineticState(turretMotor.getCurrentPosition(), turretMotor.getVelocity()));
+        double power = turretController2.calculate(turretMotor.getCurrentPosition());
 
         double powerLimit = 1.0;
         if(power>powerLimit){
