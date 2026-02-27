@@ -106,6 +106,14 @@ public class ExtraOpModeFunctions
     double launcherTicksPerRev = 28.0;
     double maxLauncherTPS = launcherTicksPerRev * maxLauncherRPM / 60; // 2800
     //private double shooterTargetVelocity = 0.0;
+
+    double MAX_TURRETANGLE = Math.toRadians(135.0);
+    double MIN_TURRETANGLE = Math.toRadians(-135.0);
+    double turretMotorEncoder = 537.7;  // PPR at the output shaft per motor data sheet
+    double turretBaseTeeth = 84.0;
+    double driveTeeth = 37.0;
+    double MAX_TURRETENCODER = turretMotorEncoder * (turretBaseTeeth/driveTeeth) * (MAX_TURRETANGLE/Math.toRadians(360));
+    //double MAX_TURRETENCODER = 1955.0;
     double turretGoodAngle = 1.0;
     boolean freezeRange = false;
 
@@ -237,7 +245,7 @@ public class ExtraOpModeFunctions
 
     public void setTurret(double turretPosition)
     {
-        turretController.setGoal(new KineticState(turretPosition));
+        //turretController.setGoal(new KineticState(turretPosition));
 
         turretController2.setPID(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
         turretController2.setSetPoint(turretPosition);
@@ -246,10 +254,12 @@ public class ExtraOpModeFunctions
         double power = turretController2.calculate(turretMotor.getCurrentPosition());
 
         double powerLimit = 1.0;
-        if(power>powerLimit){
+        if(power>powerLimit)
+        {
             power = powerLimit;
         }
-        if(power<-powerLimit){
+        if(power<-powerLimit)
+        {
             power = -powerLimit;
         }
         turretMotor.setPower(power);
