@@ -243,31 +243,59 @@ public class ExtraOpModeFunctions
         //dashboardTelemetry.update();
     }
 
-    public void setTurret(double turretPosition)
+    public void setTurret(double turretAngle)
     {
-        //turretController.setGoal(new KineticState(turretPosition));
-
-        turretController2.setPID(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
-        turretController2.setSetPoint(turretPosition);
-
-        //double power = turretController.calculate(new KineticState(turretMotor.getCurrentPosition(), turretMotor.getVelocity()));
-        double power = turretController2.calculate(turretMotor.getCurrentPosition());
-
-        double powerLimit = 1.0;
-        if(power>powerLimit)
+        if(turretAngle > MAX_TURRETANGLE)
         {
-            power = powerLimit;
+            turretAngle = MAX_TURRETANGLE;
         }
-        if(power<-powerLimit)
+        else if(turretAngle < MIN_TURRETANGLE)
         {
-            power = -powerLimit;
+            turretAngle = MIN_TURRETANGLE;
         }
-        turretMotor.setPower(power);
 
-        localLop.telemetry.addData("NXFTC turretPower set", power);
-        localLop.telemetry.addData("NXFTC turretPower get", turretMotor.getPower());
-        localLop.telemetry.addData("NXFTC turret Current", turretMotor.getCurrent(CurrentUnit.AMPS));
+        //turretPosition = turretAngle * ((MAX_SERVO - 0.5)/MAX_TURRETANGLE) + 0.5;
+        //extras.turretS.setPosition(turretPosition);
 
+        double turretPosition = turretAngle / MAX_TURRETANGLE * MAX_TURRETENCODER;
+
+        if(false)
+        { // control hub pid
+            turretMotor.setTargetPosition((int) turretPosition);
+            //extras.turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            turretMotor.setPower(1.0);
+        }
+        else
+        { // nextftc pid
+            //turretController.setGoal(new KineticState(turretPosition));
+
+            turretController2.setPID(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
+            turretController2.setSetPoint(turretPosition);
+
+            //double power = turretController.calculate(new KineticState(turretMotor.getCurrentPosition(), turretMotor.getVelocity()));
+            double power = turretController2.calculate(turretMotor.getCurrentPosition());
+
+            double powerLimit = 1.0;
+            if(power>powerLimit)
+            {
+                power = powerLimit;
+            }
+            if(power<-powerLimit)
+            {
+                power = -powerLimit;
+            }
+            turretMotor.setPower(power);
+
+        }
+
+        localLop.telemetry.addData("Turret position target: ", turretPosition);
+        localLop.telemetry.addData("Turret position actual: ", turretMotor.getCurrentPosition());
+        localLop.telemetry.addData("turret Power", turretMotor.getPower());
+        localLop.telemetry.addData("turret Current", turretMotor.getCurrent(CurrentUnit.AMPS));
+
+        dashboardTelemetry.addData("Turret power set", turretMotor.getPower());
+        dashboardTelemetry.addData("Turret target", turretPosition);
+        dashboardTelemetry.addData("Turret actual", turretMotor.getCurrentPosition());
     }
 
     public double getLauncherSpeed()

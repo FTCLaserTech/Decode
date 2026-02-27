@@ -64,7 +64,6 @@ public class BasicTeleOp extends LinearOpMode
         double rotationMultiplier = 1.0;
 
         double turretAngle = 0;
-        double turretPosition = 0.5;
         double MAX_SERVO = 1.0;
         double lastLauncherHeading = 0.0;
         double currentLoopTime = 0.0;
@@ -325,38 +324,8 @@ public class BasicTeleOp extends LinearOpMode
                     }
                 }
 
-                if(turretAngle > extras.MAX_TURRETANGLE)
-                {
-                    turretAngle = extras.MAX_TURRETANGLE;
-                }
-                else if(turretAngle < extras.MIN_TURRETANGLE)
-                {
-                    turretAngle = extras.MIN_TURRETANGLE;
-                }
-
-                //turretPosition = turretAngle * ((MAX_SERVO - 0.5)/MAX_TURRETANGLE) + 0.5;
-                //extras.turretS.setPosition(turretPosition);
-
-                turretPosition = turretAngle / extras.MAX_TURRETANGLE * extras.MAX_TURRETENCODER;
                 telemetry.addData("turret angle", Math.toDegrees(turretAngle));
-
-                if(false)
-                { // control hub pid
-                    extras.turretMotor.setTargetPosition((int) turretPosition);
-                    //extras.turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    extras.turretMotor.setPower(1.0);
-                }
-                else
-                { // nextftc pid
-                    extras.setTurret(turretPosition);
-
-                    extras.dashboardTelemetry.addData("Turret power set", extras.turretMotor.getPower());
-                    extras.dashboardTelemetry.addData("Turret target", turretPosition);
-                    extras.dashboardTelemetry.addData("Turret actual", extras.turretMotor.getCurrentPosition());
-                }
-
-                telemetry.addData("Turret position target: ", turretPosition);
-                telemetry.addData("Turret position actual: ", extras.turretMotor.getCurrentPosition());
+                extras.setTurret(turretAngle);
 
                 //telemetry.addData("RFP x", pose3D.getPosition().x*39.3700787);
                 //telemetry.addData("RFP y", pose3D.getPosition().y*39.3700787);
@@ -394,7 +363,7 @@ public class BasicTeleOp extends LinearOpMode
 
             if (gamepad1.y)
             {
-                // math on angle with turret angle and IMU
+                // add math on angle with turret angle and IMU
                 //drive.localizer.setPose(limelightrobotposition);
             }
 
