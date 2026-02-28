@@ -65,7 +65,6 @@ public class BasicTeleOp extends LinearOpMode
 
         double turretAngle = 0;
         double MAX_SERVO = 1.0;
-        double lastLauncherHeading = 0.0;
         double currentLoopTime = 0.0;
         double lastLoopTime = 0.0;
         double lastDrivePositionX = 0.0;
@@ -130,6 +129,8 @@ public class BasicTeleOp extends LinearOpMode
         telemetry.update();
 
         waitForStart();
+
+        double lastLauncherHeading = drive.localizer.getPose().heading.toDouble() - Math.PI;
 
         Pose2d startPose = new Pose2d(0,0,Math.toRadians(270));
         //Pose2d startPose = extras.readPosition();
@@ -214,15 +215,7 @@ public class BasicTeleOp extends LinearOpMode
                 }
 
                 // check if the turret is at a limit and stop it if it is
-                telemetry.addData("CW Limit: ", extras.turretLimitCW.isPressed());
-                telemetry.addData("CCW Limit: ", extras.turretLimitCCW.isPressed());
-                if ((extras.turretLimitCW.isPressed()) && (turretPower > 0))
-                {
-                    turretPower = 0.0;
-                } else if ((extras.turretLimitCCW.isPressed()) && (turretPower < 0))
-                {
-                    turretPower = 0.0;
-                }
+                telemetry.addData("turretHome: ", extras.turretHomeSensor.isPressed());
                 // now set the turret power
                 extras.turretCR.setPower(turretPower * 0.6);
                 telemetry.addData("turret power: ", extras.turretCR.getPower());
@@ -483,6 +476,11 @@ public class BasicTeleOp extends LinearOpMode
                 }
             }
             telemetry.addData("freezeRange", extras.freezeRange);
+
+            if (gamepad2.dpadLeftWasPressed())
+            {
+                extras.turretHome();
+            }
 
             // RESET IMU
             if ((gamepad1.back) && (gamepad1.b))

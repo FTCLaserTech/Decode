@@ -13,9 +13,7 @@ import com.acmerobotics.dashboard.config.Config;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.arcrobotics.ftclib.controller.PIDFController;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
@@ -40,17 +38,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Locale;
-
-import javax.crypto.ExemptionMechanism;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
-import dev.nextftc.control.builder.FilterBuilder;
 import dev.nextftc.control.feedback.PIDCoefficients;
 import dev.nextftc.control.feedforward.BasicFeedforwardParameters;
-import dev.nextftc.control.filters.Filter;
-import dev.nextftc.functionalInterfaces.Configurator;
 
 
 @Config
@@ -77,10 +69,13 @@ public class ExtraOpModeFunctions
     public Servo ballStop;
     public CRServo turretCR;
     public Servo turretS;
-    public TouchSensor turretLimitCW;  // Digital channel Object
-    public TouchSensor turretLimitCCW;  // Digital channel Object
+    public TouchSensor turretHomeSensor;  // Digital channel Object
     public DigitalChannel beamBreak1;
     public DigitalChannel beamBreak2;
+    public DigitalChannel beamBreak3;
+    public DigitalChannel beamBreak4;
+    public DigitalChannel beamBreak5;
+    public DigitalChannel beamBreak6;
     public Lights lights = null;
     public ControlSystem launcherController;
     public static PIDCoefficients launcherVelPidCoefficients =
@@ -94,6 +89,7 @@ public class ExtraOpModeFunctions
     //public static BasicFeedforwardParameters turretFeedforwardParameters =
     //        new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
+    public static int turretHomeOffset = 0;
     private PIDController turretController2;
 
 
@@ -131,8 +127,8 @@ public class ExtraOpModeFunctions
         turretCR.setDirection(DcMotorSimple.Direction.REVERSE);
         turretS = hardwareMap.get(Servo.class, "turretS");
         turretS.setDirection(Servo.Direction.REVERSE);
-        turretLimitCW = hardwareMap.get(TouchSensor.class, "turretLimitCW");
-        turretLimitCCW = hardwareMap.get(TouchSensor.class, "turretLimitCCW");
+
+        turretHomeSensor = hardwareMap.get(TouchSensor.class, "turretHomeSensor");
 
         launcher1 = hardwareMap.get(DcMotorEx.class, "shooter1");
         launcher1.setDirection(DcMotorEx.Direction.FORWARD);
@@ -160,11 +156,18 @@ public class ExtraOpModeFunctions
 
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
 
-
         beamBreak1 = hardwareMap.get(DigitalChannel.class, "beamBreak1");
         beamBreak1.setMode(DigitalChannel.Mode.INPUT);
         beamBreak2 = hardwareMap.get(DigitalChannel.class, "beamBreak2");
         beamBreak2.setMode(DigitalChannel.Mode.INPUT);
+        beamBreak3 = hardwareMap.get(DigitalChannel.class, "beamBreak3");
+        beamBreak3.setMode(DigitalChannel.Mode.INPUT);
+        beamBreak4 = hardwareMap.get(DigitalChannel.class, "beamBreak4");
+        beamBreak4.setMode(DigitalChannel.Mode.INPUT);
+        beamBreak5 = hardwareMap.get(DigitalChannel.class, "beamBreak5");
+        beamBreak5.setMode(DigitalChannel.Mode.INPUT);
+        beamBreak6 = hardwareMap.get(DigitalChannel.class, "beamBreak6");
+        beamBreak6.setMode(DigitalChannel.Mode.INPUT);
 
         turretMotor = hardwareMap.get(DcMotorEx.class, "turretMotor");
         turretMotor.setDirection(DcMotorEx.Direction.FORWARD);
@@ -192,6 +195,23 @@ public class ExtraOpModeFunctions
 
         turretController2 = new PIDController(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
 
+    }
+
+    public void turretHome()
+    {
+        //start motor
+        turretMotor.setPower(0.19);
+        while (!turretHomeSensor.isPressed())
+        {
+            localLop.telemetry.addLine("Homing...");
+            localLop.telemetry.update();
+        }
+        //stop
+        turretMotor.setPower(0.0);
+        turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        localLop.telemetry.addLine("Homing Complete");
+        localLop.telemetry.update();
+        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void intakeForward()
@@ -243,6 +263,7 @@ public class ExtraOpModeFunctions
         //dashboardTelemetry.update();
     }
 
+    double turretPosition = 0.0;
     public void setTurret(double turretAngle)
     {
         if(turretAngle > MAX_TURRETANGLE)
@@ -257,7 +278,7 @@ public class ExtraOpModeFunctions
         //turretPosition = turretAngle * ((MAX_SERVO - 0.5)/MAX_TURRETANGLE) + 0.5;
         //extras.turretS.setPosition(turretPosition);
 
-        double turretPosition = turretAngle / MAX_TURRETANGLE * MAX_TURRETENCODER;
+        turretPosition = (turretAngle / MAX_TURRETANGLE * MAX_TURRETENCODER) + turretHomeOffset;
 
         if(false)
         { // control hub pid
@@ -266,9 +287,11 @@ public class ExtraOpModeFunctions
             turretMotor.setPower(1.0);
         }
         else
-        { // nextftc pid
+        {
+            // nextftc pid
             //turretController.setGoal(new KineticState(turretPosition));
 
+            // ftclib pid
             turretController2.setPID(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
             turretController2.setSetPoint(turretPosition);
 
@@ -294,8 +317,8 @@ public class ExtraOpModeFunctions
         localLop.telemetry.addData("turret Current", turretMotor.getCurrent(CurrentUnit.AMPS));
 
         dashboardTelemetry.addData("Turret power set", turretMotor.getPower());
-        dashboardTelemetry.addData("Turret target", turretPosition);
-        dashboardTelemetry.addData("Turret actual", turretMotor.getCurrentPosition());
+        dashboardTelemetry.addData("Turret target", turretPosition/1000.0);
+        dashboardTelemetry.addData("Turret actual", turretMotor.getCurrentPosition()/1000.0);
     }
 
     public double getLauncherSpeed()
@@ -550,6 +573,41 @@ public class ExtraOpModeFunctions
     {
         runLauncherBoolean = false;
     }
+    public class SetTurretAction implements Action
+    {
+        private double turretActionAngle = 0.0;
+        private int turretGoodCounter = 0;
+
+        public SetTurretAction (double turretAngle)
+        {
+            turretActionAngle = turretAngle;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet)
+        {
+            setTurret(turretActionAngle);
+            if(abs(turretPosition-turretMotor.getCurrentPosition())<10)
+            {
+                turretGoodCounter++;
+                if (turretGoodCounter > 10)
+                {
+                    turretMotor.setPower(0);
+                    return (false);
+                }
+            }
+            else
+            {
+                turretGoodCounter = 0;
+            }
+            return(true);
+        }
+    }
+
+    public Action setTurretAction(double turretAngle)
+    {
+        return(new SetTurretAction(turretAngle));
+    }
 
     public class SetLauncherAction implements Action
     {
@@ -581,8 +639,14 @@ public class ExtraOpModeFunctions
     {
         localLop.telemetry.addData("beamBreak1: ", beamBreak1.getState());
         localLop.telemetry.addData("beamBreak2: ", beamBreak2.getState());
+        localLop.telemetry.addData("beamBreak3: ", beamBreak3.getState());
+        localLop.telemetry.addData("beamBreak4: ", beamBreak4.getState());
+        localLop.telemetry.addData("beamBreak5: ", beamBreak5.getState());
+        localLop.telemetry.addData("beamBreak6: ", beamBreak6.getState());
         localLop.telemetry.addData("intakeFullCount: ", intakeFullCount);
-        if((beamBreak1.getState() == false) || (beamBreak2.getState() == false))
+        if(((beamBreak1.getState() == false) || (beamBreak2.getState() == false))
+                && ((beamBreak3.getState() == false)||(beamBreak4.getState() == false))
+                && ((beamBreak5.getState() == false)|| (beamBreak6.getState() == false)))
         {
             intakeFullCount++;
             if(intakeFullCount > intakeFullCountMax)

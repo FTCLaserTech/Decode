@@ -55,6 +55,8 @@ public class Audience3 extends LinearOpMode
         AprilTagPoseFtc cam;
         AprilTagPoseFtc ll;
 
+        extras.turretHome();
+
         while (!isStopRequested() && !opModeIsActive())
         {
             autoFun.autoInitFunction();
@@ -97,13 +99,15 @@ public class Audience3 extends LinearOpMode
                 .build();
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
-                        ToInitialPosition,
+                        //ToInitialPosition,
+                        new SleepAction(1.0),
                         new InstantAction(() -> extras.intakeForward()),
                         new InstantAction(() -> extras.ballStopOff()),
                         new SleepAction(1.0),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.ballStopOn())),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed),
+                extras.setTurretAction(Math.toRadians(125))
         ));
 
         // drive off the line
