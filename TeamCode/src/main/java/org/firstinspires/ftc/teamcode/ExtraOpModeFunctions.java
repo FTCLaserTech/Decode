@@ -112,7 +112,6 @@ public class ExtraOpModeFunctions
     double MAX_TURRETENCODER = turretMotorEncoder * (turretBaseTeeth/driveTeeth) * (MAX_TURRETANGLE/Math.toRadians(360));
     //double MAX_TURRETENCODER = 1955.0;
     double turretGoodAngle = 1.0;
-    boolean freezeRange = false;
 
     public RevBlinkinLedDriver blinkinLedDriver;
     public RevBlinkinLedDriver.BlinkinPattern pattern;
@@ -552,23 +551,13 @@ public class ExtraOpModeFunctions
 
     public double limelightLauncherSpeed()
     {
-        double shooterTargetVelocity = 0.0;
         targetRange = aprilTagPose.range;
-        if(freezeRange == false)
-        {
-            shooterTargetVelocity = distanceToLauncherSpeed(targetRange);
-        }
-        return(shooterTargetVelocity);
+        return(distanceToLauncherSpeed(targetRange));
     }
 
     public double odometryLauncherSpeed(double goalDistance)
     {
-        double shooterTargetVelocity = 0.0;
-        if(freezeRange == false)
-        {
-            shooterTargetVelocity = distanceToLauncherSpeed(goalDistance);
-        }
-        return(shooterTargetVelocity);
+        return(distanceToLauncherSpeed(goalDistance));
     }
 
     public double distanceToLauncherSpeed(double distance)

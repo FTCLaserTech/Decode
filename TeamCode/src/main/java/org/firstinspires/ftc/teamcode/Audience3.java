@@ -36,8 +36,10 @@ public class Audience3 extends LinearOpMode
         safeWaitSeconds(0.3);
         VisionFunctions vision = new VisionFunctions(hardwareMap, this);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
-        extras.setTurretMode(ExtraOpModeFunctions.TurretMode.ControlHub);
         AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
+
+        extras.setTurretMode(ExtraOpModeFunctions.TurretMode.ControlHub);
+        extras.setTurret(0.0);
 
         PinpointLocalizer ppLocalizer = (PinpointLocalizer) drive.localizer;
         double ppYawInitial = 0.0;
