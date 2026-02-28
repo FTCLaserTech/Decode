@@ -26,6 +26,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -89,7 +90,7 @@ public class ExtraOpModeFunctions
     //public static BasicFeedforwardParameters turretFeedforwardParameters =
     //        new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
-    public static int turretHomeOffset = 0;
+    public static int turretHomeOffset = -113;
     private PIDController turretController2;
 
 
@@ -103,8 +104,8 @@ public class ExtraOpModeFunctions
     double maxLauncherTPS = launcherTicksPerRev * maxLauncherRPM / 60; // 2800
     //private double shooterTargetVelocity = 0.0;
 
-    double MAX_TURRETANGLE = Math.toRadians(135.0);
-    double MIN_TURRETANGLE = Math.toRadians(-135.0);
+    double MAX_TURRETANGLE = Math.toRadians(120.0);
+    double MIN_TURRETANGLE = Math.toRadians(-120.0);
     double turretMotorEncoder = 537.7;  // PPR at the output shaft per motor data sheet
     double turretBaseTeeth = 84.0;
     double driveTeeth = 37.0;
@@ -172,10 +173,10 @@ public class ExtraOpModeFunctions
         turretMotor = hardwareMap.get(DcMotorEx.class, "turretMotor");
         turretMotor.setDirection(DcMotorEx.Direction.FORWARD);
         turretMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        setTurretMode(TurretMode.FTCLib);
         //turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         //turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        turretMotor.setTargetPosition(0);
         //turretMotor.setPower(1.0);
         //turretMotor.setVelocity(0.0);
 
@@ -200,7 +201,7 @@ public class ExtraOpModeFunctions
     public void turretHome()
     {
         //start motor
-        turretMotor.setPower(0.19);
+        turretMotor.setPower(0.25);
         while (!turretHomeSensor.isPressed())
         {
             localLop.telemetry.addLine("Homing...");
@@ -263,6 +264,25 @@ public class ExtraOpModeFunctions
         //dashboardTelemetry.update();
     }
 
+
+    public enum TurretMode {ControlHub, NextFTC, FTCLib};
+    TurretMode turretMode = TurretMode.ControlHub;
+    public void setTurretMode(TurretMode tm)
+    {
+        turretMode = tm;
+        switch (turretMode)
+        {
+            case ControlHub:
+                turretMotor.setTargetPosition(0);
+                turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                break;
+            case NextFTC:
+            case FTCLib:
+                turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                break;
+        }
+    }
+
     double turretPosition = 0.0;
     public void setTurret(double turretAngle)
     {
@@ -279,38 +299,45 @@ public class ExtraOpModeFunctions
         //extras.turretS.setPosition(turretPosition);
 
         turretPosition = (turretAngle / MAX_TURRETANGLE * MAX_TURRETENCODER) + turretHomeOffset;
+        double power = 1.0;
+        double powerLimit = 1.0;
 
-        if(false)
-        { // control hub pid
-            turretMotor.setTargetPosition((int) turretPosition);
-            //extras.turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            turretMotor.setPower(1.0);
-        }
-        else
+        switch(turretMode)
         {
-            // nextftc pid
-            //turretController.setGoal(new KineticState(turretPosition));
-
-            // ftclib pid
-            turretController2.setPID(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
-            turretController2.setSetPoint(turretPosition);
-
-            //double power = turretController.calculate(new KineticState(turretMotor.getCurrentPosition(), turretMotor.getVelocity()));
-            double power = turretController2.calculate(turretMotor.getCurrentPosition());
-
-            double powerLimit = 1.0;
-            if(power>powerLimit)
-            {
-                power = powerLimit;
-            }
-            if(power<-powerLimit)
-            {
-                power = -powerLimit;
-            }
-            turretMotor.setPower(power);
-
+            case ControlHub:
+                turretMotor.setTargetPosition((int) turretPosition);
+                turretMotor.setPower(power);
+                break;
+            case NextFTC:
+                turretController.setGoal(new KineticState(turretPosition));
+                power = turretController.calculate(new KineticState(turretMotor.getCurrentPosition(), turretMotor.getVelocity()));
+                if(power>powerLimit)
+                {
+                    power = powerLimit;
+                }
+                if(power<-powerLimit)
+                {
+                    power = -powerLimit;
+                }
+                turretMotor.setPower(power);
+                break;
+            case FTCLib:
+                turretController2.setPID(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
+                turretController2.setSetPoint(turretPosition);
+                power = turretController2.calculate(turretMotor.getCurrentPosition());
+                if(power>powerLimit)
+                {
+                    power = powerLimit;
+                }
+                if(power<-powerLimit)
+                {
+                    power = -powerLimit;
+                }
+                turretMotor.setPower(power);
+                break;
         }
 
+        localLop.telemetry.addData("Turret angle limited: ", turretAngle);
         localLop.telemetry.addData("Turret position target: ", turretPosition);
         localLop.telemetry.addData("Turret position actual: ", turretMotor.getCurrentPosition());
         localLop.telemetry.addData("turret Power", turretMotor.getPower());
@@ -577,10 +604,12 @@ public class ExtraOpModeFunctions
     {
         private double turretActionAngle = 0.0;
         private int turretGoodCounter = 0;
+        private ElapsedTime timer = new ElapsedTime();
 
         public SetTurretAction (double turretAngle)
         {
             turretActionAngle = turretAngle;
+            timer.reset();
         }
 
         @Override
@@ -593,12 +622,17 @@ public class ExtraOpModeFunctions
                 if (turretGoodCounter > 10)
                 {
                     turretMotor.setPower(0);
-                    return (false);
+                    return(false);
                 }
             }
             else
             {
                 turretGoodCounter = 0;
+            }
+            if(timer.seconds() > 2.0)
+            {
+                turretMotor.setPower(0);
+                return(false);
             }
             return(true);
         }

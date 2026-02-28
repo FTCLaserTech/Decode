@@ -317,8 +317,10 @@ public class BasicTeleOp extends LinearOpMode
                     }
                 }
 
-                telemetry.addData("turret angle", Math.toDegrees(turretAngle));
+                telemetry.addData("Turret angle desired", Math.toDegrees(turretAngle));
                 extras.setTurret(turretAngle);
+                //extras.setTurret(0.0);
+
 
                 //telemetry.addData("RFP x", pose3D.getPosition().x*39.3700787);
                 //telemetry.addData("RFP y", pose3D.getPosition().y*39.3700787);

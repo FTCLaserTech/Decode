@@ -29,13 +29,14 @@ public class Audience3 extends LinearOpMode
 
     public void runOpMode() throws InterruptedException
     {
-        double initialRotation = 180;
+        double initialRotation = 270;
         Pose2d initPose = new Pose2d(0,0,Math.toRadians(initialRotation));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
         safeWaitSeconds(0.3);
         VisionFunctions vision = new VisionFunctions(hardwareMap, this);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
+        extras.setTurretMode(ExtraOpModeFunctions.TurretMode.ControlHub);
         AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
 
         PinpointLocalizer ppLocalizer = (PinpointLocalizer) drive.localizer;
@@ -77,7 +78,7 @@ public class Audience3 extends LinearOpMode
 
         Pose2d startPose = new Pose2d(-62, autoFun.redBlueT(-13.5), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
-        Pose2d toInitialLaunchPosition = new Pose2d(-50,autoFun.redBlueT(-14),Math.toRadians(autoFun.redBlueT(155)));
+        Pose2d toInitialLaunchPosition = new Pose2d(-50,autoFun.redBlueT(-14),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d toParkPosition = new Pose2d(-60,autoFun.redBlueT(-35),Math.toRadians(autoFun.redBlueT(270)));
         Pose2d toFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-30,Math.toRadians(270));
         Pose2d pickUpFirstArtifacts = new Pose2d(autoFun.redBlueT(30),-40,Math.toRadians(270));
@@ -92,12 +93,15 @@ public class Audience3 extends LinearOpMode
         // Turn on shooter to the expected speed
         double launcherSpeed = 1890.0;
         extras.setLauncher(launcherSpeed);
+        extras.setTurret(-120);
 
         // drive off the line and rotate towards the depot
         Action ToInitialPosition = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
         Actions.runBlocking(new ParallelAction(
+                extras.setLauncherAction(launcherSpeed),
+                //extras.setTurretAction(Math.toRadians(-120.0)),
                 new SequentialAction(
                         //ToInitialPosition,
                         new SleepAction(1.0),
@@ -105,10 +109,10 @@ public class Audience3 extends LinearOpMode
                         new InstantAction(() -> extras.ballStopOff()),
                         new SleepAction(1.0),
                         new InstantAction(() -> extras.stopLauncher()),
-                        new InstantAction(() -> extras.ballStopOn())),
-                extras.setLauncherAction(launcherSpeed),
-                extras.setTurretAction(Math.toRadians(125))
+                        new InstantAction(() -> extras.ballStopOn()))
         ));
+
+        extras.setTurret(0.0);
 
         // drive off the line
         Action ToPark = drive.actionBuilder(drive.localizer.getPose())
@@ -119,6 +123,7 @@ public class Audience3 extends LinearOpMode
         (
             new ParallelAction
             (
+                //extras.setTurretAction(Math.toRadians(0.0)),
                 new RaceAction(ToPark,extras.storePositionAction(drive, chYawInitial)),
                 new InstantAction(() -> extras.stopLauncher()),
                 new InstantAction(() -> extras.ballStopOn()),
