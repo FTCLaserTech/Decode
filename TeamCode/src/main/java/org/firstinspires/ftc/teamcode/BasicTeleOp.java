@@ -103,7 +103,6 @@ public class BasicTeleOp extends LinearOpMode
             extras.pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
             extras.blinkinLedDriver.setPattern(extras.pattern);
         }
-        extras.lights.lightsUpdate((long)(getRuntime()*1000.0));
 
         boolean targetSearchingMode = false;
         long loopCounter = 0;

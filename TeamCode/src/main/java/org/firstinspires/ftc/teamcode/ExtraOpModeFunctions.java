@@ -71,12 +71,12 @@ public class ExtraOpModeFunctions
     public CRServo turretCR;
     public Servo turretS;
     public TouchSensor turretHomeSensor;  // Digital channel Object
-    public DigitalChannel beamBreak1;
-    public DigitalChannel beamBreak2;
-    public DigitalChannel beamBreak3;
-    public DigitalChannel beamBreak4;
-    public DigitalChannel beamBreak5;
-    public DigitalChannel beamBreak6;
+    public DigitalChannel beamBreak1a;
+    public DigitalChannel beamBreak1b;
+    public DigitalChannel beamBreak2a;
+    public DigitalChannel beamBreak2b;
+    public DigitalChannel beamBreak3a;
+    public DigitalChannel beamBreak3b;
     public Lights lights = null;
     public ControlSystem launcherController;
     public static PIDCoefficients launcherVelPidCoefficients =
@@ -156,18 +156,18 @@ public class ExtraOpModeFunctions
 
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
 
-        beamBreak1 = hardwareMap.get(DigitalChannel.class, "beamBreak1");
-        beamBreak1.setMode(DigitalChannel.Mode.INPUT);
-        beamBreak2 = hardwareMap.get(DigitalChannel.class, "beamBreak2");
-        beamBreak2.setMode(DigitalChannel.Mode.INPUT);
-        beamBreak3 = hardwareMap.get(DigitalChannel.class, "beamBreak3");
-        beamBreak3.setMode(DigitalChannel.Mode.INPUT);
-        beamBreak4 = hardwareMap.get(DigitalChannel.class, "beamBreak4");
-        beamBreak4.setMode(DigitalChannel.Mode.INPUT);
-        beamBreak5 = hardwareMap.get(DigitalChannel.class, "beamBreak5");
-        beamBreak5.setMode(DigitalChannel.Mode.INPUT);
-        beamBreak6 = hardwareMap.get(DigitalChannel.class, "beamBreak6");
-        beamBreak6.setMode(DigitalChannel.Mode.INPUT);
+        beamBreak1a = hardwareMap.get(DigitalChannel.class, "beamBreak1");
+        beamBreak1a.setMode(DigitalChannel.Mode.INPUT);
+        beamBreak1b = hardwareMap.get(DigitalChannel.class, "beamBreak2");
+        beamBreak1b.setMode(DigitalChannel.Mode.INPUT);
+        beamBreak2a = hardwareMap.get(DigitalChannel.class, "beamBreak3");
+        beamBreak2a.setMode(DigitalChannel.Mode.INPUT);
+        beamBreak2b = hardwareMap.get(DigitalChannel.class, "beamBreak4");
+        beamBreak2b.setMode(DigitalChannel.Mode.INPUT);
+        beamBreak3a = hardwareMap.get(DigitalChannel.class, "beamBreak5");
+        beamBreak3a.setMode(DigitalChannel.Mode.INPUT);
+        beamBreak3b = hardwareMap.get(DigitalChannel.class, "beamBreak6");
+        beamBreak3b.setMode(DigitalChannel.Mode.INPUT);
 
         turretMotor = hardwareMap.get(DcMotorEx.class, "turretMotor");
         turretMotor.setDirection(DcMotorEx.Direction.FORWARD);
@@ -658,34 +658,80 @@ public class ExtraOpModeFunctions
 
     private int intakeFullCountMax = 6;
     private int intakeFullCount = 0;
+    private int ball1Count = 0;
+    private int ball2Count = 0;
+    private int ball3Count = 0;
+    boolean ball1Full = false;
+    boolean ball2Full = false;
+    boolean ball3Full = false;
     public boolean isIntakeFull()
     {
-        localLop.telemetry.addData("beamBreak1: ", beamBreak1.getState());
-        localLop.telemetry.addData("beamBreak2: ", beamBreak2.getState());
-        localLop.telemetry.addData("beamBreak3: ", beamBreak3.getState());
-        localLop.telemetry.addData("beamBreak4: ", beamBreak4.getState());
-        localLop.telemetry.addData("beamBreak5: ", beamBreak5.getState());
-        localLop.telemetry.addData("beamBreak6: ", beamBreak6.getState());
+        localLop.telemetry.addData("beamBreak1: ", beamBreak1a.getState());
+        localLop.telemetry.addData("beamBreak2: ", beamBreak1b.getState());
+        localLop.telemetry.addData("beamBreak3: ", beamBreak2a.getState());
+        localLop.telemetry.addData("beamBreak4: ", beamBreak2b.getState());
+        localLop.telemetry.addData("beamBreak5: ", beamBreak3a.getState());
+        localLop.telemetry.addData("beamBreak6: ", beamBreak3b.getState());
         localLop.telemetry.addData("intakeFullCount: ", intakeFullCount);
-        if(((beamBreak1.getState() == false) || (beamBreak2.getState() == false))
-                && ((beamBreak3.getState() == false)||(beamBreak4.getState() == false))
-                && ((beamBreak5.getState() == false)|| (beamBreak6.getState() == false)))
+
+        if((!beamBreak1a.getState()) || (!beamBreak1b.getState()))
         {
-            intakeFullCount++;
-            if(intakeFullCount > intakeFullCountMax)
+            ball1Count++;
+            if(ball1Count > intakeFullCountMax)
             {
-                lights.flashingOn();
-                return(true);
-            }
-            else
-            {
-                return(false);
+                ball1Full = true;
             }
         }
         else
         {
-            intakeFullCount = 0;
-            lights.flashingOff();
+            ball1Count = 0;
+            ball1Full = false;
+        }
+        if((!beamBreak2a.getState()) || (!beamBreak2b.getState()))
+        {
+            ball2Count++;
+            if(ball2Count > intakeFullCountMax)
+            {
+                ball2Full = true;
+            }
+        }
+        else
+        {
+            ball2Count = 0;
+            ball2Full = false;
+        }
+        if((!beamBreak3a.getState()) || (!beamBreak3b.getState()))
+        {
+            ball3Count++;
+            if(ball3Count > intakeFullCountMax)
+            {
+                ball3Full = true;
+            }
+        }
+        else
+        {
+            ball3Count = 0;
+            ball3Full = false;
+        }
+
+        if(ball1Full && ball2Full && ball3Full)
+        {
+            lights.setLightColor(Lights.Light_Green);
+            return(true);
+        }
+        else if(ball1Full && ball2Full)
+        {
+            lights.setLightColor(Lights.Light_Blue);
+            return(false);
+        }
+        else if(ball1Full)
+        {
+            lights.setLightColor(Lights.Light_Yellow);
+            return(false);
+        }
+        else
+        {
+            lights.setLightColor(Lights.Light_Off);
             return(false);
         }
     }
@@ -826,53 +872,8 @@ public class ExtraOpModeFunctions
         }
         public void setLightColor(double lightColor)
         {
-            this.lightColor = lightColor;
-        }
-
-        public void flashingOn()
-        {
-            light1.setPosition(Light_Green);
-            light2.setPosition(Light_Green);
-        }
-        public void flashingOff()
-        {
-            light1.setPosition(Light_Off);
-            light2.setPosition(Light_Off);
-        }
-        public void lightsUpdate(long timems)
-        {
-            localLop.telemetry.addData("lights flashing: ", flashing);
-            if(flashing)
-            {
-                //long timeRound = timems - (timems%flashPeriod);
-                long timeRound = (long) (timems/flashPeriod);
-                localLop.telemetry.addData("timems: ", timems);
-                localLop.telemetry.addData("timeRound: ", timeRound);
-                localLop.telemetry.addData("timeRound %2: ", (timeRound%2));
-
-                if(false)
-                {
-                    if ((timeRound % 2) == 0)
-                    {
-                        light1.setPosition(lightColor);
-                        light2.setPosition(lightColor);
-                    } else
-                    {
-                        light1.setPosition(Light_Off);
-                        light2.setPosition(Light_Off);
-                    }
-                }
-                else
-                {
-                    light1.setPosition(Light_Green);
-                    light2.setPosition(Light_Green);
-                }
-            }
-            else
-            {
-                light1.setPosition(Light_Off);
-                light2.setPosition(Light_Off);
-            }
+            light1.setPosition(lightColor);
+            light2.setPosition(lightColor);
         }
     }
 
