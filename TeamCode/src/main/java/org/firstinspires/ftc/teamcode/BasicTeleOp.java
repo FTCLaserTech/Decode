@@ -350,18 +350,18 @@ public class BasicTeleOp extends LinearOpMode
             {
                 launcherSpeed = 0.0;
             }
-            // now set the launcher speed
-            if (launcherOn == false)
+
+            if(!launcherOn)
             {
-                launcherSpeed = 0.0;
+                extras.setLauncher(0.0);
             }
-            if(freezeRange)
+            else if(freezeRange)
             {
                 extras.setLauncher(frozenLauncherSpeed);
             }
             else
             {
-                extras.setLauncher(launcherSpeed);
+                extras.setLauncher(0.0);
             }
 
             // get and print Megatag
