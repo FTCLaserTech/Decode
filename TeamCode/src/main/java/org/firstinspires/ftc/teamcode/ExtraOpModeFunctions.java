@@ -106,7 +106,7 @@ public class ExtraOpModeFunctions
 
     double MAX_TURRETANGLE = Math.toRadians(120.0);
     double MIN_TURRETANGLE = Math.toRadians(-120.0);
-    double turretMotorEncoder = 537.7;  // PPR at the output shaft per motor data sheet
+    double turretMotorEncoder = 751.8 ;//537.7;  // PPR at the output shaft per motor data sheet
     double turretBaseTeeth = 84.0;
     double driveTeeth = 37.0;
     double MAX_TURRETENCODER = turretMotorEncoder * (turretBaseTeeth/driveTeeth) * (MAX_TURRETANGLE/Math.toRadians(360));
@@ -200,6 +200,7 @@ public class ExtraOpModeFunctions
     public void turretHome()
     {
         //start motor
+        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         turretMotor.setPower(0.25);
         while (!turretHomeSensor.isPressed())
         {
@@ -207,11 +208,12 @@ public class ExtraOpModeFunctions
             localLop.telemetry.update();
         }
         //stop
-        turretMotor.setPower(0.0);
         turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turretMotor.setPower(0.0);
         localLop.telemetry.addLine("Homing Complete");
         localLop.telemetry.update();
-        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        setTurretMode(turretMode);
+        //turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void intakeForward()

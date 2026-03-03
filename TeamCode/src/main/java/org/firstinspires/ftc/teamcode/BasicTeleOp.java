@@ -45,9 +45,9 @@ public class BasicTeleOp extends LinearOpMode
         //MecanumDrive drive = new MecanumDrive(hardwareMap, extras.readPosition());
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
 
-        Targeting targeting = Targeting.AUTO;
+        extras.setTurretMode(ExtraOpModeFunctions.TurretMode.FTCLib);
 
-        //TrajectoryBook book = new TrajectoryBook(drive, extras);
+        Targeting targeting = Targeting.AUTO;
 
         IMU.Parameters imuParameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 drive.PARAMS.logoFacingDirection,
@@ -320,6 +320,7 @@ public class BasicTeleOp extends LinearOpMode
                 }
 
                 telemetry.addData("Turret angle desired", Math.toDegrees(turretAngle));
+                telemetry.addData("Turret angle frozen", Math.toDegrees(frozenTurretAngle));
 
                 if(freezeRange)
                 {
@@ -360,7 +361,7 @@ public class BasicTeleOp extends LinearOpMode
             }
             else
             {
-                extras.setLauncher(0.0);
+                extras.setLauncher(launcherSpeed);
             }
 
             // get and print Megatag
