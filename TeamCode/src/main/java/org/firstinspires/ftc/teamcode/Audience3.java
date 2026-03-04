@@ -95,7 +95,7 @@ public class Audience3 extends LinearOpMode
         // Turn on shooter to the expected speed
         double launcherSpeed = 1890.0;
         extras.setLauncher(launcherSpeed);
-        extras.setTurret(-100);
+        extras.setTurret(Math.toRadians(-115));
 
         // drive off the line and rotate towards the depot
         Action ToInitialPosition = drive.actionBuilder(drive.localizer.getPose())

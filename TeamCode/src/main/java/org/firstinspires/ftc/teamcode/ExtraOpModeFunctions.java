@@ -85,12 +85,13 @@ public class ExtraOpModeFunctions
             new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
     public ControlSystem turretController;
-    public static PIDCoefficients turretPosPidCoefficients =
-            new PIDCoefficients(0.0035, 0.11, 0.0003);
+    public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.003, 0.01, 0.0001);
+ //   public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.0035, 0.11, 0.0003);
     //public static BasicFeedforwardParameters turretFeedforwardParameters =
     //        new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
-    public static int turretHomeOffset = -113;
+    public static int turretHomeOffset = -160;
+    //public static int turretHomeOffset = -113;
     private PIDController turretController2;
 
 
@@ -658,7 +659,7 @@ public class ExtraOpModeFunctions
         return(new SetLauncherAction(speed));
     }
 
-    private int intakeFullCountMax = 6;
+    private int intakeFullCountMax = 3;
     private int intakeFullCount = 0;
     private int ball1Count = 0;
     private int ball2Count = 0;

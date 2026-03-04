@@ -92,6 +92,7 @@ public class DepotMain extends LinearOpMode
         // Turn on shooter to the expected speed
         double launcherSpeed = 1400.0;
         extras.setLauncher(launcherSpeed);
+        extras.setTurret(-100);
 
         //safeWaitSeconds(autoFun.startDelay);
 

@@ -4,7 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@Disabled
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
+//@Disabled
 
 @TeleOp(group = "A")
 public class BasicTeleOpTest extends LinearOpMode
@@ -37,10 +39,10 @@ public class BasicTeleOpTest extends LinearOpMode
 
         double maxShooterRPM = 6000.0;  //RPM
         double shooterTicksPerRev = 28.0;
-        double maxShooterTPS = shooterTicksPerRev * maxShooterRPM / 60; // 2800
+        double maxTurretPower = shooterTicksPerRev * maxShooterRPM / 60; // 2800
 
 
-        double shooterVelocity = 0.0;
+        double turretPower = 0.0;
 
         double previousOrientation = extras.readAutoStartRotation();
 
@@ -62,38 +64,38 @@ public class BasicTeleOpTest extends LinearOpMode
 
             if(gamepad1.xWasPressed())
             {
-                shooterVelocity = 0.0;
+                turretPower = 0.0;
             }
             if(gamepad1.bWasPressed())
             {
-                shooterVelocity = 2000.0;
+                turretPower = 1.0;
             }
             if(gamepad1.yWasPressed())
             {
-                shooterVelocity = shooterVelocity + 50.0;
-                if (shooterVelocity > maxShooterTPS)
+                turretPower = turretPower + 0.05;
+                if (turretPower > 1.0)
                 {
-                    shooterVelocity = maxShooterTPS;
+                    turretPower = 1.0;
                 }
             }
             if(gamepad1.aWasPressed())
             {
-                shooterVelocity = shooterVelocity - 50.0;
-                if (shooterVelocity < 0.0)
+                turretPower = turretPower - 0.05;
+                if (turretPower < -1.0)
                 {
-                    shooterVelocity = 0.0;
+                    turretPower = -1.0;
                 }
             }
 
-            extras.shooter1.setVelocity(shooterVelocity);
-            extras.shooter2.setVelocity(shooterVelocity);
-
-            telemetry.addData("Shooter velocity set: ", shooterVelocity);
-            telemetry.addData("Shooter1 velocity actual: ", extras.shooter1.getVelocity());
-            telemetry.addData("Shooter2 velocity actual: ", extras.shooter2.getVelocity());
+            extras.turret.setPower(turretPower);
+            //extras.shooter2.setVelocity(shooterVelocity);
 
 
-            if (extras.beamBreak.isPressed())
+            telemetry.addData("turretcurrent: ", extras.turret.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("turretpower: ", turretPower);
+
+
+           /* if (extras.beamBreak.isPressed())
             {
                 telemetry.addData("Touch Sensor", "Is Pressed");
             }
@@ -101,9 +103,9 @@ public class BasicTeleOpTest extends LinearOpMode
             {
                 telemetry.addData("Touch Sensor", "Is Not Pressed");
             }
-
-            telemetry.addData("turretLimitCW: ", extras.turretLimitCW.isPressed());
-            telemetry.addData("turretLimitCCW: ", extras.turretLimitCCW.isPressed());
+*/
+            //telemetry.addData("turretLimitCW: ", extras.turretLimitCW.isPressed());
+            //telemetry.addData("turretLimitCCW: ", extras.turretLimitCCW.isPressed());
 
             /*
             stickSideways = gamepad1.left_stick_x * speedMultiplier;
@@ -141,7 +143,7 @@ public class BasicTeleOpTest extends LinearOpMode
             }
             */
 
-            telemetry.addData("ODO adjusted angle", adjustedAngle);
+            //telemetry.addData("ODO adjusted angle", adjustedAngle);
 
             telemetry.addData("Elapsed time: ", getRuntime());
 

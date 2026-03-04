@@ -36,10 +36,11 @@ public class ExtraOpModeFunctionsTest
 
     public DcMotorEx shooter1;
     public DcMotorEx shooter2;
+    public DcMotorEx turret;
 
-    public TouchSensor beamBreak;
-    public TouchSensor turretLimitCW;  // Digital channel Object
-    public TouchSensor turretLimitCCW;  // Digital channel Object
+    //public TouchSensor beamBreak;
+    //public TouchSensor turretLimitCW;  // Digital channel Object
+    //public TouchSensor turretLimitCCW;  // Digital channel Object
 
     public boolean firstPressed = true;
 
@@ -60,10 +61,16 @@ public class ExtraOpModeFunctionsTest
         shooter2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooter2.setVelocity(0.0);
 
-        beamBreak = hardwareMap.get(TouchSensor.class, "beamBreak");
+        turret = hardwareMap.get(DcMotorEx.class, "turretMotor");
+        turret.setDirection(DcMotorEx.Direction.FORWARD);
+        turret.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        turret.setPower(0.0);
 
-        turretLimitCW = hardwareMap.get(TouchSensor.class, "turretLimitCW");
-        turretLimitCCW = hardwareMap.get(TouchSensor.class, "turretLimitCCW");
+       // beamBreak = hardwareMap.get(TouchSensor.class, "beamBreak1");
+
+        //turretLimitCW = hardwareMap.get(TouchSensor.class, "turretLimitCW");
+        //turretLimitCCW = hardwareMap.get(TouchSensor.class, "turretLimitCCW");
     }
 
     public double adjustAngleForDriverPosition(double angle, RobotStartPosition robotStartPosition)
