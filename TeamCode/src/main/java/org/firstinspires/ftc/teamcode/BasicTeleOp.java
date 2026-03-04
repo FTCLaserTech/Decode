@@ -45,9 +45,9 @@ public class BasicTeleOp extends LinearOpMode
         //MecanumDrive drive = new MecanumDrive(hardwareMap, extras.readPosition());
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
 
-        Targeting targeting = Targeting.AUTO;
+        extras.setTurretMode(ExtraOpModeFunctions.TurretMode.FTCLib);
 
-        //TrajectoryBook book = new TrajectoryBook(drive, extras);
+        Targeting targeting = Targeting.AUTO;
 
         IMU.Parameters imuParameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 drive.PARAMS.logoFacingDirection,
@@ -63,7 +63,8 @@ public class BasicTeleOp extends LinearOpMode
         double speedMultiplier = 1.0;
         double rotationMultiplier = 1.0;
 
-        double turretAngle = 0;
+        double turretAngle = 0.0;
+        double frozenTurretAngle = 0.0;
         double MAX_SERVO = 1.0;
         double currentLoopTime = 0.0;
         double lastLoopTime = 0.0;
@@ -81,6 +82,8 @@ public class BasicTeleOp extends LinearOpMode
 
         double turretPower = 0.0;
         double launcherSpeed = 0.0;
+        double frozenLauncherSpeed = 0.0;
+        boolean freezeRange = false;
 
         boolean launcherOn = true;
         boolean depotFound = false;
@@ -100,7 +103,6 @@ public class BasicTeleOp extends LinearOpMode
             extras.pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
             extras.blinkinLedDriver.setPattern(extras.pattern);
         }
-        extras.lights.lightsUpdate((long)(getRuntime()*1000.0));
 
         boolean targetSearchingMode = false;
         long loopCounter = 0;
@@ -318,9 +320,17 @@ public class BasicTeleOp extends LinearOpMode
                 }
 
                 telemetry.addData("Turret angle desired", Math.toDegrees(turretAngle));
-                extras.setTurret(turretAngle);
-                //extras.setTurret(0.0);
+                telemetry.addData("Turret angle frozen", Math.toDegrees(frozenTurretAngle));
 
+                if(freezeRange)
+                {
+                    extras.setTurret(frozenTurretAngle);
+                }
+                else
+                {
+                    extras.setTurret(turretAngle);
+                    //extras.setTurret(0.0);
+                }
 
                 //telemetry.addData("RFP x", pose3D.getPosition().x*39.3700787);
                 //telemetry.addData("RFP y", pose3D.getPosition().y*39.3700787);
@@ -340,12 +350,19 @@ public class BasicTeleOp extends LinearOpMode
             {
                 launcherSpeed = 0.0;
             }
-            // now set the launcher speed
-            if (launcherOn == false)
+
+            if(!launcherOn)
             {
-                launcherSpeed = 0.0;
+                extras.setLauncher(0.0);
             }
-            extras.setLauncher(launcherSpeed);
+            else if(freezeRange)
+            {
+                extras.setLauncher(frozenLauncherSpeed);
+            }
+            else
+            {
+                extras.setLauncher(launcherSpeed);
+            }
 
             // get and print Megatag
             Pose2d limelightrobotposition = extras.vision.getRobotFieldPositionMT();
@@ -447,19 +464,25 @@ public class BasicTeleOp extends LinearOpMode
             // freeze the launcher motor speed
             if(gamepad2.bWasPressed())
             {
-                extras.freezeRange = true;
-                telemetry.addData("b Pressed", "s2up");
+                if(freezeRange)
+                {
+                    freezeRange = false;
+                }
+                else
+                {
+                    freezeRange = true;
+                    frozenLauncherSpeed = launcherSpeed;
+                    frozenTurretAngle = turretAngle;
+                }
             }
+            telemetry.addData("freezeRange", freezeRange);
 
-            // unfreeze the launcher motor speed
             if(gamepad2.aWasPressed())
             {
-                extras.freezeRange = false;
-                telemetry.addData("a Pressed", "0.0");
+                telemetry.addLine("a Pressed");
             }
-            telemetry.addData("freezeRange", extras.freezeRange);
 
-            // unfreeze the launcher motor speed
+            // home the robot at the middle of the field
             if(gamepad1.xWasPressed())
             {
                 if(gamepad1.start)
@@ -477,7 +500,6 @@ public class BasicTeleOp extends LinearOpMode
                     }
                 }
             }
-            telemetry.addData("freezeRange", extras.freezeRange);
 
             if (gamepad2.dpadLeftWasPressed())
             {

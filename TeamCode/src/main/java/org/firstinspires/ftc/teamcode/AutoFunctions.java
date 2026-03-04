@@ -55,8 +55,6 @@ public class AutoFunctions
             localExtras.pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
             localExtras.blinkinLedDriver.setPattern(localExtras.pattern);
         }
-        localExtras.lights.lightsUpdate(0);
-
 
         // load artifacts
         localLop.telemetry.addLine("Load Artifacts - gp1 Left Trigger: ");

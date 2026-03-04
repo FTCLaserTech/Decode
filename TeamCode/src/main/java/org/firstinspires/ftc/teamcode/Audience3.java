@@ -36,8 +36,9 @@ public class Audience3 extends LinearOpMode
         safeWaitSeconds(0.3);
         VisionFunctions vision = new VisionFunctions(hardwareMap, this);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
-        extras.setTurretMode(ExtraOpModeFunctions.TurretMode.ControlHub);
         AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
+
+        extras.setTurretMode(ExtraOpModeFunctions.TurretMode.ControlHub);
 
         PinpointLocalizer ppLocalizer = (PinpointLocalizer) drive.localizer;
         double ppYawInitial = 0.0;
@@ -57,6 +58,7 @@ public class Audience3 extends LinearOpMode
         AprilTagPoseFtc ll;
 
         extras.turretHome();
+        extras.setTurret(0.0);
 
         while (!isStopRequested() && !opModeIsActive())
         {
@@ -93,7 +95,7 @@ public class Audience3 extends LinearOpMode
         // Turn on shooter to the expected speed
         double launcherSpeed = 1890.0;
         extras.setLauncher(launcherSpeed);
-        extras.setTurret(-120);
+        extras.setTurret(-100);
 
         // drive off the line and rotate towards the depot
         Action ToInitialPosition = drive.actionBuilder(drive.localizer.getPose())
