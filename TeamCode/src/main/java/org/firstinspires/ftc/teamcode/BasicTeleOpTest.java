@@ -94,6 +94,11 @@ public class BasicTeleOpTest extends LinearOpMode
             telemetry.addData("turretcurrent: ", extras.turret.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("turretpower: ", turretPower);
 
+            if (gamepad1.dpadLeftWasPressed())
+            {
+                extras.turretHome();
+            }
+
 
            /* if (extras.beamBreak.isPressed())
             {

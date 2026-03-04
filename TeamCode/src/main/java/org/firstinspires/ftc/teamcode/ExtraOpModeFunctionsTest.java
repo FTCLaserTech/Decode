@@ -38,6 +38,9 @@ public class ExtraOpModeFunctionsTest
     public DcMotorEx shooter2;
     public DcMotorEx turret;
 
+    public TouchSensor turretHomeSensor;  // Digital channel Object
+    public static int turretHomeOffset = -160;
+
     //public TouchSensor beamBreak;
     //public TouchSensor turretLimitCW;  // Digital channel Object
     //public TouchSensor turretLimitCCW;  // Digital channel Object
@@ -67,11 +70,33 @@ public class ExtraOpModeFunctionsTest
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         turret.setPower(0.0);
 
+        turretHomeSensor = hardwareMap.get(TouchSensor.class, "turretHomeSensor");
+
        // beamBreak = hardwareMap.get(TouchSensor.class, "beamBreak1");
 
         //turretLimitCW = hardwareMap.get(TouchSensor.class, "turretLimitCW");
         //turretLimitCCW = hardwareMap.get(TouchSensor.class, "turretLimitCCW");
     }
+
+    public void turretHome()
+    {
+        //start motor
+        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        turret.setPower(0.25);
+        while (!turretHomeSensor.isPressed())
+        {
+            localLop.telemetry.addLine("Homing...");
+            localLop.telemetry.update();
+        }
+        //stop
+        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turret.setPower(0.0);
+        localLop.telemetry.addLine("Homing Complete");
+        localLop.telemetry.update();
+        //setTurretMode(turretMode);
+        //turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
 
     public double adjustAngleForDriverPosition(double angle, RobotStartPosition robotStartPosition)
     {
