@@ -72,7 +72,7 @@ public class BasicTeleOpTest extends LinearOpMode
             }
             if(gamepad1.yWasPressed())
             {
-                turretPower = turretPower + 0.05;
+                turretPower = turretPower + 0.02;
                 if (turretPower > 1.0)
                 {
                     turretPower = 1.0;
@@ -80,12 +80,22 @@ public class BasicTeleOpTest extends LinearOpMode
             }
             if(gamepad1.aWasPressed())
             {
-                turretPower = turretPower - 0.05;
+                turretPower = turretPower - 0.02;
                 if (turretPower < -1.0)
                 {
                     turretPower = -1.0;
                 }
             }
+            // Get current ticks
+            int currentTicks = extras.turretMotor.getCurrentPosition();
+
+            // Convert ticks to degrees
+            // Formula: (Current Ticks / Total Ticks per Rev) * 360
+            double currentAngle = extras.getTurretAngle(currentTicks);
+
+            // Display in Telemetry
+            telemetry.addData("Turret Ticks", currentTicks);
+            telemetry.addData("Turret Angle (Deg)", "%.2f", Math.toDegrees(currentAngle));
 
             extras.turret.setPower(turretPower);
             //extras.shooter2.setVelocity(shooterVelocity);

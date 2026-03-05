@@ -28,8 +28,16 @@ import java.io.Writer;
 
 public class ExtraOpModeFunctionsTest
 {
+    double MAX_TURRETANGLE = Math.toRadians(120.0);
+    double MIN_TURRETANGLE = Math.toRadians(-120.0);
+    static final double turretMotorEncoder = 751.8;
+    double turretBaseTeeth = 84.0;
+    double driveTeeth = 37.0;
+    double MAX_TURRETENCODER = turretMotorEncoder * (turretBaseTeeth/driveTeeth) * (MAX_TURRETANGLE/Math.toRadians(360));
+
     public enum RobotStartPosition {STRAIGHT, LEFT, RIGHT};
     public static final double PI = 3.14159265;
+
 
     public LinearOpMode localLop = null;
     public HardwareMap hm = null;
@@ -37,6 +45,8 @@ public class ExtraOpModeFunctionsTest
     public DcMotorEx shooter1;
     public DcMotorEx shooter2;
     public DcMotorEx turret;
+    public DcMotorEx turretMotor;
+
 
     public TouchSensor turretHomeSensor;  // Digital channel Object
     public static int turretHomeOffset = -160;
@@ -70,12 +80,42 @@ public class ExtraOpModeFunctionsTest
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         turret.setPower(0.0);
 
+        turretMotor = hardwareMap.get(DcMotorEx.class, "turretMotor");
+        turretMotor.setDirection(DcMotorEx.Direction.FORWARD);
+        turretMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        setTurretMode(ExtraOpModeFunctions.TurretMode.FTCLib);
+
         turretHomeSensor = hardwareMap.get(TouchSensor.class, "turretHomeSensor");
 
        // beamBreak = hardwareMap.get(TouchSensor.class, "beamBreak1");
 
         //turretLimitCW = hardwareMap.get(TouchSensor.class, "turretLimitCW");
         //turretLimitCCW = hardwareMap.get(TouchSensor.class, "turretLimitCCW");
+    }
+
+    public double getTurretAngle(double turretPosition)
+    {
+        double turretAngle = (turretPosition - turretHomeOffset) / MAX_TURRETENCODER * MAX_TURRETANGLE;
+
+        return (turretAngle);
+    }
+
+    public enum TurretMode {ControlHub, NextFTC, FTCLib};
+    ExtraOpModeFunctions.TurretMode turretMode = ExtraOpModeFunctions.TurretMode.ControlHub;
+    public void setTurretMode(ExtraOpModeFunctions.TurretMode tm)
+    {
+        turretMode = tm;
+        switch (turretMode)
+        {
+            case ControlHub:
+                turretMotor.setTargetPosition(0);
+                turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                break;
+            case NextFTC:
+            case FTCLib:
+                turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                break;
+        }
     }
 
     public void turretHome()
@@ -94,7 +134,7 @@ public class ExtraOpModeFunctionsTest
         localLop.telemetry.addLine("Homing Complete");
         localLop.telemetry.update();
         //setTurretMode(turretMode);
-        //turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
 

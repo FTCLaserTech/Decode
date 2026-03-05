@@ -16,6 +16,7 @@ public class TurretFeedforward
     private final double kS;      // Nm (static friction)
     private final double kV;      // Nm per rad/s
     private final double kA;      // Nm per rad/s^2
+    private double setPoint;
 
     /**
      * @param kSpring Spring constant (Nm/rad)
@@ -28,6 +29,11 @@ public class TurretFeedforward
         this.kS = kS;
         this.kV = kV;
         this.kA = kA;
+    }
+
+    public void setSetPoint (double sp)
+    {
+        setPoint = sp;
     }
 
     /**
