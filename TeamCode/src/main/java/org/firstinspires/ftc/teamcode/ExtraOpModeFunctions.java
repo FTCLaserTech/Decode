@@ -253,16 +253,17 @@ public class ExtraOpModeFunctions
         launcher2.setPower(power);
         localLop.telemetry.addData("Launcher velocity target: ", launcherSpeed);
         localLop.telemetry.addData("Launcher power set: ", power);
+
         //localLop.telemetry.addData("Launcher1 velocity actual: ", launcher1.getVelocity());
         //localLop.telemetry.addData("Launcher2 velocity actual: ", launcher2.getVelocity());
         //localLop.telemetry.addData("Launcher1 power actual: ", launcher1.getPower());
         //localLop.telemetry.addData("Launcher2 power actual: ", launcher2.getPower());
         //localLop.telemetry.addData("Launcher Speed OK? ", isLauncherSpeedGood(launcherSpeed));
 
-        //dashboardTelemetry.addData("Launcher velocity target", launcherSpeed);
-        //dashboardTelemetry.addData("Launcher power set", power);
-        //dashboardTelemetry.addData("Launcher1 velocity actual", launcher1.getVelocity());
-        //dashboardTelemetry.addData("Launcher2 velocity actual", launcher2.getVelocity());
+        dashboardTelemetry.addData("Launcher velocity target", launcherSpeed);
+        dashboardTelemetry.addData("Launcher power set", power);
+        dashboardTelemetry.addData("Launcher1 velocity actual", launcher1.getVelocity());
+        dashboardTelemetry.addData("Launcher2 velocity actual", launcher2.getVelocity());
         //dashboardTelemetry.update();
     }
 
@@ -326,7 +327,10 @@ public class ExtraOpModeFunctions
             case FTCLib:
                 turretController2.setPID(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
                 turretController2.setSetPoint(turretPosition);
-                power = turretController2.calculate(turretMotor.getCurrentPosition());
+                double currentTurretEncoder = turretMotor.getCurrentPosition();
+                double PIDpower = turretController2.calculate(currentTurretEncoder);
+                double FFpower = turretFeedforward(turretAngle, turretEncoderToAngle(currentTurretEncoder));
+                power = PIDpower + FFpower;
                 if(power>powerLimit)
                 {
                     power = powerLimit;
@@ -348,6 +352,35 @@ public class ExtraOpModeFunctions
         dashboardTelemetry.addData("Turret power set", turretMotor.getPower());
         dashboardTelemetry.addData("Turret target", turretPosition/1000.0);
         dashboardTelemetry.addData("Turret actual", turretMotor.getCurrentPosition()/1000.0);
+    }
+
+    public double turretFeedforward(double currentAngleRad, double targetAngleRad)
+    {
+        double angleMin = Math.toRadians(-110.0);
+        double powerMin = -0.05;
+        double angleMax = Math.toRadians(110.0);
+        double powerMax = 0.25;
+
+        double slope = (powerMax - powerMin) / (angleMax - angleMin);
+        double power = 0.0;
+
+        if(currentAngleRad > targetAngleRad)
+        {
+            power = slope * (targetAngleRad - angleMin) + angleMin;
+        }
+        else
+        {
+            power = -(slope * (-targetAngleRad - angleMin) + angleMin);
+        }
+
+        return(power);
+    }
+
+    public double turretEncoderToAngle(double turretEncoder)
+    {
+        double turretAngle = (turretEncoder - turretHomeOffset) / MAX_TURRETENCODER * MAX_TURRETANGLE;
+
+        return (turretAngle);
     }
 
     public double getLauncherSpeed()

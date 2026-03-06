@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -91,7 +90,7 @@ public class BasicTeleOpTest extends LinearOpMode
 
             // Convert ticks to degrees
             // Formula: (Current Ticks / Total Ticks per Rev) * 360
-            double currentAngle = extras.getTurretAngle(currentTicks);
+            double currentAngle = extras.turretEncoderToAngle(currentTicks);
 
             // Display in Telemetry
             telemetry.addData("Turret Ticks", currentTicks);

@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
@@ -93,7 +92,7 @@ public class ExtraOpModeFunctionsTest
         //turretLimitCCW = hardwareMap.get(TouchSensor.class, "turretLimitCCW");
     }
 
-    public double getTurretAngle(double turretPosition)
+    public double turretEncoderToAngle(double turretPosition)
     {
         double turretAngle = (turretPosition - turretHomeOffset) / MAX_TURRETENCODER * MAX_TURRETANGLE;
 
