@@ -330,7 +330,12 @@ public class ExtraOpModeFunctions
                 double currentTurretEncoder = turretMotor.getCurrentPosition();
                 double PIDpower = turretController2.calculate(currentTurretEncoder);
                 double FFpower = turretFeedforward(turretAngle, turretEncoderToAngle(currentTurretEncoder));
-                power = PIDpower + FFpower;
+                localLop.telemetry.addData("Turret PID power: ", PIDpower);
+                localLop.telemetry.addData("Turret FF power: ", FFpower);
+
+                power = PIDpower;
+                //power = PIDpower + FFpower;
+
                 if(power>powerLimit)
                 {
                     power = powerLimit;
