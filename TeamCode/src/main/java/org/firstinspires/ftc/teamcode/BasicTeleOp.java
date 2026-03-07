@@ -432,6 +432,8 @@ public class BasicTeleOp extends LinearOpMode
                 speedMultiplier = 1.0;
                 rotationMultiplier = 1.0;
             }
+
+            /*
             if(gamepad1.dpad_up)
             {
                 extras.launcherSup();
@@ -440,6 +442,7 @@ public class BasicTeleOp extends LinearOpMode
             {
                 extras.launcherSdown();
             }
+            */
 
             adjustedHeading = imuHeading - previousOrientation + PI/2;
 
@@ -469,16 +472,12 @@ public class BasicTeleOp extends LinearOpMode
             }
             telemetry.addData("Launcher On: ", launcherOn);
 
-            // reset the turret motor encoder
             if(gamepad2.yWasPressed())
             {
-                extras.turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                //extras.turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                extras.turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                turretAngle = 0.0;
+                ;
             }
 
-            // freeze the launcher motor speed
+            // freeze the launcher motor speed and turret position
             if(gamepad2.bWasPressed())
             {
                 if(freezeRange)

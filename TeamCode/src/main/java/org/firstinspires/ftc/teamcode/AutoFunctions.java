@@ -24,6 +24,8 @@ public class AutoFunctions
         localLop = linearOpMode;
         localVision = vision;
         localExtras = extras;
+
+        localExtras.setTurretMode(ExtraOpModeFunctions.TurretMode.ControlHub);
     }
 
     public void autoInitFunction()

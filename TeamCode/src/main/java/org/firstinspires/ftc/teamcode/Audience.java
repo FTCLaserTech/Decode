@@ -37,8 +37,6 @@ public class Audience extends LinearOpMode
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
         AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
 
-        extras.setTurretMode(ExtraOpModeFunctions.TurretMode.ControlHub);
-
         PinpointLocalizer ppLocalizer = (PinpointLocalizer) drive.localizer;
         double ppYawInitial = 0.0;
         double ppYawFinal = 0.0;

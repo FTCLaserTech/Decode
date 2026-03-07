@@ -727,12 +727,7 @@ public class ExtraOpModeFunctions
     boolean ball3Full = false;
     public boolean isIntakeFull()
     {
-        localLop.telemetry.addData("beamBreak1: ", beamBreak1a.getState());
-        localLop.telemetry.addData("beamBreak2: ", beamBreak1b.getState());
-        localLop.telemetry.addData("beamBreak3: ", beamBreak2a.getState());
-        localLop.telemetry.addData("beamBreak4: ", beamBreak2b.getState());
-        localLop.telemetry.addData("beamBreak5: ", beamBreak3a.getState());
-        localLop.telemetry.addData("beamBreak6: ", beamBreak3b.getState());
+        localLop.telemetry.addLine("BB: " + beamBreak1a.getState() + " " + beamBreak1b.getState() + " " + beamBreak2a.getState() + " " + beamBreak2b.getState() + " " + beamBreak3a.getState() + " " + beamBreak3b.getState());
         localLop.telemetry.addData("intakeFullCount: ", intakeFullCount);
 
         if((!beamBreak1a.getState()) || (!beamBreak1b.getState()))
