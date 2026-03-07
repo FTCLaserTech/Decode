@@ -69,7 +69,9 @@ public class ExtraOpModeFunctions
     public DcMotorEx intake;
     public Servo ballStop;
     public CRServo turretCR;
-    public Servo turretS;
+    //public Servo turretS;
+    public Servo launcherS;
+    public static double launcherSupPosition = 0.0;
     public TouchSensor turretHomeSensor;  // Digital channel Object
     public DigitalChannel beamBreak1a;
     public DigitalChannel beamBreak1b;
@@ -80,12 +82,13 @@ public class ExtraOpModeFunctions
     public Lights lights = null;
     public ControlSystem launcherController;
     public static PIDCoefficients launcherVelPidCoefficients =
-            new PIDCoefficients(0.0051, 0.0, 0.0);
+            new PIDCoefficients(0.0037, 0.0, 0.0);
     public static BasicFeedforwardParameters launcherFeedforwardParameters =
             new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
     public ControlSystem turretController;
-    public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.003, 0.01, 0.0001);
+    //public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.003, 0.01, 0.0001);
+    public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.0015, 0.05, 0.00001);
  //   public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.0035, 0.11, 0.0003);
     //public static BasicFeedforwardParameters turretFeedforwardParameters =
     //        new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
@@ -126,8 +129,8 @@ public class ExtraOpModeFunctions
 
         turretCR = hardwareMap.get(CRServo.class, "turretCR");
         turretCR.setDirection(DcMotorSimple.Direction.REVERSE);
-        turretS = hardwareMap.get(Servo.class, "turretS");
-        turretS.setDirection(Servo.Direction.REVERSE);
+        //turretS = hardwareMap.get(Servo.class, "turretS");
+        //turretS.setDirection(Servo.Direction.REVERSE);
 
         turretHomeSensor = hardwareMap.get(TouchSensor.class, "turretHomeSensor");
 
@@ -152,6 +155,9 @@ public class ExtraOpModeFunctions
         intake.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         intake.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intake.setVelocity(0.0);
+
+        launcherS = hardwareMap.get(Servo.class, "launcherS");
+        launcherS.setDirection(Servo.Direction.REVERSE);
 
         lights = new Lights(hardwareMap);
 
@@ -240,6 +246,15 @@ public class ExtraOpModeFunctions
     public void ballStopOff()
     {
         ballStop.setPosition(0.3);
+    }
+    public void launcherSup()
+    {
+        launcherS.setPosition(launcherSupPosition);
+    }
+
+    public void launcherSdown()
+    {
+        launcherS.setPosition(0.5);
     }
 
     public void setLauncher(double launcherSpeed)
@@ -333,8 +348,8 @@ public class ExtraOpModeFunctions
                 localLop.telemetry.addData("Turret PID power: ", PIDpower);
                 localLop.telemetry.addData("Turret FF power: ", FFpower);
 
-                power = PIDpower;
-                //power = PIDpower + FFpower;
+                //power = PIDpower;
+                power = PIDpower + FFpower;
 
                 if(power>powerLimit)
                 {
@@ -349,33 +364,38 @@ public class ExtraOpModeFunctions
         }
 
         localLop.telemetry.addData("Turret angle limited: ", turretAngle);
+        double cp = turretMotor.getCurrentPosition();
         localLop.telemetry.addData("Turret position target: ", turretPosition);
-        localLop.telemetry.addData("Turret position actual: ", turretMotor.getCurrentPosition());
+        localLop.telemetry.addData("Turret position actual: ", cp);
+        localLop.telemetry.addData("Turret target - actual: ", turretPosition - cp);
         localLop.telemetry.addData("turret Power", turretMotor.getPower());
         localLop.telemetry.addData("turret Current", turretMotor.getCurrent(CurrentUnit.AMPS));
 
         dashboardTelemetry.addData("Turret power set", turretMotor.getPower());
-        dashboardTelemetry.addData("Turret target", turretPosition/1000.0);
-        dashboardTelemetry.addData("Turret actual", turretMotor.getCurrentPosition()/1000.0);
+        dashboardTelemetry.addData("Turret target", turretPosition);
+        dashboardTelemetry.addData("Turret actual", cp);
     }
 
     public double turretFeedforward(double currentAngleRad, double targetAngleRad)
     {
         double angleMin = Math.toRadians(-110.0);
-        double powerMin = -0.05;
+        double powerMinCCW = -0.02;
+        double powerMinCW = -0.22;
         double angleMax = Math.toRadians(110.0);
-        double powerMax = 0.25;
+        double powerMaxCCW = 0.22;
+        double powerMaxCW = 0.02;
 
-        double slope = (powerMax - powerMin) / (angleMax - angleMin);
+        double slopeCCW = (powerMaxCCW - powerMinCCW) / (angleMax - angleMin);
+        double slopeCW = (powerMaxCW - powerMinCW) / (angleMax - angleMin);
         double power = 0.0;
 
-        if(currentAngleRad > targetAngleRad)
+        if(targetAngleRad < currentAngleRad) // CCW
         {
-            power = slope * (targetAngleRad - angleMin) + angleMin;
+            power = slopeCCW * (currentAngleRad - angleMin) + powerMinCCW;
         }
-        else
+        else // CW
         {
-            power = -(slope * (-targetAngleRad - angleMin) + angleMin);
+            power = slopeCW * (currentAngleRad - angleMin) + powerMinCW;
         }
 
         return(power);
@@ -606,7 +626,7 @@ public class ExtraOpModeFunctions
         // range to speed function
         //shooterTargetVelocity = 1049 + (12.8 * targetRange) - (0.0294 * targetRange * targetRange);
         //return( 985 + (13.2 * distance) - (0.024 * distance * distance) );
-        return( 917 + (11.6 * distance) - (0.0294 * distance * distance) );
+        return( 1016 + (6.12 * distance) + (0.013 * distance * distance) );
         //( 1047 + (7.09 * distance) - (0.00119 * distance * distance) );
         //( 1155 + (5 * distance) + (0.00964 * distance * distance) );
     }
@@ -762,12 +782,12 @@ public class ExtraOpModeFunctions
         }
         else if(ball1Full && ball2Full)
         {
-            lights.setLightColor(Lights.Light_Blue);
+            lights.setLightColor(Lights.Light_Off);
             return(false);
         }
         else if(ball1Full)
         {
-            lights.setLightColor(Lights.Light_Yellow);
+            lights.setLightColor(Lights.Light_Off);
             return(false);
         }
         else

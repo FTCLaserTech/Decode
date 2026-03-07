@@ -65,6 +65,8 @@ public class Audience3 extends LinearOpMode
             autoFun.autoInitFunction();
             safeWaitSeconds(0.01);
 
+            extras.setTurret(Math.toRadians(autoFun.redBlueT(-112)));
+
             ppYawInitial = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
             chYawInitial = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
@@ -93,9 +95,9 @@ public class Audience3 extends LinearOpMode
         vision.limelight.start();
 
         // Turn on shooter to the expected speed
-        double launcherSpeed = 1890.0;
+        double launcherSpeed = 1900.0;
         extras.setLauncher(launcherSpeed);
-        extras.setTurret(Math.toRadians(-115));
+        extras.launcherSup();
 
         // drive off the line and rotate towards the depot
         Action ToInitialPosition = drive.actionBuilder(drive.localizer.getPose())

@@ -284,6 +284,15 @@ public class BasicTeleOp extends LinearOpMode
                 telemetry.addData("goal heading", goalHeading );
                 telemetry.addData("goal distance", goalDistance );
 
+                if (goalDistance > 90)
+                {
+                    extras.launcherSup();
+                }
+                else
+                {
+                    extras.launcherSdown();
+                }
+
                 if (targeting == Targeting.AUTO)
                 {
                     // calculate aim
@@ -422,6 +431,14 @@ public class BasicTeleOp extends LinearOpMode
             {
                 speedMultiplier = 1.0;
                 rotationMultiplier = 1.0;
+            }
+            if(gamepad1.dpad_up)
+            {
+                extras.launcherSup();
+            }
+            if(gamepad1.dpad_down)
+            {
+                extras.launcherSdown();
             }
 
             adjustedHeading = imuHeading - previousOrientation + PI/2;

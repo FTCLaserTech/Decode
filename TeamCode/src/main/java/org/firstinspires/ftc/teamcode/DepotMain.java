@@ -93,6 +93,8 @@ public class DepotMain extends LinearOpMode
         double launcherSpeed = 1400.0;
         extras.setLauncher(launcherSpeed);
         extras.setTurret(-100);
+        extras.launcherSdown();
+
 
         //safeWaitSeconds(autoFun.startDelay);
 

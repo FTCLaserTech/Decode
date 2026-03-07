@@ -37,6 +37,8 @@ public class Audience extends LinearOpMode
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
         AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
 
+        extras.setTurretMode(ExtraOpModeFunctions.TurretMode.ControlHub);
+
         PinpointLocalizer ppLocalizer = (PinpointLocalizer) drive.localizer;
         double ppYawInitial = 0.0;
         double ppYawFinal = 0.0;
@@ -57,10 +59,15 @@ public class Audience extends LinearOpMode
         AprilTagPoseFtc cam;
         AprilTagPoseFtc ll;
 
+        extras.turretHome();
+        extras.setTurret(0.0);
+
         while (!isStopRequested() && !opModeIsActive())
         {
             autoFun.autoInitFunction();
             safeWaitSeconds(0.01);
+
+            extras.setTurret(Math.toRadians(autoFun.redBlueT(-114)));
 
             ppYawInitial = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
             chYawInitial = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
@@ -81,8 +88,8 @@ public class Audience extends LinearOpMode
         Pose2d toInitialLaunchPosition = new Pose2d(-50,autoFun.redBlueT(-14),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d toSpike1 = new Pose2d(-34,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupSpike1 = new Pose2d(-36,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d toCorner = new Pose2d(-62,autoFun.redBlueT(-48),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d pickupCorner = new Pose2d(-62,autoFun.redBlueT(-62),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d toCorner = new Pose2d(-62,autoFun.redBlueT(-58),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d pickupCorner = new Pose2d(-62,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d toCorner2 = new Pose2d(-62,autoFun.redBlueT(-63),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d toSpike2 = new Pose2d(-42,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupSpike2 = new Pose2d(-42,autoFun.redBlueT(-62),Math.toRadians(autoFun.redBlueT(initialRotation)));
@@ -99,8 +106,10 @@ public class Audience extends LinearOpMode
         vision.limelight.start();
 
         // Turn on shooter to the expected speed
-        double launcherSpeed = 1790.0;
+        double launcherSpeed = 1800.0;
         extras.setLauncher(launcherSpeed);
+        extras.launcherSup();
+
 
 
         // drive off the line and rotate towards the depot
@@ -151,7 +160,6 @@ public class Audience extends LinearOpMode
         // pickup and launch Corner 1
         extras.intakeForward();
         Action GoToCorner = drive.actionBuilder(drive.localizer.getPose())
-                //.strafeToLinearHeading(AngleCorner.position, AngleCorner.heading)
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
                 .strafeToSplineHeading(pickupCorner.position, pickupCorner.heading)
                 .build();
@@ -178,8 +186,12 @@ public class Audience extends LinearOpMode
         extras.intakeForward();
         Action GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
-                .strafeToLinearHeading(toCorner.position, toCorner.heading)
+                .strafeToSplineHeading(pickupCorner.position, pickupCorner.heading)
                 .build();
+
+        //Actions.runBlocking(GoToCorner2);
+        Actions.runBlocking(new RaceAction(GoToCorner2,extras.checkIntakeAction()));
+        //extras.intakeOff();
 
         Action ToLaunchPosition4 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
@@ -197,34 +209,12 @@ public class Audience extends LinearOpMode
                 extras.setLauncherAction(launcherSpeed)
         ));
 
-
-        /*
-        extras.intakeForward();
-        Action GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(toSpike1.position, toSpike1.heading)
-                .strafeToLinearHeading(pickupSpike1.position, toCorner2.heading)
-                .strafeToSplineHeading(toCorner2.position, toCorner2.heading)
-                .build();
-         */
-        //Actions.runBlocking(GoToCorner2);
-        Actions.runBlocking(new RaceAction(GoToCorner2,extras.checkIntakeAction()));
-        //extras.intakeOff();
-
-
         // pickup and launch Corner third time
         extras.intakeForward();
         Action GoToCorner3 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toCorner.position, toCorner.heading)
-                .strafeToLinearHeading(toCorner.position, toCorner.heading)
+                .strafeToSplineHeading(pickupCorner.position, pickupCorner.heading)
                 .build();
-        /*
-        Action GoToCorner3 = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(toSpike1.position, toSpike1.heading)
-                .strafeToLinearHeading(pickupSpike1.position, toCorner2.heading)
-                .strafeToSplineHeading(toCorner2.position, toCorner2.heading)
-                .build();
-
-         */
 
         //Actions.runBlocking(GoToCorner3);
         Actions.runBlocking(new RaceAction(GoToCorner3,extras.checkIntakeAction()));
@@ -302,4 +292,3 @@ public class Audience extends LinearOpMode
         }
     }
 }
-
