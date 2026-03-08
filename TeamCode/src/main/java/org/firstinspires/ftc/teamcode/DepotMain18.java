@@ -11,6 +11,7 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -18,17 +19,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Config
-//@Disabled
+@Disabled
 
 @Autonomous(group = "a")
 
-public class DepotMain15 extends LinearOpMode
+public class DepotMain18 extends LinearOpMode
 {
     @Override
 
     public void runOpMode() throws InterruptedException
     {
-        double initialRotation = 270;
+        double initialRotation = 180;
         Pose2d initPose = new Pose2d(0,0,Math.toRadians(initialRotation));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
@@ -57,9 +58,6 @@ public class DepotMain15 extends LinearOpMode
         AprilTagPoseFtc cam;
         AprilTagPoseFtc ll;
 
-        extras.turretHome();
-        extras.setTurret(0.0);
-
         while (!isStopRequested() && !opModeIsActive())
         {
             autoFun.autoInitFunction();
@@ -73,7 +71,7 @@ public class DepotMain15 extends LinearOpMode
         }
 
         // AFTER START IS PRESSED
-        extras.setTurret(Math.toRadians(autoFun.redBlueT(-122)));
+        extras.setTurret(Math.toRadians(autoFun.redBlueT(-125)));
 
         Pose2d startPose = new Pose2d(61, autoFun.redBlueT(-37), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
@@ -82,13 +80,14 @@ public class DepotMain15 extends LinearOpMode
         Pose2d pickupSpike3 = new Pose2d(11,autoFun.redBlueT(-45),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
         Pose2d nearGate = new Pose2d(0.5,autoFun.redBlueT(-35),Math.toRadians(autoFun.redBlueT(initialRotation))); //-31
         Pose2d toGate = new Pose2d(0.5,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d nearGate2 = new Pose2d(-11,autoFun.redBlueT(-57),Math.toRadians(autoFun.redBlueT(305))); //-31
-        Pose2d toGate2 = new Pose2d(-11,autoFun.redBlueT(-58),Math.toRadians(autoFun.redBlueT(310)));
+        Pose2d nearGate2 = new Pose2d(-11,autoFun.redBlueT(-56),Math.toRadians(autoFun.redBlueT(305))); //-31
+        Pose2d toGate2 = new Pose2d(-11,autoFun.redBlueT(-57),Math.toRadians(autoFun.redBlueT(310)));
         Pose2d toSpike2 = new Pose2d(-11,autoFun.redBlueT(-27),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d pickupSpike2 = new Pose2d(-11,autoFun.redBlueT(-48),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
+        Pose2d pickupSpike2 = new Pose2d(-11,autoFun.redBlueT(-47),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
         Pose2d toSpike1 = new Pose2d(-35,autoFun.redBlueT(-30),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupSpike1 = new Pose2d(-35,autoFun.redBlueT(-45),Math.toRadians(autoFun.redBlueT(initialRotation))); //-51
         Pose2d park = new Pose2d(-1,autoFun.redBlueT(-45),Math.toRadians(autoFun.redBlueT(initialRotation)));
+
         extras.saveTeamColor(extras.teamColor);
 
         // turn on the LimeLight
@@ -119,14 +118,14 @@ public class DepotMain15 extends LinearOpMode
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.ballStopOn())),
                 extras.setLauncherAction(launcherSpeed)
-        ));
+                ));
 
 //
         // pickup and launch spike 2
         //
         Action GoToSpike2 = drive.actionBuilder(drive.localizer.getPose())
                 .splineToConstantHeading(toSpike2.position, toSpike2.heading)
-                .splineToLinearHeading(pickupSpike2,pickupSpike2.heading)
+                .splineToConstantHeading(pickupSpike2.position, pickupSpike2.heading)
                 .splineToConstantHeading(toSpike2.position, toSpike2.heading)
                 //.strafeToLinearHeading(toSpike2.position, toSpike2.heading)
                 .build();
@@ -135,7 +134,7 @@ public class DepotMain15 extends LinearOpMode
         Action BackToLaunchSpot2 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
-        extras.intakeOff();
+
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
                         BackToLaunchSpot2,
@@ -149,7 +148,7 @@ public class DepotMain15 extends LinearOpMode
 
 
         Action Togate2 = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToSplineHeading(toSpike2.position, toSpike2.heading)
+                .splineToConstantHeading(toSpike2.position, toSpike2.heading)
                 .strafeToSplineHeading(nearGate2.position, nearGate2.heading)
                 .splineToLinearHeading(toGate2,toGate2.heading)
                 //.strafeToLinearHeading(nearGate.position, nearGate.heading)
@@ -158,8 +157,7 @@ public class DepotMain15 extends LinearOpMode
         extras.intakeForward();
         safeWaitSeconds(1);
         Action BackToLaunchSpot3 = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToSplineHeading(pickupSpike2.position, pickupSpike2.heading)
-                .splineToLinearHeading(toSpike2, toSpike2.heading)
+                .splineToLinearHeading(toSpike2,toSpike2.heading)
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
         extras.intakeOff();
@@ -177,11 +175,9 @@ public class DepotMain15 extends LinearOpMode
         ));
 
         Action Togate = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToSplineHeading(toSpike2.position, toSpike2.heading)
+                .splineToConstantHeading(toSpike2.position, toSpike2.heading)
                 .strafeToSplineHeading(nearGate2.position, nearGate2.heading)
                 .splineToLinearHeading(toGate2,toGate2.heading)
-
-
                 //.strafeToLinearHeading(nearGate.position, nearGate.heading)
                 .build();
         Actions.runBlocking(Togate);
@@ -189,8 +185,7 @@ public class DepotMain15 extends LinearOpMode
         safeWaitSeconds(1);
 
         Action BackToLaunchSpot5 = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToSplineHeading(pickupSpike2.position, pickupSpike2.heading)
-                .splineToLinearHeading(toSpike2, toSpike2.heading)
+                .splineToLinearHeading(toSpike2,toSpike2.heading)
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
         extras.intakeOff();
@@ -235,7 +230,7 @@ public class DepotMain15 extends LinearOpMode
                         new InstantAction(() -> extras.ballStopOn())),
                 extras.setLauncherAction(launcherSpeed)
         ));
-/*
+
         // pickup and launch spike 1
         extras.intakeForward();
         Action GoToSpike1 = drive.actionBuilder(drive.localizer.getPose())
@@ -259,7 +254,7 @@ public class DepotMain15 extends LinearOpMode
                         new InstantAction(() -> extras.ballStopOn())),
                 extras.setLauncherAction(launcherSpeed)
         ));
-*/
+
         extras.intakeOff();
 
         Action Park = drive.actionBuilder(drive.localizer.getPose())
@@ -277,7 +272,7 @@ public class DepotMain15 extends LinearOpMode
 
         // Save the ending location
         //extras.saveAutoStartRotation(drive.odo.getHeading()+ initialRotation - PI/2);
-        //ppYawFinal = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
+        ppYawFinal = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
 
         chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         savedAngle = chYawFinal - chYawInitial;
