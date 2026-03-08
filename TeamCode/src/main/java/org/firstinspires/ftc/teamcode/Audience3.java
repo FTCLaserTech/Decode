@@ -63,8 +63,6 @@ public class Audience3 extends LinearOpMode
             autoFun.autoInitFunction();
             safeWaitSeconds(0.01);
 
-            extras.setTurret(Math.toRadians(autoFun.redBlueT(-112)));
-
             ppYawInitial = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
             chYawInitial = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
@@ -77,6 +75,7 @@ public class Audience3 extends LinearOpMode
         }
 
         // AFTER START IS PRESSED
+        extras.setTurret(Math.toRadians(autoFun.redBlueT(-114)));
 
         Pose2d startPose = new Pose2d(-62, autoFun.redBlueT(-13.5), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);

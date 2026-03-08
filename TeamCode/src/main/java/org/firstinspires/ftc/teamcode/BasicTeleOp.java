@@ -286,11 +286,11 @@ public class BasicTeleOp extends LinearOpMode
 
                 if (goalDistance > 90)
                 {
-                    extras.launcherSup();
+                   extras.launcherSup();
                 }
                 else
                 {
-                    extras.launcherSdown();
+                   extras.launcherSdown();
                 }
 
                 if (targeting == Targeting.AUTO)
@@ -433,7 +433,7 @@ public class BasicTeleOp extends LinearOpMode
                 rotationMultiplier = 1.0;
             }
 
-            /*
+
             if(gamepad1.dpad_up)
             {
                 extras.launcherSup();
@@ -442,7 +442,6 @@ public class BasicTeleOp extends LinearOpMode
             {
                 extras.launcherSdown();
             }
-            */
 
             adjustedHeading = imuHeading - previousOrientation + PI/2;
 

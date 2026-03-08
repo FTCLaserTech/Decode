@@ -65,8 +65,6 @@ public class Audience extends LinearOpMode
             autoFun.autoInitFunction();
             safeWaitSeconds(0.01);
 
-            extras.setTurret(Math.toRadians(autoFun.redBlueT(-114)));
-
             ppYawInitial = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
             chYawInitial = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
@@ -80,11 +78,12 @@ public class Audience extends LinearOpMode
         }
 
         // AFTER START IS PRESSED
+        extras.setTurret(Math.toRadians(autoFun.redBlueT(-114)));
 
         Pose2d startPose = new Pose2d(-62, autoFun.redBlueT(-13.5), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
         Pose2d toInitialLaunchPosition = new Pose2d(-50,autoFun.redBlueT(-14),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d toSpike1 = new Pose2d(-34,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d toSpike1 = new Pose2d(-38,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupSpike1 = new Pose2d(-36,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d toCorner = new Pose2d(-62,autoFun.redBlueT(-58),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupCorner = new Pose2d(-62,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(initialRotation)));
@@ -132,7 +131,9 @@ public class Audience extends LinearOpMode
         extras.intakeForward();
         Action GoToSpike1 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToSplineHeading(toSpike1.position, toSpike1.heading)
-                .strafeToSplineHeading(pickupSpike1.position, pickupSpike1.heading)
+                .splineToLinearHeading(pickupSpike1,pickupSpike1.heading)
+                //.strafeToSplineHeading(toSpike1.position, toSpike1.heading)
+                //.strafeToSplineHeading(pickupSpike1.position, pickupSpike1.heading)
                 .build();
         Actions.runBlocking(GoToSpike1);
         Action PickupSpike1 = drive.actionBuilder(drive.localizer.getPose())
@@ -245,6 +246,30 @@ public class Audience extends LinearOpMode
                 extras.setLauncherAction(launcherSpeed)
             )
         );
+
+        extras.intakeForward();
+        Action GoToCorner4 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toCorner.position, toCorner.heading)
+                .strafeToSplineHeading(pickupCorner.position, pickupCorner.heading)
+                .build();
+        //Actions.runBlocking(GoToCorner);
+        Actions.runBlocking(new RaceAction(GoToCorner4,extras.checkIntakeAction()));
+
+        Action ToLaunchPosition6 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .build();
+        Actions.runBlocking(new ParallelAction(
+                new SequentialAction(
+                        new ParallelAction(ToLaunchPosition6,
+                                new SequentialAction(new SleepAction(0.4),
+                                        new InstantAction(() -> extras.intakeOff()))),
+                        new InstantAction(() -> extras.intakeForward()),
+                        new InstantAction(() -> extras.ballStopOff()),
+                        new SleepAction(0.9),
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.ballStopOn())),
+                extras.setLauncherAction(launcherSpeed)
+        ));
 
         // Park
         Action toParkPosition1 = drive.actionBuilder(drive.localizer.getPose())
