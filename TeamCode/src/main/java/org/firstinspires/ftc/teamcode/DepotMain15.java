@@ -73,7 +73,7 @@ public class DepotMain15 extends LinearOpMode
         }
 
         // AFTER START IS PRESSED
-        extras.setTurret(Math.toRadians(autoFun.redBlueT(-122)));
+        extras.setTurret(Math.toRadians(autoFun.redBlueT(-125)));
 
         Pose2d startPose = new Pose2d(61, autoFun.redBlueT(-37), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
@@ -82,8 +82,8 @@ public class DepotMain15 extends LinearOpMode
         Pose2d pickupSpike3 = new Pose2d(11,autoFun.redBlueT(-45),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
         Pose2d nearGate = new Pose2d(0.5,autoFun.redBlueT(-35),Math.toRadians(autoFun.redBlueT(initialRotation))); //-31
         Pose2d toGate = new Pose2d(0.5,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d nearGate2 = new Pose2d(-11,autoFun.redBlueT(-57),Math.toRadians(autoFun.redBlueT(305))); //-31
-        Pose2d toGate2 = new Pose2d(-11,autoFun.redBlueT(-58),Math.toRadians(autoFun.redBlueT(310)));
+        Pose2d nearGate2 = new Pose2d(-12,autoFun.redBlueT(-57),Math.toRadians(autoFun.redBlueT(305))); //-31
+        Pose2d toGate2 = new Pose2d(-12,autoFun.redBlueT(-58),Math.toRadians(autoFun.redBlueT(311)));
         Pose2d toSpike2 = new Pose2d(-11,autoFun.redBlueT(-27),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupSpike2 = new Pose2d(-11,autoFun.redBlueT(-48),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
         Pose2d toSpike1 = new Pose2d(-35,autoFun.redBlueT(-30),Math.toRadians(autoFun.redBlueT(initialRotation)));
@@ -125,6 +125,7 @@ public class DepotMain15 extends LinearOpMode
         // pickup and launch spike 2
         //
         Action GoToSpike2 = drive.actionBuilder(drive.localizer.getPose())
+                .setTangent(Math.toRadians(180))
                 .splineToConstantHeading(toSpike2.position, toSpike2.heading)
                 .splineToLinearHeading(pickupSpike2,pickupSpike2.heading)
                 .splineToConstantHeading(toSpike2.position, toSpike2.heading)
