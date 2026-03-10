@@ -121,7 +121,7 @@ public class ExtraOpModeFunctionsTest
     {
         //start motor
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        turret.setPower(0.25);
+        turret.setPower(0.3);
         while (!turretHomeSensor.isPressed())
         {
             localLop.telemetry.addLine("Homing...");
