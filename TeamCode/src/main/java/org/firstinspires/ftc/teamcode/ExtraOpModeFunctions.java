@@ -88,7 +88,7 @@ public class ExtraOpModeFunctions
 
     public ControlSystem turretController;
     //public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.003, 0.01, 0.0001);
-    public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.0015, 0.05, 0.00001);
+    public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.002, 0.05, 0.0002);
  //   public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.0035, 0.11, 0.0003);
     //public static BasicFeedforwardParameters turretFeedforwardParameters =
     //        new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
@@ -208,7 +208,7 @@ public class ExtraOpModeFunctions
     {
         //start motor
         turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        turretMotor.setPower(0.3);
+        turretMotor.setPower(0.2);
         while (!turretHomeSensor.isPressed())
         {
             localLop.telemetry.addLine("Homing...");
@@ -379,11 +379,11 @@ public class ExtraOpModeFunctions
     public double turretFeedforward(double currentAngleRad, double targetAngleRad)
     {
         double angleMin = Math.toRadians(-110.0);
-        double powerMinCCW = -0.02;
-        double powerMinCW = -0.22;
+        double powerMinCCW = -0.1;
+        double powerMinCW = -0.1;
         double angleMax = Math.toRadians(110.0);
-        double powerMaxCCW = 0.22;
-        double powerMaxCW = 0.02;
+        double powerMaxCCW = 0.15;
+        double powerMaxCW = 0.15;
 
         double slopeCCW = (powerMaxCCW - powerMinCCW) / (angleMax - angleMin);
         double slopeCW = (powerMaxCW - powerMinCW) / (angleMax - angleMin);

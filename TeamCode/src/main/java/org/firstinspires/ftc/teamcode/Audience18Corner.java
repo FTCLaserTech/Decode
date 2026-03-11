@@ -23,7 +23,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Autonomous(group = "a")
 
-public class Audience extends LinearOpMode
+public class Audience18Corner extends LinearOpMode
 {
     @Override
 
@@ -123,10 +123,10 @@ public class Audience extends LinearOpMode
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.ballStopOn()),
                         new InstantAction(() -> extras.intakeOff())
-                        ),
+                ),
                 extras.setLauncherAction(launcherSpeed)
         ));
-
+/*
         // pickup and launch spike 1
         extras.intakeForward();
         Action GoToSpike1 = drive.actionBuilder(drive.localizer.getPose())
@@ -155,7 +155,7 @@ public class Audience extends LinearOpMode
                         new InstantAction(() -> extras.ballStopOn())),
                 extras.setLauncherAction(launcherSpeed)
         ));
-
+*/
         // pickup and launch Corner 1
         extras.intakeForward();
         Action GoToCorner = drive.actionBuilder(drive.localizer.getPose())
@@ -172,7 +172,7 @@ public class Audience extends LinearOpMode
                 new SequentialAction(
                         new ParallelAction(ToLaunchPosition3,
                                 new SequentialAction(new SleepAction(0.4),
-                                new InstantAction(() -> extras.intakeOff()))),
+                                        new InstantAction(() -> extras.intakeOff()))),
                         new InstantAction(() -> extras.intakeForward()),
                         new InstantAction(() -> extras.ballStopOff()),
                         new SleepAction(0.9),
@@ -223,29 +223,29 @@ public class Audience extends LinearOpMode
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
         Actions.runBlocking
-        (
-            new ParallelAction
-            (
-                new SequentialAction
                 (
-                    new ParallelAction
-                    (
-                            new RaceAction(ToLaunchPosition5,extras.storePositionAction(drive, chYawInitial)),
-                            new SequentialAction
-                            (
-                                    new SleepAction(0.4),
-                                    new InstantAction(() -> extras.intakeOff())
-                            )
-                    ),
-                    new InstantAction(() -> extras.intakeForward()),
-                    new InstantAction(() -> extras.ballStopOff()),
-                    new SleepAction(0.9),
-                    new InstantAction(() -> extras.stopLauncher()),
-                    new InstantAction(() -> extras.ballStopOn())
-                ),
-                extras.setLauncherAction(launcherSpeed)
-            )
-        );
+                        new ParallelAction
+                                (
+                                        new SequentialAction
+                                                (
+                                                        new ParallelAction
+                                                                (
+                                                                        new RaceAction(ToLaunchPosition5,extras.storePositionAction(drive, chYawInitial)),
+                                                                        new SequentialAction
+                                                                                (
+                                                                                        new SleepAction(0.4),
+                                                                                        new InstantAction(() -> extras.intakeOff())
+                                                                                )
+                                                                ),
+                                                        new InstantAction(() -> extras.intakeForward()),
+                                                        new InstantAction(() -> extras.ballStopOff()),
+                                                        new SleepAction(0.9),
+                                                        new InstantAction(() -> extras.stopLauncher()),
+                                                        new InstantAction(() -> extras.ballStopOn())
+                                                ),
+                                        extras.setLauncherAction(launcherSpeed)
+                                )
+                );
 
         extras.intakeForward();
         Action GoToCorner4 = drive.actionBuilder(drive.localizer.getPose())
@@ -271,21 +271,45 @@ public class Audience extends LinearOpMode
                 extras.setLauncherAction(launcherSpeed)
         ));
 
+        extras.intakeForward();
+        Action GoToCorner5 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toCorner.position, toCorner.heading)
+                .strafeToSplineHeading(pickupCorner.position, pickupCorner.heading)
+                .build();
+        //Actions.runBlocking(GoToCorner);
+        Actions.runBlocking(new RaceAction(GoToCorner5,extras.checkIntakeAction()));
+
+        Action ToLaunchPosition7 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .build();
+        Actions.runBlocking(new ParallelAction(
+                new SequentialAction(
+                        new ParallelAction(ToLaunchPosition7,
+                                new SequentialAction(new SleepAction(0.4),
+                                        new InstantAction(() -> extras.intakeOff()))),
+                        new InstantAction(() -> extras.intakeForward()),
+                        new InstantAction(() -> extras.ballStopOff()),
+                        new SleepAction(0.9),
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.ballStopOn())),
+                extras.setLauncherAction(launcherSpeed)
+        ));
+
         // Park
         Action toParkPosition1 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
                 .build();
         Actions.runBlocking
-        (
-            new ParallelAction
-            (
-                new RaceAction(toParkPosition1,extras.storePositionAction(drive, chYawInitial)),
-                new InstantAction(() -> extras.stopLauncher()),
-                new InstantAction(() -> extras.ballStopOn()),
-                new InstantAction(() -> extras.intakeOff()),
-                extras.setLauncherAction(0)
-            )
-        );
+                (
+                        new ParallelAction
+                                (
+                                        new RaceAction(toParkPosition1,extras.storePositionAction(drive, chYawInitial)),
+                                        new InstantAction(() -> extras.stopLauncher()),
+                                        new InstantAction(() -> extras.ballStopOn()),
+                                        new InstantAction(() -> extras.intakeOff()),
+                                        extras.setLauncherAction(0)
+                                )
+                );
 
         // turn the intake and shooter off
 
