@@ -75,7 +75,7 @@ public class Audience3 extends LinearOpMode
         }
 
         // AFTER START IS PRESSED
-        extras.setTurret(Math.toRadians(autoFun.redBlueT(-108)));
+        extras.setTurret(Math.toRadians(autoFun.redBlueT(-113)));
 
         Pose2d startPose = new Pose2d(-62, autoFun.redBlueT(-13.5), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);

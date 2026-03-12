@@ -78,7 +78,7 @@ public class Audience18OffCorner extends LinearOpMode
         }
 
         // AFTER START IS PRESSED
-        extras.setTurret(Math.toRadians(autoFun.redBlueT(-110)));
+        extras.setTurret(Math.toRadians(autoFun.redBlueT(-113)));
 
         Pose2d startPose = new Pose2d(-62, autoFun.redBlueT(-13.5), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
@@ -87,8 +87,8 @@ public class Audience18OffCorner extends LinearOpMode
         Pose2d pickupSpike1 = new Pose2d(-36,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d toCorner = new Pose2d(-62,autoFun.redBlueT(-58),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupCorner = new Pose2d(-62,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d tooffCorner = new Pose2d(-40,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d pickupoffCorner = new Pose2d(-40,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d tooffCorner = new Pose2d(-38,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d pickupoffCorner = new Pose2d(-38,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d toCorner2 = new Pose2d(-62,autoFun.redBlueT(-63),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d toSpike2 = new Pose2d(-42,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupSpike2 = new Pose2d(-42,autoFun.redBlueT(-62),Math.toRadians(autoFun.redBlueT(initialRotation)));

@@ -78,7 +78,7 @@ public class Audience18Corner extends LinearOpMode
         }
 
         // AFTER START IS PRESSED
-        extras.setTurret(Math.toRadians(autoFun.redBlueT(-110)));
+        extras.setTurret(Math.toRadians(autoFun.redBlueT(-112)));
 
         Pose2d startPose = new Pose2d(-62, autoFun.redBlueT(-13.5), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);

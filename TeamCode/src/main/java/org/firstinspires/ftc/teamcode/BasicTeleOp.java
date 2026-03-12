@@ -569,7 +569,7 @@ public class BasicTeleOp extends LinearOpMode
                 sleep(500);
 
                 //Use this for Pinpoint IMU Driving
-                previousOrientation = drive.localizer.getPose().heading.toDouble() +PI/2;
+                previousOrientation = drive.localizer.getPose().heading.toDouble() + (PI/2);
                 //Use this for control hub IMU Driving
                 //previousOrientation = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
