@@ -73,7 +73,7 @@ public class Depot18Eat extends LinearOpMode
         }
 
         // AFTER START IS PRESSED
-        extras.setTurret(Math.toRadians(autoFun.redBlueT(-125)));
+        extras.setTurret(Math.toRadians(autoFun.redBlueT(-120)));
 
         Pose2d forwardRotation = new Pose2d(0,0, Math.toRadians(autoFun.redBlueT(270)));
         Pose2d backwardRotation = new Pose2d(0,0, Math.toRadians(autoFun.redBlueT(90)));

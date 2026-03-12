@@ -11,6 +11,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -21,6 +22,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
+import java.util.List;
 import java.util.Locale;
 
 //imports from the Mecanum website
@@ -107,7 +109,10 @@ public class BasicTeleOp extends LinearOpMode
         boolean targetSearchingMode = false;
         long loopCounter = 0;
 
-        telemetry.setMsTransmissionInterval(50);
+        telemetry.addData("dashboardinterval", extras.dashboard.getTelemetryTransmissionInterval());
+        telemetry.addData("dashboardTinterval", extras.dashboardTelemetry.getMsTransmissionInterval());
+
+        telemetry.setMsTransmissionInterval(500);
         telemetry.addData("Team Color: ", extras.teamColor);
 
         Pose2d storedPose = PoseStorage.currentPose;
@@ -130,9 +135,15 @@ public class BasicTeleOp extends LinearOpMode
         telemetry.addLine("Init Complete");
         telemetry.update();
 
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+        for (LynxModule module : allHubs) {
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
+
         waitForStart();
 
         double lastLauncherHeading = drive.localizer.getPose().heading.toDouble() - Math.PI;
+        double driveHeading = drive.localizer.getPose().heading.toDouble();
 
         Pose2d startPose = new Pose2d(0,0,Math.toRadians(270));
         //Pose2d startPose = extras.readPosition();
@@ -140,18 +151,27 @@ public class BasicTeleOp extends LinearOpMode
 
         extras.vision.limelight.start();
 
+        double runtimeStart = 0.0;
+        double runtimeMid = 0.0;
+        double runtimeEnd = 0.0;
+
         while (!isStopRequested())
         {
             lastLoopTime = currentLoopTime;
             currentLoopTime = getRuntime();
 
-            ppYaw = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
+            runtimeStart = currentLoopTime;
+            //telemetry.addData("Elapsed time: ", runtimeStart);
+            extras.dashboardTelemetry.addData("runtimeEnd", runtimeStart);
+            extras.dashboardTelemetry.addData("runtimeS-E", runtimeStart-runtimeEnd);
+
+            //ppYaw = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
             imuHeading = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
-            telemetry.addData("launcher1: ", extras.launcher1.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("launcher2: ", extras.launcher2.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("intake: ", extras.intake.getCurrent(CurrentUnit.AMPS));
-            telemetry.addData("turret: ", extras.turretMotor.getCurrent(CurrentUnit.AMPS));
+            //telemetry.addData("launcher1: ", extras.launcher1.getCurrent(CurrentUnit.AMPS));
+            //telemetry.addData("launcher2: ", extras.launcher2.getCurrent(CurrentUnit.AMPS));
+            //telemetry.addData("intake: ", extras.intake.getCurrent(CurrentUnit.AMPS));
+            //telemetry.addData("turret: ", extras.turretMotor.getCurrent(CurrentUnit.AMPS));
 
             // change team color if needed
             if (gamepad2.xWasPressed())
@@ -192,11 +212,13 @@ public class BasicTeleOp extends LinearOpMode
             // start of aiming
 
             // Look for the Depot
+            /*
             depotFound = extras.lookForDeopt();
             if (depotFound)
             {
                 telemetry.addData("limelightTargetRange: ", extras.getAprilTagPose().range);
             }
+            */
 
             // false = odometry
             // true = limelight
@@ -224,12 +246,13 @@ public class BasicTeleOp extends LinearOpMode
             }
             else // odometry
             {
-                double drivePositionX = drive.localizer.getPose().position.x;
-                double drivePositionY = drive.localizer.getPose().position.y;
+                Pose2d drivePosition = drive.localizer.getPose();
+                double drivePositionX = drivePosition.position.x;
+                double drivePositionY = drivePosition.position.y;
                 double futureDrivePositionX = drivePositionX + ((drivePositionX-lastDrivePositionX)*positionScaler);
                 double futureDrivePositionY = drivePositionY + ((drivePositionY-lastDrivePositionY)*positionScaler);
 
-                double driveHeading = drive.localizer.getPose().heading.toDouble();
+                driveHeading = drivePosition.heading.toDouble();
                 // or use control hub IMU if pinpoint IMU is drifting?
 
                 // pinpoint
@@ -269,18 +292,19 @@ public class BasicTeleOp extends LinearOpMode
                     goalHeading = atan2(GOAL_Y_BLUE - futureDrivePositionY, GOAL_X_BLUE - futureDrivePositionX);
                 }
 
-                extras.dashboardTelemetry.addData("Drive heading", driveHeading);
-                extras.dashboardTelemetry.addData("Launcher heading", launcherHeading);
-                extras.dashboardTelemetry.addData("Last launcher heading", lastLauncherHeading);
-                extras.dashboardTelemetry.addData("Future launcher heading", futureLauncherHeading);
-                extras.dashboardTelemetry.addData("Goal heading", goalHeading);
+                //extras.dashboardTelemetry.addData("Drive heading", driveHeading);
+                //extras.dashboardTelemetry.addData("Launcher heading", launcherHeading);
+                //extras.dashboardTelemetry.addData("Last launcher heading", lastLauncherHeading);
+                //extras.dashboardTelemetry.addData("Future launcher heading", futureLauncherHeading);
+                //extras.dashboardTelemetry.addData("Goal heading", goalHeading);
 
                 lastDrivePositionX = drivePositionX;
                 lastDrivePositionY = drivePositionY;
 
-                telemetry.addData("RR drive x", drivePositionX);
-                telemetry.addData("RR drive y", drivePositionY);
-                telemetry.addData("RR drive heading", driveHeading );
+                //telemetry.addData("RR drive x", drivePositionX);
+                //telemetry.addData("RR drive y", drivePositionY);
+                telemetry.addData("RR drive heading", Math.toDegrees(driveHeading) );
+                telemetry.addData("RR launcher heading", Math.toDegrees(launcherHeading) );
                 telemetry.addData("goal heading", goalHeading );
                 telemetry.addData("goal distance", goalDistance );
 
@@ -328,8 +352,8 @@ public class BasicTeleOp extends LinearOpMode
                     }
                 }
 
-                telemetry.addData("Turret angle desired", Math.toDegrees(turretAngle));
-                telemetry.addData("Turret angle frozen", Math.toDegrees(frozenTurretAngle));
+                //telemetry.addData("Turret angle desired", Math.toDegrees(turretAngle));
+                //telemetry.addData("Turret angle frozen", Math.toDegrees(frozenTurretAngle));
 
                 if(freezeRange)
                 {
@@ -360,6 +384,10 @@ public class BasicTeleOp extends LinearOpMode
                 launcherSpeed = 0.0;
             }
 
+            runtimeMid = getRuntime();
+            //extras.dashboardTelemetry.addData("runtimeEnd", runtimeStart);
+            extras.dashboardTelemetry.addData("runtimeM-S", runtimeMid-runtimeStart);
+
             if(!launcherOn)
             {
                 extras.setLauncher(0.0);
@@ -374,19 +402,20 @@ public class BasicTeleOp extends LinearOpMode
             }
 
             // get and print Megatag
-            Pose2d limelightrobotposition = extras.vision.getRobotFieldPositionMT();
-            String data = String.format(Locale.US, "MT1 X: %.2f, Y: %.2f, Y: %.1f",
-                    limelightrobotposition.position.x, limelightrobotposition.position.y, Math.toDegrees(limelightrobotposition.heading.toDouble()));
-            telemetry.addLine(data);
-            telemetry.addData("limelightAngle", Math.toDegrees(limelightrobotposition.heading.toDouble()));
-            telemetry.addData("imuAngle", Math.toDegrees(imuHeading));
-            telemetry.addData("turretAngle", Math.toDegrees(turretAngle));
+            //Pose2d limelightrobotposition = extras.vision.getRobotFieldPositionMT();
+            //String data = String.format(Locale.US, "MT1 X: %.2f, Y: %.2f, Y: %.1f", limelightrobotposition.position.x, limelightrobotposition.position.y, Math.toDegrees(limelightrobotposition.heading.toDouble()));
+            //telemetry.addLine(data);
+            //telemetry.addData("limelightAngle", Math.toDegrees(limelightrobotposition.heading.toDouble()));
+            //telemetry.addData("imuAngle", Math.toDegrees(imuHeading));
+            //telemetry.addData("turretAngle", Math.toDegrees(turretAngle));
 
+            /*
             if (gamepad1.y)
             {
                 // add math on angle with turret angle and IMU
                 //drive.localizer.setPose(limelightrobotposition);
             }
+            */
 
             // get and print Megatag2
             /*
@@ -433,7 +462,6 @@ public class BasicTeleOp extends LinearOpMode
                 rotationMultiplier = 1.0;
             }
 
-
             if(gamepad1.dpad_up)
             {
                 extras.launcherSup();
@@ -443,7 +471,11 @@ public class BasicTeleOp extends LinearOpMode
                 extras.launcherSdown();
             }
 
-            adjustedHeading = imuHeading - previousOrientation + PI/2;
+            //Use this for Pinpoint IMU Driving
+            adjustedHeading = driveHeading - previousOrientation + PI;
+
+            //Use this for contorl hub IMU Driving
+            //adjustedHeading = imuHeading - previousOrientation + PI/2;
 
             stickSideways = gamepad1.left_stick_x * speedMultiplier;
             stickForward = -gamepad1.left_stick_y * speedMultiplier;
@@ -535,7 +567,12 @@ public class BasicTeleOp extends LinearOpMode
                 //drive.lazyImu.get().initialize(imuParameters);
                 drive.lazyImu.get().resetYaw();
                 sleep(500);
-                previousOrientation = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+                //Use this for Pinpoint IMU Driving
+                previousOrientation = drive.localizer.getPose().heading.toDouble() +PI/2;
+                //Use this for control hub IMU Driving
+                //previousOrientation = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
                 imuYawInitial = previousOrientation;
                 //drive.odo.resetPosAndIMU();
                 //previousOrientation = drive.odo.getHeading()+ PI/2;
@@ -546,12 +583,12 @@ public class BasicTeleOp extends LinearOpMode
             //telemetry.addData("pp x", ppLocalizer.driver.getPosX(DistanceUnit.INCH));
             //telemetry.addData("pp y", ppLocalizer.driver.getPosY(DistanceUnit.INCH));
             //telemetry.addData("pp heading", ppLocalizer.driver.getHeading(AngleUnit.DEGREES));
-            telemetry.addData("IMU now     : ", Math.toDegrees(imuHeading));
-            telemetry.addData("IMU initial : ", Math.toDegrees(imuYawInitial));
-            telemetry.addData("IMU delta   : ", Math.toDegrees(imuHeading-imuYawInitial));
-            telemetry.addData("PP now      : ", Math.toDegrees(ppYaw));
-            telemetry.addData("PP initial  : ", Math.toDegrees(ppYawInitial));
-            telemetry.addData("PP delta    : ", Math.toDegrees(ppYaw-ppYawInitial));
+            //telemetry.addData("IMU now     : ", Math.toDegrees(imuHeading));
+            //telemetry.addData("IMU initial : ", Math.toDegrees(imuYawInitial));
+            //telemetry.addData("IMU delta   : ", Math.toDegrees(imuHeading-imuYawInitial));
+            //telemetry.addData("PP now      : ", Math.toDegrees(ppYaw));
+            //telemetry.addData("PP initial  : ", Math.toDegrees(ppYawInitial));
+            //telemetry.addData("PP delta    : ", Math.toDegrees(ppYaw-ppYawInitial));
             telemetry.addData("IMU Heading: ", Math.toDegrees(imuHeading));
             telemetry.addData("adjustedHeading: ", Math.toDegrees(adjustedHeading));
             telemetry.addData("previousOrientation: ", Math.toDegrees(previousOrientation));
@@ -564,7 +601,10 @@ public class BasicTeleOp extends LinearOpMode
 
             //telemetry.addLine();
 
-            telemetry.addData("Elapsed time: ", getRuntime());
+            runtimeEnd = getRuntime();
+            //telemetry.addData("Elapsed time: ", runtimeEnd);
+            extras.dashboardTelemetry.addData("runtimeEnd", runtimeEnd);
+            extras.dashboardTelemetry.addData("runtimeE-S", runtimeEnd-runtimeStart);
 
             drive.updatePoseEstimate();
             //extras.lights.lightsUpdate((long)(getRuntime()*1000.0));

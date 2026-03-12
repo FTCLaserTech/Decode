@@ -75,7 +75,7 @@ public class Audience3 extends LinearOpMode
         }
 
         // AFTER START IS PRESSED
-        extras.setTurret(Math.toRadians(autoFun.redBlueT(-114)));
+        extras.setTurret(Math.toRadians(autoFun.redBlueT(-108)));
 
         Pose2d startPose = new Pose2d(-62, autoFun.redBlueT(-13.5), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
@@ -146,8 +146,8 @@ public class Audience3 extends LinearOpMode
         chYawFinal = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         savedAngle = chYawFinal - chYawInitial;
         //extras.saveAutoStartRotation(savedAngle);
-        //PoseStorage.currentAngle = savedAngle;
-        //PoseStorage.currentPose = drive.localizer.getPose();
+        PoseStorage.currentAngle = savedAngle;
+        PoseStorage.currentPose = drive.localizer.getPose();
 
         safeWaitSeconds(1);
     }

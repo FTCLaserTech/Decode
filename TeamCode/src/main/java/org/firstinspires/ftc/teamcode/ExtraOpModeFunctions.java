@@ -93,7 +93,7 @@ public class ExtraOpModeFunctions
     //public static BasicFeedforwardParameters turretFeedforwardParameters =
     //        new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
-    public static int turretHomeOffset = -160;
+    public static int turretHomeOffset = -168;
     //public static int turretHomeOffset = -113;
     private PIDController turretController2;
 
@@ -126,6 +126,8 @@ public class ExtraOpModeFunctions
         hm = hardwareMap;
         localLop = linearOpMode;
         vision = new VisionFunctions(hardwareMap, localLop);
+
+        dashboard.setTelemetryTransmissionInterval(500);
 
         turretCR = hardwareMap.get(CRServo.class, "turretCR");
         turretCR.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -208,7 +210,7 @@ public class ExtraOpModeFunctions
     {
         //start motor
         turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        turretMotor.setPower(0.2);
+        turretMotor.setPower(0.1);
         while (!turretHomeSensor.isPressed())
         {
             localLop.telemetry.addLine("Homing...");
@@ -345,8 +347,8 @@ public class ExtraOpModeFunctions
                 double currentTurretEncoder = turretMotor.getCurrentPosition();
                 double PIDpower = turretController2.calculate(currentTurretEncoder);
                 double FFpower = turretFeedforward(turretAngle, turretEncoderToAngle(currentTurretEncoder));
-                localLop.telemetry.addData("Turret PID power: ", PIDpower);
-                localLop.telemetry.addData("Turret FF power: ", FFpower);
+                //localLop.telemetry.addData("Turret PID power: ", PIDpower);
+                //localLop.telemetry.addData("Turret FF power: ", FFpower);
 
                 //power = PIDpower;
                 power = PIDpower + FFpower;
@@ -363,13 +365,13 @@ public class ExtraOpModeFunctions
                 break;
         }
 
-        localLop.telemetry.addData("Turret angle limited: ", turretAngle);
+        //localLop.telemetry.addData("Turret angle limited: ", turretAngle);
         double cp = turretMotor.getCurrentPosition();
-        localLop.telemetry.addData("Turret position target: ", turretPosition);
-        localLop.telemetry.addData("Turret position actual: ", cp);
+        //localLop.telemetry.addData("Turret position target: ", turretPosition);
+        //localLop.telemetry.addData("Turret position actual: ", cp);
         localLop.telemetry.addData("Turret target - actual: ", turretPosition - cp);
         localLop.telemetry.addData("turret Power", turretMotor.getPower());
-        localLop.telemetry.addData("turret Current", turretMotor.getCurrent(CurrentUnit.AMPS));
+        //localLop.telemetry.addData("turret Current", turretMotor.getCurrent(CurrentUnit.AMPS));
 
         dashboardTelemetry.addData("Turret power set", turretMotor.getPower());
         dashboardTelemetry.addData("Turret target", turretPosition);
