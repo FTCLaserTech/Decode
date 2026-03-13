@@ -106,11 +106,11 @@ public class Audience3 extends LinearOpMode
                 new SequentialAction(
                         //ToInitialPosition,
                         new SleepAction(1.0),
-                        new InstantAction(() -> extras.intakeForward()),
-                        new InstantAction(() -> extras.ballStopOff()),
+                        new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
+                        new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
                         new SleepAction(1.0),
                         new InstantAction(() -> extras.stopLauncher()),
-                        new InstantAction(() -> extras.ballStopOn()))
+                        new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON)))
         ));
 
         extras.setTurret(0.0);
@@ -127,8 +127,8 @@ public class Audience3 extends LinearOpMode
                 //extras.setTurretAction(Math.toRadians(0.0)),
                 new RaceAction(ToPark,extras.storePositionAction(drive, chYawInitial)),
                 new InstantAction(() -> extras.stopLauncher()),
-                new InstantAction(() -> extras.ballStopOn()),
-                new InstantAction(() -> extras.intakeOff()),
+                new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON)),
+                new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF)),
                 extras.setLauncherAction(launcherSpeed)
             )
         );

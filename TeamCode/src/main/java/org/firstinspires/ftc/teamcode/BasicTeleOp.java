@@ -90,9 +90,6 @@ public class BasicTeleOp extends LinearOpMode
         boolean launcherOn = true;
         boolean depotFound = false;
 
-        //double previousOrientation = extras.readAutoStartRotation();
-        double previousOrientation = PoseStorage.currentAngle;
-
         extras.teamColor = extras.readTeamColor();
         if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
         {
@@ -104,6 +101,13 @@ public class BasicTeleOp extends LinearOpMode
             extras.lights.setLightColor(ExtraOpModeFunctions.Lights.Light_Blue);
             extras.pattern = RevBlinkinLedDriver.BlinkinPattern.BLUE;
             extras.blinkinLedDriver.setPattern(extras.pattern);
+        }
+
+        //double previousOrientation = extras.readAutoStartRotation();
+        double previousOrientation = PoseStorage.currentAngle;
+        if (extras.teamColor == ExtraOpModeFunctions.TeamColor.BLUE)
+        {
+            previousOrientation += PI;
         }
 
         boolean targetSearchingMode = false;
@@ -137,7 +141,7 @@ public class BasicTeleOp extends LinearOpMode
 
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule module : allHubs) {
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
         }
 
         waitForStart();
@@ -157,6 +161,11 @@ public class BasicTeleOp extends LinearOpMode
 
         while (!isStopRequested())
         {
+            for (LynxModule hub : allHubs)
+            {
+                hub.clearBulkCache();
+            }
+
             lastLoopTime = currentLoopTime;
             currentLoopTime = getRuntime();
 
@@ -303,10 +312,10 @@ public class BasicTeleOp extends LinearOpMode
 
                 //telemetry.addData("RR drive x", drivePositionX);
                 //telemetry.addData("RR drive y", drivePositionY);
-                telemetry.addData("RR drive heading", Math.toDegrees(driveHeading) );
-                telemetry.addData("RR launcher heading", Math.toDegrees(launcherHeading) );
-                telemetry.addData("goal heading", goalHeading );
-                telemetry.addData("goal distance", goalDistance );
+                //telemetry.addData("RR drive heading", Math.toDegrees(driveHeading) );
+                //telemetry.addData("RR launcher heading", Math.toDegrees(launcherHeading) );
+                //telemetry.addData("goal heading", goalHeading );
+                //telemetry.addData("goal distance", goalDistance );
 
                 if (goalDistance > 90)
                 {
@@ -432,22 +441,22 @@ public class BasicTeleOp extends LinearOpMode
             // intake and banana control
             if (gamepad1.right_bumper)
             {
-                extras.ballStopOff();
-                extras.intakeReverse();
+                extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF);
+                extras.setIntake(ExtraOpModeFunctions.IntakeStates.REVERSE);
             }
             else if (gamepad1.right_trigger > 0)
             {
-                extras.intakeForward();
-                extras.ballStopOff();
+                extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
+                extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF);
             }
             else if (gamepad1.left_trigger > 0)
             {
-                extras.intakeForward();
+                extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
             }
             else
             {
-                extras.intakeOff();
-                extras.ballStopOn();
+                extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF);
+                extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON);
             }
 
             // DRIVE CONTROL STARTS HERE
@@ -603,7 +612,7 @@ public class BasicTeleOp extends LinearOpMode
 
             runtimeEnd = getRuntime();
             //telemetry.addData("Elapsed time: ", runtimeEnd);
-            extras.dashboardTelemetry.addData("runtimeEnd", runtimeEnd);
+            //extras.dashboardTelemetry.addData("runtimeEnd", runtimeEnd);
             extras.dashboardTelemetry.addData("runtimeE-S", runtimeEnd-runtimeStart);
 
             drive.updatePoseEstimate();

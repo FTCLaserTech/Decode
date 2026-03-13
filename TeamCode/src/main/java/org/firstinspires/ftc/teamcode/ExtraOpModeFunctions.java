@@ -93,7 +93,7 @@ public class ExtraOpModeFunctions
     //public static BasicFeedforwardParameters turretFeedforwardParameters =
     //        new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
-    public static int turretHomeOffset = -168;
+    public static int turretHomeOffset = -162;
     //public static int turretHomeOffset = -113;
     private PIDController turretController2;
 
@@ -210,7 +210,7 @@ public class ExtraOpModeFunctions
     {
         //start motor
         turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        turretMotor.setPower(0.1);
+        turretMotor.setPower(0.14);
         while (!turretHomeSensor.isPressed())
         {
             localLop.telemetry.addLine("Homing...");
@@ -224,6 +224,43 @@ public class ExtraOpModeFunctions
         setTurretMode(turretMode);
         //turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
+
+    public enum IntakeStates {NA, OFF, FORWARD, REVERSE};
+    IntakeStates currentIntakeState = IntakeStates.NA;
+    public void setIntake(IntakeStates intakeState)
+    {
+        switch (intakeState)
+        {
+            case OFF:
+                if(intakeState != currentIntakeState)
+                {
+                    intake.setPower(0.0);
+                    currentIntakeState = intakeState;
+                }
+                break;
+
+            case FORWARD:
+                if(intakeState != currentIntakeState)
+                {
+                    intake.setPower(1.0);
+                    currentIntakeState = intakeState;
+                }
+                break;
+
+            case REVERSE:
+                if(intakeState != currentIntakeState)
+                {
+                    intake.setPower(-1.0);
+                    currentIntakeState = intakeState;
+                }
+                break;
+
+            case NA:
+                break;
+
+        }
+    }
+
 
     public void intakeForward()
     {
@@ -240,6 +277,33 @@ public class ExtraOpModeFunctions
         intake.setPower(-1.0);
     }
 
+
+    public enum BallStopStates {NA, OFF, ON};
+    BallStopStates currentBallStopState = BallStopStates.NA;
+    public void setBallStop (BallStopStates ballStopState)
+    {
+        switch (ballStopState)
+        {
+            case OFF:
+                if(ballStopState != currentBallStopState)
+                {
+                    ballStop.setPosition(0.3);
+                    currentBallStopState = ballStopState;
+                }
+                break;
+            case ON:
+                if(ballStopState != currentBallStopState)
+                {
+                    ballStop.setPosition(1.0);
+                    currentBallStopState = ballStopState;
+                }
+                break;
+            case NA:
+                break;
+        }
+    }
+
+
     public void ballStopOn()
     {
         ballStop.setPosition(1.0);
@@ -249,6 +313,8 @@ public class ExtraOpModeFunctions
     {
         ballStop.setPosition(0.3);
     }
+
+
     public void launcherSup()
     {
         launcherS.setPosition(launcherSupPosition);
@@ -278,7 +344,7 @@ public class ExtraOpModeFunctions
         //localLop.telemetry.addData("Launcher Speed OK? ", isLauncherSpeedGood(launcherSpeed));
 
         dashboardTelemetry.addData("Launcher velocity target", launcherSpeed);
-        dashboardTelemetry.addData("Launcher power set", power);
+        //dashboardTelemetry.addData("Launcher power set", power);
         dashboardTelemetry.addData("Launcher1 velocity actual", launcher1.getVelocity());
         dashboardTelemetry.addData("Launcher2 velocity actual", launcher2.getVelocity());
         //dashboardTelemetry.update();
@@ -320,13 +386,13 @@ public class ExtraOpModeFunctions
 
         turretPosition = (turretAngle / MAX_TURRETANGLE * MAX_TURRETENCODER) + turretHomeOffset;
         double power = 1.0;
+        double lastPower = 0.0;
         double powerLimit = 1.0;
 
         switch(turretMode)
         {
             case ControlHub:
                 turretMotor.setTargetPosition((int) turretPosition);
-                turretMotor.setPower(power);
                 break;
             case NextFTC:
                 turretController.setGoal(new KineticState(turretPosition));
@@ -339,7 +405,6 @@ public class ExtraOpModeFunctions
                 {
                     power = -powerLimit;
                 }
-                turretMotor.setPower(power);
                 break;
             case FTCLib:
                 turretController2.setPID(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
@@ -361,8 +426,13 @@ public class ExtraOpModeFunctions
                 {
                     power = -powerLimit;
                 }
-                turretMotor.setPower(power);
                 break;
+        }
+
+        if(power != lastPower)
+        {
+            turretMotor.setPower(power);
+            lastPower = power;
         }
 
         //localLop.telemetry.addData("Turret angle limited: ", turretAngle);
@@ -373,7 +443,7 @@ public class ExtraOpModeFunctions
         localLop.telemetry.addData("turret Power", turretMotor.getPower());
         //localLop.telemetry.addData("turret Current", turretMotor.getCurrent(CurrentUnit.AMPS));
 
-        dashboardTelemetry.addData("Turret power set", turretMotor.getPower());
+        //dashboardTelemetry.addData("Turret power set", turretMotor.getPower());
         dashboardTelemetry.addData("Turret target", turretPosition);
         dashboardTelemetry.addData("Turret actual", cp);
     }
@@ -628,7 +698,7 @@ public class ExtraOpModeFunctions
         // range to speed function
         //shooterTargetVelocity = 1049 + (12.8 * targetRange) - (0.0294 * targetRange * targetRange);
         //return( 985 + (13.2 * distance) - (0.024 * distance * distance) );
-        return( 1016 + (6.12 * distance) + (0.013 * distance * distance) );
+        return( 1003 + (6.43 * distance) + (0.014 * distance * distance) );
         //( 1047 + (7.09 * distance) - (0.00119 * distance * distance) );
         //( 1155 + (5 * distance) + (0.00964 * distance * distance) );
     }
@@ -730,7 +800,7 @@ public class ExtraOpModeFunctions
     public boolean isIntakeFull()
     {
         localLop.telemetry.addLine("BB: " + beamBreak1a.getState() + " " + beamBreak1b.getState() + " " + beamBreak2a.getState() + " " + beamBreak2b.getState() + " " + beamBreak3a.getState() + " " + beamBreak3b.getState());
-        localLop.telemetry.addData("intakeFullCount: ", intakeFullCount);
+        //localLop.telemetry.addData("intakeFullCount: ", intakeFullCount);
 
         if((!beamBreak1a.getState()) || (!beamBreak1b.getState()))
         {
@@ -920,18 +990,22 @@ public class ExtraOpModeFunctions
         public static final double Light_Purple = 0.666;
         public static final double Light_Yellow = 0.388;
         public static final double Light_Off = 0.000;
-        public double lightColor = Light_Green;
+        public double lastLightColor = Light_Off;
 
         public Lights(HardwareMap hm)
         {
             this.light1 = hm.get(Servo.class, "light1");
             this.light2 = hm.get(Servo.class, "light2");
-            this.setLightColor(Light_Green);
+            setLightColor(lastLightColor);
         }
         public void setLightColor(double lightColor)
         {
-            light1.setPosition(lightColor);
-            light2.setPosition(lightColor);
+            if(lightColor != lastLightColor)
+            {
+                light1.setPosition(lightColor);
+                light2.setPosition(lightColor);
+                lastLightColor = lightColor;
+            }
         }
     }
 
