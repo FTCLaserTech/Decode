@@ -33,8 +33,8 @@ public class BasicTeleOp extends LinearOpMode
 {
     public enum Targeting{MANUAL,AUTO};
 
-    public static double headingScaler = 2.0;
-    public static double positionScaler = 0.0;
+    public static double headingScaler = 3.0;
+    public static double positionScaler = 10.0;
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -310,8 +310,10 @@ public class BasicTeleOp extends LinearOpMode
                 lastDrivePositionX = drivePositionX;
                 lastDrivePositionY = drivePositionY;
 
-                //telemetry.addData("RR drive x", drivePositionX);
-                //telemetry.addData("RR drive y", drivePositionY);
+                telemetry.addData("RR c x", drivePositionX);
+                telemetry.addData("RR l x", lastDrivePositionX);
+                telemetry.addData("RR c y", drivePositionY);
+                telemetry.addData("RR l y", lastDrivePositionY);
                 //telemetry.addData("RR drive heading", Math.toDegrees(driveHeading) );
                 //telemetry.addData("RR launcher heading", Math.toDegrees(launcherHeading) );
                 //telemetry.addData("goal heading", goalHeading );
@@ -589,6 +591,7 @@ public class BasicTeleOp extends LinearOpMode
                 PoseStorage.currentAngle = previousOrientation;
             }
 
+            //telemetry.addData("turretHome: ", extras.turretHomeSensor.isPressed());
             //telemetry.addData("pp x", ppLocalizer.driver.getPosX(DistanceUnit.INCH));
             //telemetry.addData("pp y", ppLocalizer.driver.getPosY(DistanceUnit.INCH));
             //telemetry.addData("pp heading", ppLocalizer.driver.getHeading(AngleUnit.DEGREES));

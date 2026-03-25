@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 //import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 
+import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.SECONDS;
 import static java.lang.Math.abs;
 
 import android.os.Environment;
@@ -14,6 +15,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
@@ -39,6 +41,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
@@ -87,13 +90,14 @@ public class ExtraOpModeFunctions
             new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
     public ControlSystem turretController;
-    //public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.003, 0.01, 0.0001);
-    public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.002, 0.05, 0.0002);
- //   public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.0035, 0.11, 0.0003);
+    public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.004, 0.0, 0.00008);
+    //public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.002, 0.05, 0.0002);
+    //public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.0035, 0.11, 0.0003);
     //public static BasicFeedforwardParameters turretFeedforwardParameters =
     //        new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
-    public static int turretHomeOffset = -162;
+    public static int turretHomeOffset = -306;
+    //public static int turretHomeOffset = -162;
     //public static int turretHomeOffset = -113;
     private PIDController turretController2;
 
@@ -110,7 +114,7 @@ public class ExtraOpModeFunctions
 
     double MAX_TURRETANGLE = Math.toRadians(125.0);
     double MIN_TURRETANGLE = Math.toRadians(-125.0);
-    double turretMotorEncoder = 751.8 ;//537.7;  // PPR at the output shaft per motor data sheet
+    double turretMotorEncoder = 1425.1; //751.8 ;//537.7;  // PPR at the output shaft per motor data sheet
     double turretBaseTeeth = 84.0;
     double driveTeeth = 37.0;
     double MAX_TURRETENCODER = turretMotorEncoder * (turretBaseTeeth/driveTeeth) * (MAX_TURRETANGLE/Math.toRadians(360));
@@ -211,9 +215,19 @@ public class ExtraOpModeFunctions
         //start motor
         turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         turretMotor.setPower(0.14);
+        List<LynxModule> allHubs = localLop.hardwareMap.getAll(LynxModule.class);
+        for (LynxModule hub : allHubs)
+        {
+            hub.clearBulkCache();
+        }
         while (!turretHomeSensor.isPressed())
         {
+            for (LynxModule hub : allHubs)
+            {
+                hub.clearBulkCache();
+            }
             localLop.telemetry.addLine("Homing...");
+            localLop.telemetry.addData("turretHomeSensor", turretHomeSensor.isPressed());
             localLop.telemetry.update();
         }
         //stop
@@ -221,6 +235,7 @@ public class ExtraOpModeFunctions
         turretMotor.setPower(0.0);
         localLop.telemetry.addLine("Homing Complete");
         localLop.telemetry.update();
+        //safeWaitSeconds(5.0);
         setTurretMode(turretMode);
         //turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
@@ -435,10 +450,11 @@ public class ExtraOpModeFunctions
             lastPower = power;
         }
 
-        //localLop.telemetry.addData("Turret angle limited: ", turretAngle);
         double cp = turretMotor.getCurrentPosition();
+        //localLop.telemetry.addData("Turret angle limited: ", turretAngle);
+        localLop.telemetry.addData("Turret angle delta: ", Math.toDegrees(turretAngle-turretEncoderToAngle(cp))) ;
         //localLop.telemetry.addData("Turret position target: ", turretPosition);
-        //localLop.telemetry.addData("Turret position actual: ", cp);
+        localLop.telemetry.addData("Turret position actual: ", cp);
         localLop.telemetry.addData("Turret target - actual: ", turretPosition - cp);
         localLop.telemetry.addData("turret Power", turretMotor.getPower());
         //localLop.telemetry.addData("turret Current", turretMotor.getCurrent(CurrentUnit.AMPS));
@@ -908,6 +924,15 @@ public class ExtraOpModeFunctions
         return(new StorePositionAction());
     }
 
+    public void safeWaitSeconds(double time)
+    {
+        ElapsedTime timer = new ElapsedTime(SECONDS);
+        timer.reset();
+        while (!localLop.isStopRequested() && timer.time() < time)
+        {
+            ;
+        }
+    }
     public double angleToSpeed(double angle)
     {
         // fitting a parabola through 3 points
