@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -123,7 +124,8 @@ public class Depot18Spike extends LinearOpMode
                 .splineToConstantHeading(toSpike2.position, forwardRotation.heading)
                 .splineToConstantHeading(pickupSpike2.position,pickupSpike2.heading)
                 .build();
-        Actions.runBlocking(GoToSpike2);
+        Actions.runBlocking(new RaceAction(GoToSpike2,extras.checkIntakeAction()));
+        //Actions.runBlocking(GoToSpike2);
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
 
         Action BackToLaunchSpotSpike2 = drive.actionBuilder(drive.localizer.getPose())
@@ -147,7 +149,8 @@ public class Depot18Spike extends LinearOpMode
                 .setTangent(Math.toRadians(180))
                 .splineToLinearHeading(toGate,forwardRotation.heading)
                 .build();
-        Actions.runBlocking(ToGate1);
+        Actions.runBlocking(new RaceAction(ToGate1,extras.checkIntakeAction()));
+        //Actions.runBlocking(ToGate1);
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
         safeWaitSeconds(1.4);
 
@@ -175,7 +178,8 @@ public class Depot18Spike extends LinearOpMode
                 .setTangent(Math.toRadians(180))
                 .splineToLinearHeading(toGate,forwardRotation.heading)
                 .build();
-        Actions.runBlocking(ToGate2);
+        Actions.runBlocking(new RaceAction(ToGate2,extras.checkIntakeAction()));
+        //Actions.runBlocking(ToGate2);
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
         safeWaitSeconds(1.4);
 
@@ -204,7 +208,8 @@ public class Depot18Spike extends LinearOpMode
                 .splineToConstantHeading(toSpike3.position, toSpike3.heading)
                 .splineToConstantHeading(pickupSpike3.position, pickupSpike3.heading)
                 .build();
-        Actions.runBlocking(GoToSpike3);
+        Actions.runBlocking(new RaceAction(GoToSpike3,extras.checkIntakeAction()));
+        //Actions.runBlocking(GoToSpike3);
 
         Action BackToLaunchSpotSpike3 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
@@ -228,7 +233,8 @@ public class Depot18Spike extends LinearOpMode
                 .splineToConstantHeading(toSpike1.position, toSpike1.heading)
                 .splineToConstantHeading(pickupSpike1.position, pickupSpike1.heading)
                 .build();
-        Actions.runBlocking(GoToSpike1);
+        Actions.runBlocking(new RaceAction(GoToSpike1,extras.checkIntakeAction()));
+        //Actions.runBlocking(GoToSpike1);
 
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF);
         Action BackToLaunchSpotSpike1 = drive.actionBuilder(drive.localizer.getPose())

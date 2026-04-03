@@ -121,7 +121,7 @@ public class Audience18OffCorner extends LinearOpMode
                         ToLaunchPosition,
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.9),
+                        new SleepAction(0.7),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON)),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF))
@@ -152,7 +152,7 @@ public class Audience18OffCorner extends LinearOpMode
                         ToLaunchPosition2,
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.9),
+                        new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed)
@@ -173,11 +173,11 @@ public class Audience18OffCorner extends LinearOpMode
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
                         new ParallelAction(ToLaunchPosition3,
-                                new SequentialAction(new SleepAction(0.4),
+                                new SequentialAction(new SleepAction(0.3),
                                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF)))),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.9),
+                        new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed)
@@ -186,8 +186,10 @@ public class Audience18OffCorner extends LinearOpMode
         // pickup and launch Corner second time
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
         Action GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(tooffCorner.position, tooffCorner.heading)
-                .strafeToSplineHeading(pickupoffCorner.position, pickupoffCorner.heading)
+                .splineToConstantHeading(tooffCorner.position, tooffCorner.heading)
+                .splineToConstantHeading(pickupoffCorner.position, pickupoffCorner.heading)
+                //.strafeToLinearHeading(tooffCorner.position, tooffCorner.heading)
+                //.strafeToSplineHeading(pickupoffCorner.position, pickupoffCorner.heading)
                 .build();
 
         //Actions.runBlocking(GoToCorner2);
@@ -200,11 +202,11 @@ public class Audience18OffCorner extends LinearOpMode
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
                         new ParallelAction(ToLaunchPosition4,
-                                new SequentialAction(new SleepAction(0.4),
+                                new SequentialAction(new SleepAction(0.3),
                                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF)))),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.9),
+                        new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed)
@@ -213,8 +215,10 @@ public class Audience18OffCorner extends LinearOpMode
         // pickup and launch Corner third time
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
         Action GoToCorner3 = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(toCorner.position, toCorner.heading)
-                .strafeToSplineHeading(pickupCorner.position, pickupCorner.heading)
+                .splineToConstantHeading(toCorner.position, toCorner.heading)
+                .splineToConstantHeading(pickupCorner.position, pickupCorner.heading)
+                //.strafeToLinearHeading(toCorner.position, toCorner.heading)
+                //.strafeToSplineHeading(pickupCorner.position, pickupCorner.heading)
                 .build();
 
         //Actions.runBlocking(GoToCorner3);
@@ -227,11 +231,11 @@ public class Audience18OffCorner extends LinearOpMode
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
                         new ParallelAction(ToLaunchPosition5,
-                                new SequentialAction(new SleepAction(0.4),
+                                new SequentialAction(new SleepAction(0.3),
                                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF)))),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.9),
+                        new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed)
@@ -239,8 +243,10 @@ public class Audience18OffCorner extends LinearOpMode
 
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
         Action GoToCorner4 = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(tooffCorner.position, tooffCorner.heading)
-                .strafeToSplineHeading(pickupoffCorner.position, pickupoffCorner.heading)
+                .splineToConstantHeading(tooffCorner.position, tooffCorner.heading)
+                .splineToConstantHeading(pickupoffCorner.position, pickupoffCorner.heading)
+                //.strafeToLinearHeading(tooffCorner.position, tooffCorner.heading)
+                //.strafeToSplineHeading(pickupoffCorner.position, pickupoffCorner.heading)
                 .build();
         //Actions.runBlocking(GoToCorner);
         Actions.runBlocking(new RaceAction(GoToCorner4,extras.checkIntakeAction()));
@@ -251,15 +257,42 @@ public class Audience18OffCorner extends LinearOpMode
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
                         new ParallelAction(ToLaunchPosition6,
-                                new SequentialAction(new SleepAction(0.4),
+                                new SequentialAction(new SleepAction(0.3),
                                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF)))),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.9),
+                        new SleepAction(0.7),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed)
         ));
+
+        extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
+        Action GoToCorner5 = drive.actionBuilder(drive.localizer.getPose())
+                .splineToConstantHeading(toCorner.position, toCorner.heading)
+                .splineToConstantHeading(pickupCorner.position, pickupCorner.heading)
+                //.strafeToLinearHeading(tooffCorner.position, tooffCorner.heading)
+                //.strafeToSplineHeading(pickupoffCorner.position, pickupoffCorner.heading)
+                .build();
+        //Actions.runBlocking(GoToCorner);
+        Actions.runBlocking(new RaceAction(GoToCorner5,extras.checkIntakeAction()));
+
+        Action ToLaunchPosition7 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .build();
+        Actions.runBlocking(new ParallelAction(
+                new SequentialAction(
+                        new ParallelAction(ToLaunchPosition7,
+                                new SequentialAction(new SleepAction(0.3),
+                                        new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF)))),
+                        new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
+                        new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
+                        new SleepAction(0.7),
+                        new InstantAction(() -> extras.stopLauncher()),
+                        new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
+                extras.setLauncherAction(launcherSpeed)
+        ));
+
 
         // Park
         Action toParkPosition1 = drive.actionBuilder(drive.localizer.getPose())

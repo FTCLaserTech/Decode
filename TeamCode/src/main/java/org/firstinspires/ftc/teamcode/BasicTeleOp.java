@@ -7,7 +7,10 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.sqrt;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -22,6 +25,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,6 +35,8 @@ import java.util.Locale;
 @TeleOp(group = "A")
 public class BasicTeleOp extends LinearOpMode
 {
+    private List<Action> runningActions = new ArrayList<>();
+    private FtcDashboard dash = FtcDashboard.getInstance();
     public enum Targeting{MANUAL,AUTO};
 
     public static double headingScaler = 3.0;
@@ -46,6 +52,10 @@ public class BasicTeleOp extends LinearOpMode
 
         //MecanumDrive drive = new MecanumDrive(hardwareMap, extras.readPosition());
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
+        VisionFunctions vision = new VisionFunctions(hardwareMap, this);
+        AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
+
+
 
         extras.setTurretMode(ExtraOpModeFunctions.TurretMode.FTCLib);
 
@@ -86,7 +96,7 @@ public class BasicTeleOp extends LinearOpMode
         double launcherSpeed = 0.0;
         double frozenLauncherSpeed = 0.0;
         boolean freezeRange = false;
-
+        boolean manualDrive = true;
         boolean launcherOn = true;
         boolean depotFound = false;
 
@@ -161,6 +171,8 @@ public class BasicTeleOp extends LinearOpMode
 
         while (!isStopRequested())
         {
+            TelemetryPacket packet = new TelemetryPacket();
+
             for (LynxModule hub : allHubs)
             {
                 hub.clearBulkCache();
@@ -461,6 +473,40 @@ public class BasicTeleOp extends LinearOpMode
                 extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON);
             }
 
+            if(gamepad1.yWasPressed())
+            {
+                if(runningActions.isEmpty())
+                {
+                    manualDrive = false;
+                    double initialRotation = 270;
+                    Pose2d toInitialLaunchPosition = new Pose2d(12, autoFun.redBlueT(-24), Math.toRadians(autoFun.redBlueT(initialRotation))); // old position(12,-17)
+                    Action ToInitialPosition = drive.actionBuilder(drive.localizer.getPose())
+                            .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                            .build();
+                    runningActions.add(ToInitialPosition);
+
+                }
+                else
+                {
+                    runningActions.clear();
+                }
+            }
+            // update running actions
+            List<Action> newActions = new ArrayList<>();
+            for (Action action : runningActions) {
+                action.preview(packet.fieldOverlay());
+                if (action.run(packet)) {
+                    newActions.add(action);
+                }
+            }
+            runningActions = newActions;
+            if(runningActions.isEmpty())
+            {
+                manualDrive = true;
+            }
+
+            dash.sendTelemetryPacket(packet);
+
             // DRIVE CONTROL STARTS HERE
             if (gamepad1.left_bumper)
             {
@@ -493,13 +539,16 @@ public class BasicTeleOp extends LinearOpMode
             stickSidewaysRotated = (stickSideways * Math.cos(-adjustedHeading)) - (stickForward * Math.sin(-adjustedHeading));
             stickForwardRotated = (stickSideways * Math.sin(-adjustedHeading)) + (stickForward * Math.cos(-adjustedHeading));
 
-            drive.setDrivePowers(new PoseVelocity2d(
-                    new Vector2d(
-                            stickSidewaysRotated,
-                            stickForwardRotated
-                    ),
-                    -(gamepad1.right_stick_x * rotationMultiplier)
-            ));
+            if(manualDrive)
+            {
+                drive.setDrivePowers(new PoseVelocity2d(
+                        new Vector2d(
+                                stickSidewaysRotated,
+                                stickForwardRotated
+                        ),
+                        -(gamepad1.right_stick_x * rotationMultiplier)
+                ));
+            }
 
             // launcher on/off function
             if (gamepad1.aWasPressed())
