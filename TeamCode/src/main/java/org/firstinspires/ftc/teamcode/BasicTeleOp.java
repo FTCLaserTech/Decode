@@ -19,15 +19,12 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 //imports from the Mecanum website
 
@@ -40,7 +37,8 @@ public class BasicTeleOp extends LinearOpMode
     public enum Targeting{MANUAL,AUTO};
 
     public static double headingScaler = 3.0;
-    public static double positionScaler = 10.0;
+    public static double positionScalerAim = 10.0;
+    public static double positionScalerRange = 10.0;
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -270,8 +268,10 @@ public class BasicTeleOp extends LinearOpMode
                 Pose2d drivePosition = drive.localizer.getPose();
                 double drivePositionX = drivePosition.position.x;
                 double drivePositionY = drivePosition.position.y;
-                double futureDrivePositionX = drivePositionX + ((drivePositionX-lastDrivePositionX)*positionScaler);
-                double futureDrivePositionY = drivePositionY + ((drivePositionY-lastDrivePositionY)*positionScaler);
+                double futureDrivePositionXAim = drivePositionX + ((drivePositionX-lastDrivePositionX)* positionScalerAim);
+                double futureDrivePositionYAim = drivePositionY + ((drivePositionY-lastDrivePositionY)* positionScalerAim);
+                double futureDrivePositionXRange = drivePositionX + ((drivePositionX-lastDrivePositionX)* positionScalerRange);
+                double futureDrivePositionYRange = drivePositionY + ((drivePositionY-lastDrivePositionY)* positionScalerRange);
 
                 driveHeading = drivePosition.heading.toDouble();
                 // or use control hub IMU if pinpoint IMU is drifting?
@@ -300,24 +300,30 @@ public class BasicTeleOp extends LinearOpMode
                 }
 
                 //telemetry.addData("launcherHeading: ", Math.toDegrees(launcherHeading));
-                double goalDistance = 0;
-                double goalHeading = 0;
+                double goalDistanceAim = 0;
+                double goalDistanceRange = 0;
+                double goalDistanceActual = 0;
+                double goalHeadingAim = 0;
                 if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
                 {
-                    goalDistance = sqrt((APRIL_TAG_X_RED - futureDrivePositionX) * (APRIL_TAG_X_RED - futureDrivePositionX) + ( APRIL_TAG_Y_RED - futureDrivePositionY) * (APRIL_TAG_Y_RED - futureDrivePositionY) + (29.5-14) * (29.5-14))-5.875;
-                    goalHeading = atan2(GOAL_Y_RED - futureDrivePositionY, GOAL_X_RED - futureDrivePositionX);
+                    goalDistanceActual = sqrt((APRIL_TAG_X_RED - drivePositionX) * (APRIL_TAG_X_RED - drivePositionX) + ( APRIL_TAG_Y_RED - drivePositionY) * (APRIL_TAG_Y_RED - drivePositionY) + (29.5-14) * (29.5-14))-5.875;
+                    goalDistanceRange = sqrt((APRIL_TAG_X_RED - futureDrivePositionXRange) * (APRIL_TAG_X_RED - futureDrivePositionXRange) + ( APRIL_TAG_Y_RED - futureDrivePositionYRange) * (APRIL_TAG_Y_RED - futureDrivePositionYRange) + (29.5-14) * (29.5-14))-5.875;
+                    goalDistanceAim = sqrt((APRIL_TAG_X_RED - futureDrivePositionXAim) * (APRIL_TAG_X_RED - futureDrivePositionXAim) + ( APRIL_TAG_Y_RED - futureDrivePositionYAim) * (APRIL_TAG_Y_RED - futureDrivePositionYAim) + (29.5-14) * (29.5-14))-5.875;
+                    goalHeadingAim = atan2(GOAL_Y_RED - futureDrivePositionYAim, GOAL_X_RED - futureDrivePositionXAim);
                 }
                 else
                 {
-                    goalDistance = sqrt((APRIL_TAG_X_BLUE - futureDrivePositionX) * (APRIL_TAG_X_BLUE - futureDrivePositionX) + ( APRIL_TAG_Y_BLUE - futureDrivePositionY) * (APRIL_TAG_Y_BLUE - futureDrivePositionY) + (29.5-14) * (29.5-14))-5.875;
-                    goalHeading = atan2(GOAL_Y_BLUE - futureDrivePositionY, GOAL_X_BLUE - futureDrivePositionX);
+                    goalDistanceActual = sqrt((APRIL_TAG_X_BLUE - drivePositionX) * (APRIL_TAG_X_BLUE - drivePositionX) + ( APRIL_TAG_Y_BLUE - drivePositionY) * (APRIL_TAG_Y_BLUE - futureDrivePositionYRange) + (29.5-14) * (29.5-14))-5.875;
+                    goalDistanceRange = sqrt((APRIL_TAG_X_BLUE - futureDrivePositionXRange) * (APRIL_TAG_X_BLUE - futureDrivePositionXRange) + ( APRIL_TAG_Y_BLUE - futureDrivePositionYRange) * (APRIL_TAG_Y_BLUE - futureDrivePositionYRange) + (29.5-14) * (29.5-14))-5.875;
+                    goalDistanceAim = sqrt((APRIL_TAG_X_BLUE - futureDrivePositionXAim) * (APRIL_TAG_X_BLUE - futureDrivePositionXAim) + ( APRIL_TAG_Y_BLUE - futureDrivePositionYAim) * (APRIL_TAG_Y_BLUE - futureDrivePositionYAim) + (29.5-14) * (29.5-14))-5.875;
+                    goalHeadingAim = atan2(GOAL_Y_BLUE - futureDrivePositionYAim, GOAL_X_BLUE - futureDrivePositionXAim);
                 }
 
                 //extras.dashboardTelemetry.addData("Drive heading", driveHeading);
                 //extras.dashboardTelemetry.addData("Launcher heading", launcherHeading);
                 //extras.dashboardTelemetry.addData("Last launcher heading", lastLauncherHeading);
                 //extras.dashboardTelemetry.addData("Future launcher heading", futureLauncherHeading);
-                //extras.dashboardTelemetry.addData("Goal heading", goalHeading);
+                //extras.dashboardTelemetry.addData("Goal heading", goalHeadingAim);
 
                 lastDrivePositionX = drivePositionX;
                 lastDrivePositionY = drivePositionY;
@@ -326,12 +332,15 @@ public class BasicTeleOp extends LinearOpMode
                 telemetry.addData("RR l x", lastDrivePositionX);
                 telemetry.addData("RR c y", drivePositionY);
                 telemetry.addData("RR l y", lastDrivePositionY);
-                //telemetry.addData("RR drive heading", Math.toDegrees(driveHeading) );
-                //telemetry.addData("RR launcher heading", Math.toDegrees(launcherHeading) );
-                //telemetry.addData("goal heading", goalHeading );
-                //telemetry.addData("goal distance", goalDistance );
+                //telemetry.addData("RR drive heading", Math.toDegrees(driveHeading));
+                //telemetry.addData("RR launcher heading", Math.toDegrees(launcherHeading));
+                //telemetry.addData("goal heading", goalHeadingAim);
+                //telemetry.addData("goal distance (aim)", goalDistanceAim);
+                telemetry.addData("goal distance (actual)", goalDistanceActual);
+                telemetry.addData("goal distance (range)", goalDistanceRange);
+                telemetry.addData("goal distance (aim)", goalDistanceAim);
 
-                if (goalDistance > 90)
+                if (goalDistanceAim > 90)
                 {
                    extras.launcherSup();
                 }
@@ -343,7 +352,7 @@ public class BasicTeleOp extends LinearOpMode
                 if (targeting == Targeting.AUTO)
                 {
                     // calculate aim
-                    turretAngle = goalHeading - futureLauncherHeading;
+                    turretAngle = goalHeadingAim - futureLauncherHeading;
                     lastLauncherHeading = launcherHeading;
 
                     if(turretAngle > Math.PI)
@@ -356,7 +365,7 @@ public class BasicTeleOp extends LinearOpMode
                     }
 
                     // calculate range
-                    launcherSpeed = extras.odometryLauncherSpeed(goalDistance);
+                    launcherSpeed = extras.odometryLauncherSpeed(goalDistanceRange);
                 }
                 else // manual targeting
                 {
