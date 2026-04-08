@@ -532,6 +532,10 @@ public class BasicTeleOp extends LinearOpMode
             {
                 extras.launcherSup();
             }
+            if(gamepad1.dpad_left)
+            {
+                extras.launcherSmid();
+            }
             if(gamepad1.dpad_down)
             {
                 extras.launcherSdown();

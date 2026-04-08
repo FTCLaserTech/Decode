@@ -335,6 +335,11 @@ public class ExtraOpModeFunctions
         launcherS.setPosition(launcherSupPosition);
     }
 
+    public void launcherSmid()
+    {
+        launcherS.setPosition(0.25);
+    }
+
     public void launcherSdown()
     {
         launcherS.setPosition(0.5);
@@ -360,7 +365,7 @@ public class ExtraOpModeFunctions
 
         dashboardTelemetry.addData("Launcher velocity target", launcherSpeed);
         //dashboardTelemetry.addData("Launcher power set", power);
-        dashboardTelemetry.addData("Launcher1 velocity actual", launcher1.getVelocity());
+        dashboardTelemetry.addData("Launfcher1 velocity actual", launcher1.getVelocity());
         dashboardTelemetry.addData("Launcher2 velocity actual", launcher2.getVelocity());
         //dashboardTelemetry.update();
     }
@@ -805,7 +810,7 @@ public class ExtraOpModeFunctions
         return(new SetLauncherAction(speed));
     }
 
-    private int intakeFullCountMax = 3;
+    private int intakeFullCountMax = 2;
     private int intakeFullCount = 0;
     private int ball1Count = 0;
     private int ball2Count = 0;

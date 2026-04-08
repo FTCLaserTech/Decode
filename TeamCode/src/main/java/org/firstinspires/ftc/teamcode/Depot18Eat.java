@@ -99,7 +99,7 @@ public class Depot18Eat extends LinearOpMode
         // Turn on shooter to the expected speed
         double launcherSpeed = 1350.0;
         extras.setLauncher(launcherSpeed);
-        extras.launcherSdown();
+        extras.launcherSmid();
 
         //safeWaitSeconds(autoFun.startDelay);
 
@@ -110,10 +110,10 @@ public class Depot18Eat extends LinearOpMode
         Actions.runBlocking(new ParallelAction(
                 ToInitialPosition,
                 new SequentialAction(
-                        new SleepAction(1.3),
+                        new SleepAction(1.1),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.7),
+                        new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed)
@@ -139,7 +139,7 @@ public class Depot18Eat extends LinearOpMode
                         new SleepAction(1.0),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.7),
+                        new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed)
@@ -153,7 +153,7 @@ public class Depot18Eat extends LinearOpMode
         Actions.runBlocking(new RaceAction(ToGate1,extras.checkIntakeAction()));
         //Actions.runBlocking(ToGate1);
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
-        safeWaitSeconds(1.4);
+        safeWaitSeconds(1.1);
 
         Action BackToLaunchSpotGate1 = drive.actionBuilder(drive.localizer.getPose())
                 .setTangent(backwardRotation.heading)
@@ -168,7 +168,7 @@ public class Depot18Eat extends LinearOpMode
                         new SleepAction(1.2),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.7),
+                        new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed)
@@ -197,7 +197,7 @@ public class Depot18Eat extends LinearOpMode
                         new SleepAction(1.2),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.7),
+                        new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed)
@@ -226,13 +226,13 @@ public class Depot18Eat extends LinearOpMode
                         new SleepAction(1.2),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.7),
+                        new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed)
         ));
 
-        // 1st gate pickup and launch
+        // 4th gate pickup and launch
         Action ToGate4 = drive.actionBuilder(drive.localizer.getPose())
                 .setTangent(Math.toRadians(180))
                 .splineToLinearHeading(toGate,forwardRotation.heading)
@@ -255,7 +255,7 @@ public class Depot18Eat extends LinearOpMode
                         new SleepAction(1.2),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.7),
+                        new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed)
@@ -271,15 +271,16 @@ public class Depot18Eat extends LinearOpMode
         //Actions.runBlocking(GoToSpike3);
 
         Action BackToLaunchSpotSpike3 = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .setTangent(backwardRotation.heading)
+                .splineToConstantHeading(toInitialLaunchPosition.position, Math.toRadians(0))
                 .build();
         Actions.runBlocking(new ParallelAction(
                 BackToLaunchSpotSpike3,
                 new SequentialAction(
-                        new SleepAction(0.9),
+                        new SleepAction(0.8),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.7),
+                        new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed)
