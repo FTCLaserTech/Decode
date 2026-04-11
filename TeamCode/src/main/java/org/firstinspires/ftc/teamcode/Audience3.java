@@ -92,7 +92,7 @@ public class Audience3 extends LinearOpMode
         vision.limelight.start();
 
         // Turn on shooter to the expected speed
-        double launcherSpeed = 1900.0;
+        double launcherSpeed = 1890.0;
         extras.setLauncher(launcherSpeed);
         extras.launcherSup();
 
@@ -105,7 +105,7 @@ public class Audience3 extends LinearOpMode
                 //extras.setTurretAction(Math.toRadians(-120.0)),
                 new SequentialAction(
                         //ToInitialPosition,
-                        new SleepAction(1.0),
+                        new SleepAction(1.6),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
                         new SleepAction(1.0),

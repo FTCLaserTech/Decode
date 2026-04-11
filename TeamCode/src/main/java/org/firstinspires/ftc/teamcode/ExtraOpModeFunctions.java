@@ -329,6 +329,10 @@ public class ExtraOpModeFunctions
         ballStop.setPosition(0.3);
     }
 
+    public void launcherSposition ( double distance)
+    {
+        launcherS.setPosition(distanceToBackboardPosition(distance));
+    }
 
     public void launcherSup()
     {
@@ -365,7 +369,7 @@ public class ExtraOpModeFunctions
 
         dashboardTelemetry.addData("Launcher velocity target", launcherSpeed);
         //dashboardTelemetry.addData("Launcher power set", power);
-        dashboardTelemetry.addData("Launfcher1 velocity actual", launcher1.getVelocity());
+        dashboardTelemetry.addData("Launcher1 velocity actual", launcher1.getVelocity());
         dashboardTelemetry.addData("Launcher2 velocity actual", launcher2.getVelocity());
         //dashboardTelemetry.update();
     }
@@ -718,10 +722,30 @@ public class ExtraOpModeFunctions
     {
         // range to speed function
         //shooterTargetVelocity = 1049 + (12.8 * targetRange) - (0.0294 * targetRange * targetRange);
-        //return( 985 + (13.2 * distance) - (0.024 * distance * distance) );
-        return( 1003 + (6.43 * distance) + (0.014 * distance * distance) );
-        //( 1047 + (7.09 * distance) - (0.00119 * distance * distance) );
-        //( 1155 + (5 * distance) + (0.00964 * distance * distance) );
+        return( 977 + (6.56 * distance) + (0.00473 * distance * distance) );
+        //return( 998 + (7.33 * distance) + (0.00794 * distance * distance) );
+
+        // old backboard
+        //return( 1003 + (6.43 * distance) + (0.014 * distance * distance) );
+    }
+
+    public double distanceToBackboardPosition(double distance)
+    {
+        double position = 0.0;
+        // range to
+        if(distance > 90)
+        {
+            position = 0.0;
+        }
+        else
+        {
+            position = (1.06 - (0.02 * distance) + (0.0000919 * distance * distance));
+            if (position > 0.5)
+            {
+                position = 0.5;
+            }
+        }
+        return (position);
     }
 
     public boolean isLauncherSpeedGood(double shooterTargetVelocity)
@@ -810,7 +834,7 @@ public class ExtraOpModeFunctions
         return(new SetLauncherAction(speed));
     }
 
-    private int intakeFullCountMax = 2;
+    private int intakeFullCountMax = 1;
     private int intakeFullCount = 0;
     private int ball1Count = 0;
     private int ball2Count = 0;

@@ -22,6 +22,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -187,8 +188,8 @@ public class BasicTeleOp extends LinearOpMode
             //ppYaw = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
             imuHeading = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
-            //telemetry.addData("launcher1: ", extras.launcher1.getCurrent(CurrentUnit.AMPS));
-            //telemetry.addData("launcher2: ", extras.launcher2.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("launcher1: ", extras.launcher1.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("launcher2: ", extras.launcher2.getCurrent(CurrentUnit.AMPS));
             //telemetry.addData("intake: ", extras.intake.getCurrent(CurrentUnit.AMPS));
             //telemetry.addData("turret: ", extras.turretMotor.getCurrent(CurrentUnit.AMPS));
 
@@ -340,9 +341,10 @@ public class BasicTeleOp extends LinearOpMode
                 telemetry.addData("goal distance (range)", goalDistanceRange);
                 telemetry.addData("goal distance (aim)", goalDistanceAim);
 
-                if (goalDistanceAim > 90)
+                if (goalDistanceAim > 0)
                 {
-                   extras.launcherSup();
+                   //extras.launcherSup();
+                    extras.launcherSposition(goalDistanceRange);
                 }
                 else
                 {

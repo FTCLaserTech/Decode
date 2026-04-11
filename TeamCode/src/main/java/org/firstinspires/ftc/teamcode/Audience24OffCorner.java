@@ -23,7 +23,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Autonomous(group = "a")
 
-public class Audience18OffCorner extends LinearOpMode
+public class Audience24OffCorner extends LinearOpMode
 {
     @Override
 
@@ -105,7 +105,7 @@ public class Audience18OffCorner extends LinearOpMode
         vision.limelight.start();
 
         // Turn on shooter to the expected speed
-        double launcherSpeed = 1800.0;
+        double launcherSpeed = 1850.0;
         extras.setLauncher(launcherSpeed);
         extras.launcherSup();
 
