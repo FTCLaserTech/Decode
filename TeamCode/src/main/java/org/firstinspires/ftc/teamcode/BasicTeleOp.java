@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.atan2;
+import static java.lang.Math.cos;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -73,6 +75,7 @@ public class BasicTeleOp extends LinearOpMode
         double adjustedHeading = 0.0;
         double speedMultiplier = 1.0;
         double rotationMultiplier = 1.0;
+        PoseVelocity2d lastPoseVelocity = new PoseVelocity2d(new Vector2d(0, 0), 0);
 
         double turretAngle = 0.0;
         double frozenTurretAngle = 0.0;
@@ -269,10 +272,15 @@ public class BasicTeleOp extends LinearOpMode
                 Pose2d drivePosition = drive.localizer.getPose();
                 double drivePositionX = drivePosition.position.x;
                 double drivePositionY = drivePosition.position.y;
+
                 double futureDrivePositionXAim = drivePositionX + ((drivePositionX-lastDrivePositionX)* positionScalerAim);
                 double futureDrivePositionYAim = drivePositionY + ((drivePositionY-lastDrivePositionY)* positionScalerAim);
-                double futureDrivePositionXRange = drivePositionX + ((drivePositionX-lastDrivePositionX)* positionScalerRange);
-                double futureDrivePositionYRange = drivePositionY + ((drivePositionY-lastDrivePositionY)* positionScalerRange);
+
+                // calculate the speed the robot is moving towards/away from the goal
+                //double futureDrivePositionXRange = drivePositionX + ((drivePositionX-lastDrivePositionX)* positionScalerRange);
+                //double futureDrivePositionYRange = drivePositionY + ((drivePositionY-lastDrivePositionY)* positionScalerRange);
+                double futureDrivePositionXRange = drivePositionX + (lastPoseVelocity.linearVel.x * positionScalerRange);
+                double futureDrivePositionYRange = drivePositionY + (lastPoseVelocity.linearVel.y * positionScalerRange);
 
                 driveHeading = drivePosition.heading.toDouble();
                 // or use control hub IMU if pinpoint IMU is drifting?
@@ -341,6 +349,7 @@ public class BasicTeleOp extends LinearOpMode
                 telemetry.addData("goal distance (range)", goalDistanceRange);
                 telemetry.addData("goal distance (aim)", goalDistanceAim);
 
+                // set the height of the launcher back plate
                 if (goalDistanceAim > 0)
                 {
                    //extras.launcherSup();
@@ -420,7 +429,7 @@ public class BasicTeleOp extends LinearOpMode
 
             runtimeMid = getRuntime();
             //extras.dashboardTelemetry.addData("runtimeEnd", runtimeStart);
-            extras.dashboardTelemetry.addData("runtimeM-S", runtimeMid-runtimeStart);
+            //extras.dashboardTelemetry.addData("runtimeM-S", runtimeMid-runtimeStart);
 
             if(!launcherOn)
             {
@@ -551,8 +560,8 @@ public class BasicTeleOp extends LinearOpMode
 
             stickSideways = gamepad1.left_stick_x * speedMultiplier;
             stickForward = -gamepad1.left_stick_y * speedMultiplier;
-            stickSidewaysRotated = (stickSideways * Math.cos(-adjustedHeading)) - (stickForward * Math.sin(-adjustedHeading));
-            stickForwardRotated = (stickSideways * Math.sin(-adjustedHeading)) + (stickForward * Math.cos(-adjustedHeading));
+            stickSidewaysRotated = (stickSideways * cos(-adjustedHeading)) - (stickForward * Math.sin(-adjustedHeading));
+            stickForwardRotated = (stickSideways * Math.sin(-adjustedHeading)) + (stickForward * cos(-adjustedHeading));
 
             if(manualDrive)
             {
@@ -677,12 +686,14 @@ public class BasicTeleOp extends LinearOpMode
 
             //telemetry.addLine();
 
+            double lastrunTimeEnd = runtimeEnd;
             runtimeEnd = getRuntime();
             //telemetry.addData("Elapsed time: ", runtimeEnd);
             //extras.dashboardTelemetry.addData("runtimeEnd", runtimeEnd);
-            extras.dashboardTelemetry.addData("runtimeE-S", runtimeEnd-runtimeStart);
+            //extras.dashboardTelemetry.addData("runtimeE-S", runtimeEnd-runtimeStart);
+            extras.dashboardTelemetry.addData("runtimeDelta", runtimeEnd-lastrunTimeEnd);
 
-            drive.updatePoseEstimate();
+            lastPoseVelocity = drive.updatePoseEstimate();
             //extras.lights.lightsUpdate((long)(getRuntime()*1000.0));
 
             telemetry.update();
