@@ -25,6 +25,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class BasicTeleOp extends LinearOpMode
 
     public static double headingScaler = 3.0;
     public static double positionScalerAim = 10.0;
-    public static double positionScalerRange = 10.0;
+    public static double positionScalerRange = 1.0;
 
     @Override
     public void runOpMode() throws InterruptedException
@@ -194,7 +195,7 @@ public class BasicTeleOp extends LinearOpMode
             telemetry.addData("launcher1: ", extras.launcher1.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("launcher2: ", extras.launcher2.getCurrent(CurrentUnit.AMPS));
             //telemetry.addData("intake: ", extras.intake.getCurrent(CurrentUnit.AMPS));
-            //telemetry.addData("turret: ", extras.turretMotor.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("turret: ", extras.turretMotor.getCurrent(CurrentUnit.AMPS));
 
             // change team color if needed
             if (gamepad2.xWasPressed())
@@ -279,8 +280,12 @@ public class BasicTeleOp extends LinearOpMode
                 // calculate the speed the robot is moving towards/away from the goal
                 //double futureDrivePositionXRange = drivePositionX + ((drivePositionX-lastDrivePositionX)* positionScalerRange);
                 //double futureDrivePositionYRange = drivePositionY + ((drivePositionY-lastDrivePositionY)* positionScalerRange);
-                double futureDrivePositionXRange = drivePositionX + (lastPoseVelocity.linearVel.x * positionScalerRange);
-                double futureDrivePositionYRange = drivePositionY + (lastPoseVelocity.linearVel.y * positionScalerRange);
+                double velX = ppLocalizer.driver.getVelY(DistanceUnit.INCH);
+                double velY = -ppLocalizer.driver.getVelX(DistanceUnit.INCH);
+                double futureDrivePositionXRange = drivePositionX + (velX * positionScalerRange);
+                double futureDrivePositionYRange = drivePositionY + (velY * positionScalerRange);
+                telemetry.addData("VelX", velX);
+                telemetry.addData("VelY", velY);
 
                 driveHeading = drivePosition.heading.toDouble();
                 // or use control hub IMU if pinpoint IMU is drifting?
@@ -338,9 +343,9 @@ public class BasicTeleOp extends LinearOpMode
                 lastDrivePositionY = drivePositionY;
 
                 telemetry.addData("RR c x", drivePositionX);
-                telemetry.addData("RR l x", lastDrivePositionX);
+                //telemetry.addData("RR l x", lastDrivePositionX);
                 telemetry.addData("RR c y", drivePositionY);
-                telemetry.addData("RR l y", lastDrivePositionY);
+                //telemetry.addData("RR l y", lastDrivePositionY);
                 //telemetry.addData("RR drive heading", Math.toDegrees(driveHeading));
                 //telemetry.addData("RR launcher heading", Math.toDegrees(launcherHeading));
                 //telemetry.addData("goal heading", goalHeadingAim);

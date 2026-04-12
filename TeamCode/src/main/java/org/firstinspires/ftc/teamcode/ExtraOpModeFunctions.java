@@ -85,7 +85,7 @@ public class ExtraOpModeFunctions
     public Lights lights = null;
     public ControlSystem launcherController;
     public static PIDCoefficients launcherVelPidCoefficients =
-            new PIDCoefficients(0.0037, 0.0, 0.0);
+            new PIDCoefficients(0.009, 0.0, 0.0);
     public static BasicFeedforwardParameters launcherFeedforwardParameters =
             new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
