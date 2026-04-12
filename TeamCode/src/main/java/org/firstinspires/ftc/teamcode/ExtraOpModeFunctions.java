@@ -74,6 +74,7 @@ public class ExtraOpModeFunctions
     public CRServo turretCR;
     //public Servo turretS;
     public Servo launcherS;
+    public Servo tilt;
     public static double launcherSupPosition = 0.0;
     public TouchSensor turretHomeSensor;  // Digital channel Object
     public DigitalChannel beamBreak1a;
@@ -164,6 +165,9 @@ public class ExtraOpModeFunctions
 
         launcherS = hardwareMap.get(Servo.class, "launcherS");
         launcherS.setDirection(Servo.Direction.REVERSE);
+
+        tilt = hardwareMap.get(Servo.class, "tilt");
+        tilt.setDirection(Servo.Direction.REVERSE);
 
         lights = new Lights(hardwareMap);
 
@@ -327,6 +331,16 @@ public class ExtraOpModeFunctions
     public void ballStopOff()
     {
         ballStop.setPosition(0.3);
+    }
+
+    public void tiltup()
+    {
+        tilt.setPosition(0.0);
+    }
+
+    public void tiltdown()
+    {
+        tilt.setPosition(1.0);
     }
 
     public void launcherSposition ( double distance)

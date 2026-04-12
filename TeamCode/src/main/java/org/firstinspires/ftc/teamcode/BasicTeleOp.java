@@ -557,6 +557,22 @@ public class BasicTeleOp extends LinearOpMode
                 extras.launcherSdown();
             }
 
+            if (gamepad1.dpadRightWasPressed())
+            {
+                extras.tiltdown();
+            }
+
+            if (gamepad1.dpadRightWasPressed())
+            {
+                extras.tiltdown();
+            }
+            else
+            {
+                extras.tiltup();
+            }
+
+
+
             //Use this for Pinpoint IMU Driving
             adjustedHeading = driveHeading - previousOrientation + PI;
 
