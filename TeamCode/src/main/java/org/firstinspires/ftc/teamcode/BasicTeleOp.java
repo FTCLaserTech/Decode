@@ -333,6 +333,11 @@ public class BasicTeleOp extends LinearOpMode
                     goalHeadingAim = atan2(GOAL_Y_BLUE - futureDrivePositionYAim, GOAL_X_BLUE - futureDrivePositionXAim);
                 }
 
+                double velN = (velX * Math.cos(goalHeadingAim)) + (velY * Math.sin(goalHeadingAim));
+                double velT = (-velX * Math.sin(goalHeadingAim)) + (velY * Math.cos(goalHeadingAim));
+                telemetry.addData("VelN", velN);
+                telemetry.addData("VelT", velT);
+
                 //extras.dashboardTelemetry.addData("Drive heading", driveHeading);
                 //extras.dashboardTelemetry.addData("Launcher heading", launcherHeading);
                 //extras.dashboardTelemetry.addData("Last launcher heading", lastLauncherHeading);
@@ -346,10 +351,10 @@ public class BasicTeleOp extends LinearOpMode
                 //telemetry.addData("RR l x", lastDrivePositionX);
                 telemetry.addData("RR c y", drivePositionY);
                 //telemetry.addData("RR l y", lastDrivePositionY);
-                //telemetry.addData("RR drive heading", Math.toDegrees(driveHeading));
+                telemetry.addData("RR drive heading", Math.toDegrees(driveHeading));
                 //telemetry.addData("RR launcher heading", Math.toDegrees(launcherHeading));
-                //telemetry.addData("goal heading", goalHeadingAim);
-                //telemetry.addData("goal distance (aim)", goalDistanceAim);
+                telemetry.addData("goal heading", Math.toDegrees(goalHeadingAim));
+
                 telemetry.addData("goal distance (actual)", goalDistanceActual);
                 telemetry.addData("goal distance (range)", goalDistanceRange);
                 telemetry.addData("goal distance (aim)", goalDistanceAim);
@@ -381,7 +386,7 @@ public class BasicTeleOp extends LinearOpMode
                     }
 
                     // calculate range
-                    launcherSpeed = extras.odometryLauncherSpeed(goalDistanceRange);
+                    launcherSpeed = extras.distanceToLauncherSpeed(goalDistanceRange, velN);
                 }
                 else // manual targeting
                 {

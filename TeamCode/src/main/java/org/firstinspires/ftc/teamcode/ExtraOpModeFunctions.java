@@ -32,7 +32,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 import java.io.BufferedReader;
@@ -76,6 +75,7 @@ public class ExtraOpModeFunctions
     public Servo launcherS;
     public Servo tilt;
     public static double launcherSupPosition = 0.0;
+    public static double rangeScale = 0.0;
     public TouchSensor turretHomeSensor;  // Digital channel Object
     public DigitalChannel beamBreak1a;
     public DigitalChannel beamBreak1b;
@@ -90,7 +90,7 @@ public class ExtraOpModeFunctions
     public static BasicFeedforwardParameters launcherFeedforwardParameters =
             new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
-    public ControlSystem turretController;
+    public ControlSystem turretControllerNextFTC;
     public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.004, 0.0, 0.00008);
     //public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.002, 0.05, 0.0002);
     //public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.0035, 0.11, 0.0003);
@@ -100,7 +100,7 @@ public class ExtraOpModeFunctions
     public static int turretHomeOffset = -306;
     //public static int turretHomeOffset = -162;
     //public static int turretHomeOffset = -113;
-    private PIDController turretController2;
+    private PIDController turretControllerFTCLib;
 
 
     private AprilTagPoseFtc aprilTagPose;
@@ -204,13 +204,13 @@ public class ExtraOpModeFunctions
                 .build();
         launcherController.setGoal(new KineticState(0.0, 0.0));
 
-        turretController = ControlSystem.builder()
+        turretControllerNextFTC = ControlSystem.builder()
                 .posPid(turretPosPidCoefficients)
                 //.basicFF(turretFeedforwardParameters)
                 .build();
-        turretController.setGoal(new KineticState(0.0, 0.0));
+        turretControllerNextFTC.setGoal(new KineticState(0.0, 0.0));
 
-        turretController2 = new PIDController(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
+        turretControllerFTCLib = new PIDController(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
 
     }
 
@@ -407,7 +407,7 @@ public class ExtraOpModeFunctions
         }
     }
 
-    double turretPosition = 0.0;
+    double targetTurretEncoder = 0.0;
     public void setTurret(double turretAngle)
     {
         if(turretAngle > MAX_TURRETANGLE)
@@ -422,19 +422,21 @@ public class ExtraOpModeFunctions
         //turretPosition = turretAngle * ((MAX_SERVO - 0.5)/MAX_TURRETANGLE) + 0.5;
         //extras.turretS.setPosition(turretPosition);
 
-        turretPosition = (turretAngle / MAX_TURRETANGLE * MAX_TURRETENCODER) + turretHomeOffset;
+        targetTurretEncoder = (turretAngle / MAX_TURRETANGLE * MAX_TURRETENCODER) + turretHomeOffset;
         double power = 1.0;
         double lastPower = 0.0;
         double powerLimit = 1.0;
+        double currentTurretEncoder = turretMotor.getCurrentPosition();
+        double currentTurretVelocity = turretMotor.getVelocity();
 
         switch(turretMode)
         {
             case ControlHub:
-                turretMotor.setTargetPosition((int) turretPosition);
+                turretMotor.setTargetPosition((int) targetTurretEncoder);
                 break;
             case NextFTC:
-                turretController.setGoal(new KineticState(turretPosition));
-                power = turretController.calculate(new KineticState(turretMotor.getCurrentPosition(), turretMotor.getVelocity()));
+                turretControllerNextFTC.setGoal(new KineticState(targetTurretEncoder));
+                power = turretControllerNextFTC.calculate(new KineticState(currentTurretEncoder, currentTurretVelocity));
                 if(power>powerLimit)
                 {
                     power = powerLimit;
@@ -445,10 +447,9 @@ public class ExtraOpModeFunctions
                 }
                 break;
             case FTCLib:
-                turretController2.setPID(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
-                turretController2.setSetPoint(turretPosition);
-                double currentTurretEncoder = turretMotor.getCurrentPosition();
-                double PIDpower = turretController2.calculate(currentTurretEncoder);
+                turretControllerFTCLib.setPID(turretPosPidCoefficients.kP, turretPosPidCoefficients.kI, turretPosPidCoefficients.kD);
+                turretControllerFTCLib.setSetPoint(targetTurretEncoder);
+                double PIDpower = turretControllerFTCLib.calculate(currentTurretEncoder);
                 double FFpower = turretFeedforward(turretAngle, turretEncoderToAngle(currentTurretEncoder));
                 //localLop.telemetry.addData("Turret PID power: ", PIDpower);
                 //localLop.telemetry.addData("Turret FF power: ", FFpower);
@@ -473,18 +474,17 @@ public class ExtraOpModeFunctions
             lastPower = power;
         }
 
-        double cp = turretMotor.getCurrentPosition();
         //localLop.telemetry.addData("Turret angle limited: ", turretAngle);
-        localLop.telemetry.addData("Turret angle delta: ", Math.toDegrees(turretAngle-turretEncoderToAngle(cp))) ;
+        localLop.telemetry.addData("Turret angle delta: ", Math.toDegrees(turretAngle-turretEncoderToAngle(currentTurretEncoder))) ;
         //localLop.telemetry.addData("Turret position target: ", turretPosition);
-        localLop.telemetry.addData("Turret position actual: ", cp);
-        localLop.telemetry.addData("Turret target - actual: ", turretPosition - cp);
+        localLop.telemetry.addData("Turret position actual: ", currentTurretEncoder);
+        localLop.telemetry.addData("Turret target - actual: ", targetTurretEncoder - currentTurretEncoder);
         localLop.telemetry.addData("turret Power", turretMotor.getPower());
         //localLop.telemetry.addData("turret Current", turretMotor.getCurrent(CurrentUnit.AMPS));
 
         //dashboardTelemetry.addData("Turret power set", turretMotor.getPower());
-        dashboardTelemetry.addData("Turret target", turretPosition);
-        dashboardTelemetry.addData("Turret actual", cp);
+        dashboardTelemetry.addData("Turret target", targetTurretEncoder);
+        dashboardTelemetry.addData("Turret actual", currentTurretEncoder);
     }
 
     public double turretFeedforward(double currentAngleRad, double targetAngleRad)
@@ -724,23 +724,23 @@ public class ExtraOpModeFunctions
     public double limelightLauncherSpeed()
     {
         targetRange = aprilTagPose.range;
-        return(distanceToLauncherSpeed(targetRange));
+        return(distanceToLauncherSpeed(targetRange, 0));
     }
 
-    public double odometryLauncherSpeed(double goalDistance)
-    {
-        return(distanceToLauncherSpeed(goalDistance));
-    }
-
-    public double distanceToLauncherSpeed(double distance)
+    public double distanceToLauncherSpeed(double robotTargetDistance, double robotTargetNormalVelocity)
     {
         // range to speed function
         //shooterTargetVelocity = 1049 + (12.8 * targetRange) - (0.0294 * targetRange * targetRange);
-        return( 977 + (6.56 * distance) + (0.00473 * distance * distance) );
-        //return( 998 + (7.33 * distance) + (0.00794 * distance * distance) );
+        double shooterTargetVelocity  = 977 + (6.56 * robotTargetDistance) + (0.00473 * robotTargetDistance * robotTargetDistance);
+        //return( 998 + (7.33 * robotTargetDistance) + (0.00794 * robotTargetDistance * robotTargetDistance) );
 
         // old backboard
-        //return( 1003 + (6.43 * distance) + (0.014 * distance * distance) );
+        //return( 1003 + (6.43 * robotTargetDistance) + (0.014 * robotTargetDistance * robotTargetDistance) );
+
+        // offset for robot velocity
+        shooterTargetVelocity = shooterTargetVelocity + (robotTargetNormalVelocity * rangeScale);
+
+        return(shooterTargetVelocity);
     }
 
     public double distanceToBackboardPosition(double distance)
@@ -797,7 +797,7 @@ public class ExtraOpModeFunctions
         public boolean run(@NonNull TelemetryPacket packet)
         {
             setTurret(turretActionAngle);
-            if(abs(turretPosition-turretMotor.getCurrentPosition())<10)
+            if(abs(targetTurretEncoder -turretMotor.getCurrentPosition())<10)
             {
                 turretGoodCounter++;
                 if (turretGoodCounter > 10)
