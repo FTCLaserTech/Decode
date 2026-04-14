@@ -97,7 +97,7 @@ public class ExtraOpModeFunctions
     //public static BasicFeedforwardParameters turretFeedforwardParameters =
     //        new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
-    public static int turretHomeOffset = -306;
+    public static int turretHomeOffset = -308;
     //public static int turretHomeOffset = -162;
     //public static int turretHomeOffset = -113;
     private PIDController turretControllerFTCLib;
@@ -119,7 +119,7 @@ public class ExtraOpModeFunctions
     double turretBaseTeeth = 84.0;
     double driveTeeth = 37.0;
     double MAX_TURRETENCODER = turretMotorEncoder * (turretBaseTeeth/driveTeeth) * (MAX_TURRETANGLE/Math.toRadians(360));
-    //double MAX_TURRETENCODER = 1955.0;
+    //double MAX_TURRETENCODER = 1123.4;
     double turretGoodAngle = 1.0;
 
     public RevBlinkinLedDriver blinkinLedDriver;

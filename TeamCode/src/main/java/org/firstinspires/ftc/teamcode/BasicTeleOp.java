@@ -333,7 +333,7 @@ public class BasicTeleOp extends LinearOpMode
                     goalHeadingAim = atan2(GOAL_Y_BLUE - futureDrivePositionYAim, GOAL_X_BLUE - futureDrivePositionXAim);
                 }
 
-                double velN = (velX * Math.cos(goalHeadingAim)) + (velY * Math.sin(goalHeadingAim));
+                double velN = -((velX * Math.cos(goalHeadingAim)) + (velY * Math.sin(goalHeadingAim)));
                 double velT = (-velX * Math.sin(goalHeadingAim)) + (velY * Math.cos(goalHeadingAim));
                 telemetry.addData("VelN", velN);
                 telemetry.addData("VelT", velT);
@@ -386,7 +386,8 @@ public class BasicTeleOp extends LinearOpMode
                     }
 
                     // calculate range
-                    launcherSpeed = extras.distanceToLauncherSpeed(goalDistanceRange, velN);
+                    launcherSpeed = extras.distanceToLauncherSpeed(goalDistanceActual, velN);
+                    //launcherSpeed = extras.distanceToLauncherSpeed(goalDistanceRange, velN);
                 }
                 else // manual targeting
                 {
