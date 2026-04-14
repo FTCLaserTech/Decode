@@ -265,8 +265,8 @@ public class BasicTeleOp extends LinearOpMode
                 // check if the turret is at a limit and stop it if it is
                 telemetry.addData("turretHome: ", extras.turretHomeSensor.isPressed());
                 // now set the turret power
-                extras.turretCR.setPower(turretPower * 0.6);
-                telemetry.addData("turret power: ", extras.turretCR.getPower());
+                //extras.turretCR.setPower(turretPower * 0.6);
+                //telemetry.addData("turret power: ", extras.turretCR.getPower());
             }
             else // odometry
             {
@@ -700,7 +700,7 @@ public class BasicTeleOp extends LinearOpMode
             //telemetry.addData("PP now      : ", Math.toDegrees(ppYaw));
             //telemetry.addData("PP initial  : ", Math.toDegrees(ppYawInitial));
             //telemetry.addData("PP delta    : ", Math.toDegrees(ppYaw-ppYawInitial));
-            telemetry.addData("IMU Heading: ", Math.toDegrees(imuHeading));
+            telemetry.addData("CH IMU Heading: ", Math.toDegrees(imuHeading));
             telemetry.addData("adjustedHeading: ", Math.toDegrees(adjustedHeading));
             telemetry.addData("previousOrientation: ", Math.toDegrees(previousOrientation));
             //telemetry.addData("ODO adjusted angle", adjustedHeading);

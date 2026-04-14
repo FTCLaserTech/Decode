@@ -70,7 +70,7 @@ public class ExtraOpModeFunctions
     public DcMotorEx launcher2;
     public DcMotorEx intake;
     public Servo ballStop;
-    public CRServo turretCR;
+    //public CRServo turretCR;
     //public Servo turretS;
     public Servo launcherS;
     public Servo tilt;
@@ -134,8 +134,8 @@ public class ExtraOpModeFunctions
 
         dashboard.setTelemetryTransmissionInterval(500);
 
-        turretCR = hardwareMap.get(CRServo.class, "turretCR");
-        turretCR.setDirection(DcMotorSimple.Direction.REVERSE);
+        //turretCR = hardwareMap.get(CRServo.class, "turretCR");
+        //turretCR.setDirection(DcMotorSimple.Direction.REVERSE);
         //turretS = hardwareMap.get(Servo.class, "turretS");
         //turretS.setDirection(Servo.Direction.REVERSE);
 
