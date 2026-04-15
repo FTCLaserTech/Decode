@@ -86,14 +86,20 @@ public class BasicTeleOp extends LinearOpMode
         double lastDrivePositionX = 0.0;
         double lastDrivePositionY = 0.0;
 
-        double GOAL_X_RED = 59; //62
-        double GOAL_Y_RED = -56; //-62
-        double GOAL_X_BLUE = 59; //62
-        double GOAL_Y_BLUE = 56; //62
+        double GOAL_X_RED = 65; //62
+        double GOAL_Y_RED = -65; //-62
+        double GOAL_X_BLUE = 65; //62
+        double GOAL_Y_BLUE = 65; //62
         double APRIL_TAG_X_RED = 59;
         double APRIL_TAG_Y_RED = -56;
         double APRIL_TAG_X_BLUE = 59;
         double APRIL_TAG_Y_BLUE = 56;
+
+        double SCORE_HEIGHT = 25.0;
+        double SCORE_ANGLE = Math.toRadians(-30.0);
+        double PASS_THROUGH_POINT_RADIUS = 5;
+        double MAX_HOOD_ANGLE = Math.toRadians(60.0);
+        double MIN_HOOD_ANGLE = Math.toRadians(47.0);
 
         double turretPower = 0.0;
         double launcherSpeed = 0.0;
@@ -274,14 +280,17 @@ public class BasicTeleOp extends LinearOpMode
                 double drivePositionX = drivePosition.position.x;
                 double drivePositionY = drivePosition.position.y;
 
-                double futureDrivePositionXAim = drivePositionX + ((drivePositionX-lastDrivePositionX)* positionScalerAim);
-                double futureDrivePositionYAim = drivePositionY + ((drivePositionY-lastDrivePositionY)* positionScalerAim);
+                double velX = ppLocalizer.driver.getVelY(DistanceUnit.INCH);
+                double velY = -ppLocalizer.driver.getVelX(DistanceUnit.INCH);
+
+                //double futureDrivePositionXAim = drivePositionX + ((drivePositionX-lastDrivePositionX)* positionScalerAim);
+                //double futureDrivePositionYAim = drivePositionY + ((drivePositionY-lastDrivePositionY)* positionScalerAim);
+                double futureDrivePositionXAim = drivePositionX + (velX * positionScalerAim);
+                double futureDrivePositionYAim = drivePositionY + (velY * positionScalerAim);
 
                 // calculate the speed the robot is moving towards/away from the goal
                 //double futureDrivePositionXRange = drivePositionX + ((drivePositionX-lastDrivePositionX)* positionScalerRange);
                 //double futureDrivePositionYRange = drivePositionY + ((drivePositionY-lastDrivePositionY)* positionScalerRange);
-                double velX = ppLocalizer.driver.getVelY(DistanceUnit.INCH);
-                double velY = -ppLocalizer.driver.getVelX(DistanceUnit.INCH);
                 double futureDrivePositionXRange = drivePositionX + (velX * positionScalerRange);
                 double futureDrivePositionYRange = drivePositionY + (velY * positionScalerRange);
                 telemetry.addData("VelX", velX);
@@ -295,48 +304,86 @@ public class BasicTeleOp extends LinearOpMode
                 // imu
                 //double launcherHeading = previousOrientation + (drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - imuYawInitial);
 
+                double robotAngularVelocity = lastPoseVelocity.angVel;
+
                 double futureLauncherHeading = launcherHeading;
                 // adjust for the future but check for angle wraps
                 if( abs(launcherHeading-lastLauncherHeading) > Math.PI) // there must be an angle wrap if it moved this much between samples
                 {
                     if (launcherHeading>lastLauncherHeading)
                     {
-                        futureLauncherHeading = futureLauncherHeading + (( (launcherHeading-2*PI) - lastLauncherHeading)*headingScaler);
+                        //futureLauncherHeading = launcherHeading + (( (launcherHeading-2*PI) - lastLauncherHeading)*headingScaler);
+                        futureLauncherHeading = launcherHeading + (robotAngularVelocity * headingScaler);
                     }
                     else
                     {
-                        futureLauncherHeading = futureLauncherHeading + ((launcherHeading - (lastLauncherHeading-2*PI) )*headingScaler);
+                        //futureLauncherHeading = launcherHeading + ((launcherHeading - (lastLauncherHeading-2*PI) )*headingScaler);
+                        futureLauncherHeading = launcherHeading + (robotAngularVelocity * headingScaler);
                     }
                 }
                 else // no angle wrap
                 {
-                    futureLauncherHeading = futureLauncherHeading + ((launcherHeading - lastLauncherHeading)*headingScaler);
+                    //futureLauncherHeading = launcherHeading + ((launcherHeading - lastLauncherHeading)*headingScaler);
+                    futureLauncherHeading = launcherHeading + (robotAngularVelocity * headingScaler);
                 }
 
                 //telemetry.addData("launcherHeading: ", Math.toDegrees(launcherHeading));
+                double targetDistance = 0;
                 double goalDistanceAim = 0;
                 double goalDistanceRange = 0;
                 double goalDistanceActual = 0;
                 double goalHeadingAim = 0;
+                double goalHeadingActual = 0;
                 if (extras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
                 {
+                    targetDistance = sqrt((GOAL_X_RED - drivePositionX) * (GOAL_X_RED - drivePositionX) + ( GOAL_Y_RED - drivePositionY) * (GOAL_Y_RED - drivePositionY) + (29.5-14) * (29.5-14))-5.875;
                     goalDistanceActual = sqrt((APRIL_TAG_X_RED - drivePositionX) * (APRIL_TAG_X_RED - drivePositionX) + ( APRIL_TAG_Y_RED - drivePositionY) * (APRIL_TAG_Y_RED - drivePositionY) + (29.5-14) * (29.5-14))-5.875;
                     goalDistanceRange = sqrt((APRIL_TAG_X_RED - futureDrivePositionXRange) * (APRIL_TAG_X_RED - futureDrivePositionXRange) + ( APRIL_TAG_Y_RED - futureDrivePositionYRange) * (APRIL_TAG_Y_RED - futureDrivePositionYRange) + (29.5-14) * (29.5-14))-5.875;
                     goalDistanceAim = sqrt((APRIL_TAG_X_RED - futureDrivePositionXAim) * (APRIL_TAG_X_RED - futureDrivePositionXAim) + ( APRIL_TAG_Y_RED - futureDrivePositionYAim) * (APRIL_TAG_Y_RED - futureDrivePositionYAim) + (29.5-14) * (29.5-14))-5.875;
-                    goalHeadingAim = atan2(GOAL_Y_RED - futureDrivePositionYAim, GOAL_X_RED - futureDrivePositionXAim);
+                    goalHeadingAim = atan2(APRIL_TAG_Y_RED - futureDrivePositionYAim, APRIL_TAG_X_RED - futureDrivePositionXAim);
+                    goalHeadingActual = atan2(APRIL_TAG_Y_RED - drivePositionY, APRIL_TAG_X_RED - drivePositionX);
                 }
                 else
                 {
+                    targetDistance = sqrt((GOAL_X_BLUE - drivePositionX) * (GOAL_X_BLUE - drivePositionX) + ( GOAL_Y_BLUE - drivePositionY) * (GOAL_Y_BLUE - drivePositionY) + (29.5-14) * (29.5-14))-5.875;
                     goalDistanceActual = sqrt((APRIL_TAG_X_BLUE - drivePositionX) * (APRIL_TAG_X_BLUE - drivePositionX) + ( APRIL_TAG_Y_BLUE - drivePositionY) * (APRIL_TAG_Y_BLUE - futureDrivePositionYRange) + (29.5-14) * (29.5-14))-5.875;
                     goalDistanceRange = sqrt((APRIL_TAG_X_BLUE - futureDrivePositionXRange) * (APRIL_TAG_X_BLUE - futureDrivePositionXRange) + ( APRIL_TAG_Y_BLUE - futureDrivePositionYRange) * (APRIL_TAG_Y_BLUE - futureDrivePositionYRange) + (29.5-14) * (29.5-14))-5.875;
                     goalDistanceAim = sqrt((APRIL_TAG_X_BLUE - futureDrivePositionXAim) * (APRIL_TAG_X_BLUE - futureDrivePositionXAim) + ( APRIL_TAG_Y_BLUE - futureDrivePositionYAim) * (APRIL_TAG_Y_BLUE - futureDrivePositionYAim) + (29.5-14) * (29.5-14))-5.875;
-                    goalHeadingAim = atan2(GOAL_Y_BLUE - futureDrivePositionYAim, GOAL_X_BLUE - futureDrivePositionXAim);
+                    goalHeadingAim = atan2(APRIL_TAG_Y_BLUE - futureDrivePositionYAim, APRIL_TAG_X_BLUE - futureDrivePositionXAim);
+                    goalHeadingActual = atan2(APRIL_TAG_Y_BLUE - drivePositionY, APRIL_TAG_X_BLUE - drivePositionX);
                 }
 
-                double velN = -((velX * Math.cos(goalHeadingAim)) + (velY * Math.sin(goalHeadingAim)));
-                double velT = (-velX * Math.sin(goalHeadingAim)) + (velY * Math.cos(goalHeadingAim));
+                double velN = ((velX * Math.cos(goalHeadingActual)) + (velY * Math.sin(goalHeadingActual)));
+                double velT = (-velX * Math.sin(goalHeadingActual)) + (velY * Math.cos(goalHeadingActual));
                 telemetry.addData("VelN", velN);
                 telemetry.addData("VelT", velT);
+
+                double g = 32.174*12;
+                double x = targetDistance - PASS_THROUGH_POINT_RADIUS;
+                double y = SCORE_HEIGHT;
+                double a = SCORE_ANGLE;
+                double ha = Math.atan(2 * y / x - Math.tan(a));
+                double hoodAngle = extras.clamp(ha, MAX_HOOD_ANGLE, MIN_HOOD_ANGLE);
+                double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle),2) * (x * Math.tan(hoodAngle) - y)));
+                telemetry.addData("ha", Math.toDegrees(ha));
+                telemetry.addData("hoodAngle", Math.toDegrees(hoodAngle));
+                telemetry.addData("flywheelSpeed", flywheelSpeed);
+
+                double vz = flywheelSpeed * Math.sin(hoodAngle);
+                double time = x / (flywheelSpeed * Math.cos(hoodAngle));
+                double ivr = x / time + velN;
+                double nvr = Math.sqrt(ivr * ivr + velT * velT);
+                double ndr = nvr * time;
+
+                ha = Math.atan(vz/nvr);
+                hoodAngle = extras.clamp(ha, MAX_HOOD_ANGLE, MIN_HOOD_ANGLE);
+                flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle),2) * (ndr * Math.tan(hoodAngle) - y)));
+                double turretVelCompOffset = Math.atan(velT / ivr);
+                telemetry.addData("time", time);
+                telemetry.addData("ha", Math.toDegrees(ha));
+                telemetry.addData("hoodAngle", Math.toDegrees(hoodAngle));
+                telemetry.addData("flywheelSpeed", flywheelSpeed);
+                telemetry.addData("turretVelCompOffset", Math.toDegrees(turretVelCompOffset));
 
                 //extras.dashboardTelemetry.addData("Drive heading", driveHeading);
                 //extras.dashboardTelemetry.addData("Launcher heading", launcherHeading);
@@ -362,8 +409,9 @@ public class BasicTeleOp extends LinearOpMode
                 // set the height of the launcher back plate
                 if (goalDistanceAim > 0)
                 {
-                   //extras.launcherSup();
-                    extras.launcherSposition(goalDistanceRange);
+                    //extras.launcherSup();
+                    //extras.launcherSposition(goalDistanceRange);
+                    extras.launcherSposition2(Math.toDegrees(hoodAngle));
                 }
                 else
                 {
@@ -373,7 +421,8 @@ public class BasicTeleOp extends LinearOpMode
                 if (targeting == Targeting.AUTO)
                 {
                     // calculate aim
-                    turretAngle = goalHeadingAim - futureLauncherHeading;
+                    turretAngle = goalHeadingActual - launcherHeading + turretVelCompOffset;
+                    //turretAngle = goalHeadingAim - futureLauncherHeading;
                     lastLauncherHeading = launcherHeading;
 
                     if(turretAngle > Math.PI)
@@ -386,7 +435,7 @@ public class BasicTeleOp extends LinearOpMode
                     }
 
                     // calculate range
-                    launcherSpeed = extras.distanceToLauncherSpeed(goalDistanceActual, velN);
+                    launcherSpeed = extras.distanceToLauncherSpeed(goalDistanceActual, -velN);
                     //launcherSpeed = extras.distanceToLauncherSpeed(goalDistanceRange, velN);
                 }
                 else // manual targeting
@@ -406,7 +455,10 @@ public class BasicTeleOp extends LinearOpMode
                     }
                 }
 
-                //telemetry.addData("Turret angle desired", Math.toDegrees(turretAngle));
+                telemetry.addData("goalHeadingActual", Math.toDegrees(goalHeadingActual));
+                telemetry.addData("launcherHeading", Math.toDegrees(launcherHeading));
+                telemetry.addData("turretVelCompOffset", Math.toDegrees(turretVelCompOffset));
+                telemetry.addData("turretAngle", Math.toDegrees(turretAngle));
                 //telemetry.addData("Turret angle frozen", Math.toDegrees(frozenTurretAngle));
 
                 if(freezeRange)

@@ -343,9 +343,16 @@ public class ExtraOpModeFunctions
         tilt.setPosition(1.0);
     }
 
-    public void launcherSposition ( double distance)
+    public void launcherSposition (double distance)
     {
         launcherS.setPosition(distanceToBackboardPosition(distance));
+    }
+
+    public void launcherSposition2 (double hoodAngle)
+    {
+        double servoPosition = hoodAngleToServoPosition(hoodAngle);
+        localLop.telemetry.addData("servoPosition", servoPosition);
+        launcherS.setPosition(servoPosition);
     }
 
     public void launcherSup()
@@ -422,7 +429,7 @@ public class ExtraOpModeFunctions
         //turretPosition = turretAngle * ((MAX_SERVO - 0.5)/MAX_TURRETANGLE) + 0.5;
         //extras.turretS.setPosition(turretPosition);
 
-        targetTurretEncoder = (turretAngle / MAX_TURRETANGLE * MAX_TURRETENCODER) + turretHomeOffset;
+        targetTurretEncoder = turretAngleToEncoder(turretAngle);
         double power = 1.0;
         double lastPower = 0.0;
         double powerLimit = 1.0;
@@ -510,6 +517,11 @@ public class ExtraOpModeFunctions
         }
 
         return(power);
+    }
+
+    public double turretAngleToEncoder(double turretAngle)
+    {
+        return( (turretAngle / MAX_TURRETANGLE * MAX_TURRETENCODER) + turretHomeOffset);
     }
 
     public double turretEncoderToAngle(double turretEncoder)
@@ -743,6 +755,16 @@ public class ExtraOpModeFunctions
         return(shooterTargetVelocity);
     }
 
+    public double hoodAngleToServoPosition(double hoodAngle)
+    {
+        // 1 60 - 0.5
+        // 2 47 - 0.0
+
+        // return y1 + ((y2 - y1) / (x2 - x1)) * (x - x1);
+
+        return 0.5 + ((0.0 - 0.5) / (47 - 60)) * (hoodAngle - 60);
+    }
+
     public double distanceToBackboardPosition(double distance)
     {
         double position = 0.0;
@@ -944,6 +966,16 @@ public class ExtraOpModeFunctions
         intakeFullCountMax = 15;
         return(new CheckIntakeAction());
     }
+
+    public double clamp(double val, double max, double min)
+    {
+        if (val>max)
+            return(max);
+        if(val<min)
+            return(min);
+        return(val);
+    }
+
 
     boolean continueStorePositionAction = true;
     private MecanumDrive drive = null;
