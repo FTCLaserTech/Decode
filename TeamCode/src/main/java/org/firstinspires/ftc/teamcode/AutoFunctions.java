@@ -28,6 +28,28 @@ public class AutoFunctions
         localExtras.setTurretMode(ExtraOpModeFunctions.TurretMode.ControlHub);
     }
 
+    public void selectSide()
+    {
+        boolean colorNotSelected = true;
+        localLop.telemetry.addLine("Select Team Color.");
+        localLop.telemetry.addLine("Press X (blue) for Blue.");
+        localLop.telemetry.addLine("Press B (red) for Red.");
+        localLop.telemetry.update();
+        while(colorNotSelected)
+        {
+            if(localLop.gamepad1.xWasPressed())
+            {
+                localExtras.teamColor = ExtraOpModeFunctions.TeamColor.BLUE;
+                colorNotSelected = false;
+            }
+            if(localLop.gamepad1.bWasPressed())
+            {
+                localExtras.teamColor = ExtraOpModeFunctions.TeamColor.RED;
+                colorNotSelected = false;
+            }
+        }
+    }
+
     public void autoInitFunction()
     {
         // use g1 x button to change red/blue

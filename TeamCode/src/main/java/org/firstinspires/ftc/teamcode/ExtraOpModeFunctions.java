@@ -739,6 +739,8 @@ public class ExtraOpModeFunctions
         return(distanceToLauncherSpeed(targetRange, 0));
     }
 
+    double MIN_LAUNCHER_SPEED = 1000.0;
+    double MAX_LAUNCHER_SPEED = 2000.0;
     public double distanceToLauncherSpeed(double robotTargetDistance, double robotTargetNormalVelocity)
     {
         // range to speed function
@@ -752,6 +754,15 @@ public class ExtraOpModeFunctions
         // offset for robot velocity
         shooterTargetVelocity = shooterTargetVelocity + (robotTargetNormalVelocity * rangeScale);
 
+        shooterTargetVelocity = clamp(shooterTargetVelocity,MAX_LAUNCHER_SPEED, MIN_LAUNCHER_SPEED);
+
+        return(shooterTargetVelocity);
+    }
+
+    public double ballSpeedToLauncherSpeed(double ballSpeed)
+    {
+        double shooterTargetVelocity  = 977 + (6.56 * ballSpeed) + (0.00473 * ballSpeed * ballSpeed);
+        shooterTargetVelocity = clamp(shooterTargetVelocity,MAX_LAUNCHER_SPEED, MIN_LAUNCHER_SPEED);
         return(shooterTargetVelocity);
     }
 

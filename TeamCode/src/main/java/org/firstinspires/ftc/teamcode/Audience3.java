@@ -58,6 +58,8 @@ public class Audience3 extends LinearOpMode
         extras.turretHome();
         extras.setTurret(0.0);
 
+        autoFun.selectSide();
+
         while (!isStopRequested() && !opModeIsActive())
         {
             autoFun.autoInitFunction();

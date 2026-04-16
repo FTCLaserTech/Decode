@@ -29,6 +29,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 //imports from the Mecanum website
 
@@ -145,11 +146,11 @@ public class BasicTeleOp extends LinearOpMode
         double imuYaw = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
         double ppYawInitial = ppYaw;
         double imuYawInitial = imuYaw;
-        telemetry.addData("ppYaw r: ", ppYaw);
-        telemetry.addData("chYaw r: ", imuYaw);
+        //telemetry.addData("ppYaw r: ", ppYaw);
+        //telemetry.addData("chYaw r: ", imuYaw);
         telemetry.addData("ppYaw d: ", Math.toDegrees(ppYaw));
         telemetry.addData("chYaw d: ", Math.toDegrees(imuYaw));
-        telemetry.addData("savedAngle r: ", previousOrientation);
+        //telemetry.addData("savedAngle r: ", previousOrientation);
         telemetry.addData("savedAngle d: ", Math.toDegrees(previousOrientation));
 
         telemetry.addData("spx: ", storedPose.position.x);
@@ -365,9 +366,9 @@ public class BasicTeleOp extends LinearOpMode
                 double ha = Math.atan(2 * y / x - Math.tan(a));
                 double hoodAngle = extras.clamp(ha, MAX_HOOD_ANGLE, MIN_HOOD_ANGLE);
                 double flywheelSpeed = Math.sqrt(g * x * x / (2 * Math.pow(Math.cos(hoodAngle),2) * (x * Math.tan(hoodAngle) - y)));
-                telemetry.addData("ha", Math.toDegrees(ha));
-                telemetry.addData("hoodAngle", Math.toDegrees(hoodAngle));
-                telemetry.addData("flywheelSpeed", flywheelSpeed);
+                //telemetry.addData("ha", Math.toDegrees(ha));
+                //telemetry.addData("hoodAngle", Math.toDegrees(hoodAngle));
+                //telemetry.addData("flywheelSpeed", flywheelSpeed);
 
                 double vz = flywheelSpeed * Math.sin(hoodAngle);
                 double time = x / (flywheelSpeed * Math.cos(hoodAngle));
@@ -400,11 +401,11 @@ public class BasicTeleOp extends LinearOpMode
                 //telemetry.addData("RR l y", lastDrivePositionY);
                 telemetry.addData("RR drive heading", Math.toDegrees(driveHeading));
                 //telemetry.addData("RR launcher heading", Math.toDegrees(launcherHeading));
-                telemetry.addData("goal heading", Math.toDegrees(goalHeadingAim));
+                //telemetry.addData("goal heading", Math.toDegrees(goalHeadingAim));
 
                 telemetry.addData("goal distance (actual)", goalDistanceActual);
-                telemetry.addData("goal distance (range)", goalDistanceRange);
-                telemetry.addData("goal distance (aim)", goalDistanceAim);
+                //telemetry.addData("goal distance (range)", goalDistanceRange);
+                //telemetry.addData("goal distance (aim)", goalDistanceAim);
 
                 // set the height of the launcher back plate
                 if (goalDistanceAim > 0)
@@ -436,7 +437,7 @@ public class BasicTeleOp extends LinearOpMode
 
                     // calculate range
                     launcherSpeed = extras.distanceToLauncherSpeed(goalDistanceActual, -velN);
-                    //launcherSpeed = extras.distanceToLauncherSpeed(goalDistanceRange, velN);
+                    //launcherSpeed = extras.ballSpeedToLauncherSpeed(flywheelSpeed);
                 }
                 else // manual targeting
                 {
@@ -508,20 +509,21 @@ public class BasicTeleOp extends LinearOpMode
             }
 
             // get and print Megatag
-            //Pose2d limelightrobotposition = extras.vision.getRobotFieldPositionMT();
+            Pose2d limelightrobotposition = extras.vision.getRobotFieldPositionMT();
             //String data = String.format(Locale.US, "MT1 X: %.2f, Y: %.2f, Y: %.1f", limelightrobotposition.position.x, limelightrobotposition.position.y, Math.toDegrees(limelightrobotposition.heading.toDouble()));
             //telemetry.addLine(data);
+            telemetry.addData("LL x", limelightrobotposition.position.x);
+            telemetry.addData("LL y", limelightrobotposition.position.y);
+            telemetry.addData("LL heading", limelightrobotposition.heading.toDouble());
             //telemetry.addData("limelightAngle", Math.toDegrees(limelightrobotposition.heading.toDouble()));
             //telemetry.addData("imuAngle", Math.toDegrees(imuHeading));
             //telemetry.addData("turretAngle", Math.toDegrees(turretAngle));
 
-            /*
             if (gamepad1.y)
             {
                 // add math on angle with turret angle and IMU
-                //drive.localizer.setPose(limelightrobotposition);
+                drive.localizer.setPose(limelightrobotposition);
             }
-            */
 
             // get and print Megatag2
             /*
