@@ -514,7 +514,7 @@ public class BasicTeleOp extends LinearOpMode
             //telemetry.addLine(data);
             telemetry.addData("LL x", limelightrobotposition.position.x);
             telemetry.addData("LL y", limelightrobotposition.position.y);
-            telemetry.addData("LL heading", limelightrobotposition.heading.toDouble());
+            telemetry.addData("LL heading", Math.toDegrees(limelightrobotposition.heading.toDouble()));
             //telemetry.addData("limelightAngle", Math.toDegrees(limelightrobotposition.heading.toDouble()));
             //telemetry.addData("imuAngle", Math.toDegrees(imuHeading));
             //telemetry.addData("turretAngle", Math.toDegrees(turretAngle));
@@ -551,6 +551,7 @@ public class BasicTeleOp extends LinearOpMode
             else if (gamepad1.left_trigger > 0)
             {
                 extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
+                extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON);
             }
             else
             {
@@ -558,6 +559,7 @@ public class BasicTeleOp extends LinearOpMode
                 extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON);
             }
 
+            /*
             if(gamepad1.yWasPressed())
             {
                 if(runningActions.isEmpty())
@@ -589,6 +591,7 @@ public class BasicTeleOp extends LinearOpMode
             {
                 manualDrive = true;
             }
+            */
 
             dash.sendTelemetryPacket(packet);
 

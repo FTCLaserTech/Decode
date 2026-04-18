@@ -435,16 +435,16 @@ public class VisionFunctions {
         LLResult llResult = limelight.getLatestResult();
         if (llResult.isValid())
         {
-            if (xpos.size() > 25)
+            if (xpos.size() > 3)
             {
                 xpos.pollFirst();
                 ypos.pollFirst();
                 rotation.pollFirst();
             }
             Pose3D pose3D = llResult.getBotpose();
-            xpos.add(pose3D.getPosition().x * 39.3700787);
-            ypos.add(pose3D.getPosition().y * 39.3700787);
-            rotation.add(pose3D.getOrientation().getYaw(AngleUnit.RADIANS));
+            xpos.add(pose3D.getPosition().x * -39.3700787);
+            ypos.add(pose3D.getPosition().y * -39.3700787);
+            rotation.add(pose3D.getOrientation().getYaw(AngleUnit.RADIANS)-Math.PI);
 
             double sumx = 0;
             for (double num : xpos) {
