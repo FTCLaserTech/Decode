@@ -379,7 +379,7 @@ public class BasicTeleOp extends LinearOpMode
                 ha = Math.atan(vz/nvr);
                 hoodAngle = extras.clamp(ha, MAX_HOOD_ANGLE, MIN_HOOD_ANGLE);
                 flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle),2) * (ndr * Math.tan(hoodAngle) - y)));
-                double turretVelCompOffset = Math.atan(velT / ivr);
+                double turretVelCompOffset = Math.atan(-velT / ivr);
                 telemetry.addData("time", time);
                 telemetry.addData("ha", Math.toDegrees(ha));
                 telemetry.addData("hoodAngle", Math.toDegrees(hoodAngle));
@@ -522,7 +522,10 @@ public class BasicTeleOp extends LinearOpMode
             if (gamepad1.y)
             {
                 // add math on angle with turret angle and IMU
-                drive.localizer.setPose(limelightrobotposition);
+                if(limelightrobotposition.position.x != 0.0 && limelightrobotposition.position.y != 0.0)
+                {
+                    drive.localizer.setPose(limelightrobotposition);
+                }
             }
 
             // get and print Megatag2
