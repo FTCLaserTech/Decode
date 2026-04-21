@@ -60,6 +60,7 @@ public class ExtraOpModeFunctions
 
     public enum RobotStartPosition {STRAIGHT, LEFT, RIGHT};
     public enum TeamColor{RED,BLUE};
+    public enum TiltState{DOWN,UP};
     public enum TrackDepotState{NOTFOUND,TARGETING, TARGETING_ATSPEED, TARGETING_AIMED,ONTARGET};
     public TeamColor teamColor = TeamColor.RED;
 
@@ -73,7 +74,9 @@ public class ExtraOpModeFunctions
     //public CRServo turretCR;
     //public Servo turretS;
     public Servo launcherS;
-    public Servo tilt;
+    public Servo tiltRed;
+    public Servo tiltGreen;
+    public TiltState tiltState = TiltState.DOWN;
     public static double launcherSupPosition = 0.0;
     public static double rangeScale = 0.0;
     public TouchSensor turretHomeSensor;  // Digital channel Object
@@ -91,7 +94,7 @@ public class ExtraOpModeFunctions
             new BasicFeedforwardParameters(0.00042, 0.0, 0.0);
 
     public ControlSystem turretControllerNextFTC;
-    public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.004, 0.0, 0.00008);
+    public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.011, 0.0, 0.00008);
     //public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.002, 0.05, 0.0002);
     //public static PIDCoefficients turretPosPidCoefficients = new PIDCoefficients(0.0035, 0.11, 0.0003);
     //public static BasicFeedforwardParameters turretFeedforwardParameters =
@@ -166,8 +169,9 @@ public class ExtraOpModeFunctions
         launcherS = hardwareMap.get(Servo.class, "launcherS");
         launcherS.setDirection(Servo.Direction.REVERSE);
 
-        tilt = hardwareMap.get(Servo.class, "tilt");
-        tilt.setDirection(Servo.Direction.REVERSE);
+        tiltRed = hardwareMap.get(Servo.class, "tiltRed");
+        tiltGreen = hardwareMap.get(Servo.class, "tiltGreen");
+        tiltDown();
 
         lights = new Lights(hardwareMap);
 
@@ -333,14 +337,19 @@ public class ExtraOpModeFunctions
         ballStop.setPosition(0.3);
     }
 
-    public void tiltup()
+
+    public void tiltUp()
     {
-        tilt.setPosition(0.0);
+        tiltRed.setPosition(0.0);
+        tiltGreen.setPosition(1.0);
+        tiltState = TiltState.UP;
     }
 
-    public void tiltdown()
+    public void tiltDown()
     {
-        tilt.setPosition(1.0);
+        tiltRed.setPosition(0.5);
+        tiltGreen.setPosition(0.5);
+        tiltState = TiltState.DOWN;
     }
 
     public void launcherSposition (double distance)
@@ -761,7 +770,7 @@ public class ExtraOpModeFunctions
 
     public double ballSpeedToLauncherSpeed(double ballSpeed)
     {
-        double shooterTargetVelocity  = 977 + (6.56 * ballSpeed) + (0.00473 * ballSpeed * ballSpeed);
+        double shooterTargetVelocity  = 960 - (3.23 * ballSpeed) + (0.0285 * ballSpeed * ballSpeed);
         shooterTargetVelocity = clamp(shooterTargetVelocity,MAX_LAUNCHER_SPEED, MIN_LAUNCHER_SPEED);
         return(shooterTargetVelocity);
     }

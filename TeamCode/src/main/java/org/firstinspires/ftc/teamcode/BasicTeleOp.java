@@ -379,7 +379,15 @@ public class BasicTeleOp extends LinearOpMode
                 ha = Math.atan(vz/nvr);
                 hoodAngle = extras.clamp(ha, MAX_HOOD_ANGLE, MIN_HOOD_ANGLE);
                 flywheelSpeed = Math.sqrt(g * ndr * ndr / (2 * Math.pow(Math.cos(hoodAngle),2) * (ndr * Math.tan(hoodAngle) - y)));
-                double turretVelCompOffset = Math.atan(-velT / ivr);
+                double turretVelCompOffset = 0;
+                if(extras.teamColor == ExtraOpModeFunctions.TeamColor.BLUE)
+                {
+                    turretVelCompOffset = Math.atan(velT / ivr);
+                }
+                else
+                {
+                    turretVelCompOffset = Math.atan(-velT / ivr);
+                }
                 telemetry.addData("time", time);
                 telemetry.addData("ha", Math.toDegrees(ha));
                 telemetry.addData("hoodAngle", Math.toDegrees(hoodAngle));
@@ -436,8 +444,8 @@ public class BasicTeleOp extends LinearOpMode
                     }
 
                     // calculate range
-                    launcherSpeed = extras.distanceToLauncherSpeed(goalDistanceActual, -velN);
-                    //launcherSpeed = extras.ballSpeedToLauncherSpeed(flywheelSpeed);
+                    //launcherSpeed = extras.distanceToLauncherSpeed(goalDistanceActual, -velN);
+                    launcherSpeed = extras.ballSpeedToLauncherSpeed(flywheelSpeed);
                 }
                 else // manual targeting
                 {
@@ -625,19 +633,15 @@ public class BasicTeleOp extends LinearOpMode
 
             if (gamepad1.dpadRightWasPressed())
             {
-                extras.tiltdown();
+                if(extras.tiltState == ExtraOpModeFunctions.TiltState.UP)
+                {
+                    extras.tiltDown();
+                }
+                else
+                {
+                    extras.tiltUp();
+                }
             }
-
-            if (gamepad1.dpadRightWasPressed())
-            {
-                extras.tiltdown();
-            }
-            else
-            {
-                extras.tiltup();
-            }
-
-
 
             //Use this for Pinpoint IMU Driving
             adjustedHeading = driveHeading - previousOrientation + PI;
