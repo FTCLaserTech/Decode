@@ -78,7 +78,9 @@ public class Audience24 extends LinearOpMode
         }
 
         // AFTER START IS PRESSED
-        extras.setTurret(Math.toRadians(autoFun.redBlueT(-113)));
+        double turretAngle = Math.toRadians(autoFun.redBlueT(-115));
+        extras.setTurret(turretAngle);
+
 
         Pose2d startPose = new Pose2d(-62, autoFun.redBlueT(-13.5), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
@@ -127,7 +129,7 @@ public class Audience24 extends LinearOpMode
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON)),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF))
                 ),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         // pickup and launch spike 1
@@ -157,7 +159,7 @@ public class Audience24 extends LinearOpMode
                         new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
         //go to corner 1 (corner)
         // pickup and launch Corner 1
@@ -183,7 +185,7 @@ public class Audience24 extends LinearOpMode
                         new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         //go to corner 5 (off corner)
@@ -214,7 +216,7 @@ public class Audience24 extends LinearOpMode
                         new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         //go to corner 3 (corner)
@@ -245,7 +247,7 @@ public class Audience24 extends LinearOpMode
                         new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         //go to corner 4 (off corner)
@@ -273,7 +275,7 @@ public class Audience24 extends LinearOpMode
                         new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         //go to corner 5 (corner)
@@ -301,7 +303,7 @@ public class Audience24 extends LinearOpMode
                         new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
         // to corner 6 (off corner)
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
@@ -328,7 +330,7 @@ public class Audience24 extends LinearOpMode
                         new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         // park in corner while trying to pick up balls
@@ -344,7 +346,8 @@ public class Audience24 extends LinearOpMode
                         new RaceAction(GoToCorner7,extras.checkIntakeAction()),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF)),
                         new InstantAction(() -> extras.stopLauncher())),
-                extras.setLauncherAction(0.0)));
+                extras.setLauncherAction(launcherSpeed, turretAngle)
+        ));
 
         /*
         // Park

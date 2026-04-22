@@ -74,7 +74,8 @@ public class Depot21Gate extends LinearOpMode
         }
 
         // AFTER START IS PRESSED
-        extras.setTurret(Math.toRadians(autoFun.redBlueT(-124)));
+        double turretAngle = Math.toRadians(autoFun.redBlueT(-125));
+        extras.setTurret(turretAngle);
 
         Pose2d forwardRotation = new Pose2d(0,0, Math.toRadians(autoFun.redBlueT(270)));
         Pose2d backwardRotation = new Pose2d(0,0, Math.toRadians(autoFun.redBlueT(90)));
@@ -115,7 +116,7 @@ public class Depot21Gate extends LinearOpMode
                         new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         // pickup spike 2, open gate, launch spike 2
@@ -147,7 +148,7 @@ public class Depot21Gate extends LinearOpMode
                         new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         // 1st gate pickup and launch
@@ -175,7 +176,7 @@ public class Depot21Gate extends LinearOpMode
                         new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         // 2nd gate pickup and launch
@@ -203,7 +204,7 @@ public class Depot21Gate extends LinearOpMode
                         new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         // 3rd gate pickup and launch
@@ -231,7 +232,7 @@ public class Depot21Gate extends LinearOpMode
                         new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         // 4th gate pickup and launch
@@ -260,7 +261,7 @@ public class Depot21Gate extends LinearOpMode
                         new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         // pickup and launch spike 3
@@ -283,7 +284,7 @@ public class Depot21Gate extends LinearOpMode
                         new SleepAction(1.0),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF);

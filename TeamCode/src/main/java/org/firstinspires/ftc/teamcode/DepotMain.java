@@ -74,8 +74,9 @@ public class DepotMain extends LinearOpMode
 
         // AFTER START IS PRESSED
 
-        extras.setTurret(Math.toRadians(autoFun.redBlueT(-122)));
-
+        double turretAngle = Math.toRadians(autoFun.redBlueT(-125));
+        // AFTER START IS PRESSED
+        extras.setTurret(turretAngle);
         Pose2d startPose = new Pose2d(61, autoFun.redBlueT(-37), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
         Pose2d toInitialLaunchPosition = new Pose2d(12,autoFun.redBlueT(-24),Math.toRadians(autoFun.redBlueT(initialRotation)));
@@ -113,10 +114,10 @@ public class DepotMain extends LinearOpMode
                         ToInitialPosition,
                         new InstantAction(() -> extras.intakeForward()),
                         new InstantAction(() -> extras.ballStopOff()),
-                        new SleepAction(1.0),
+                        new SleepAction(1.1),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.ballStopOn())),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         //
@@ -152,10 +153,10 @@ public class DepotMain extends LinearOpMode
                         BackToLaunchSpot1,
                         new InstantAction(() -> extras.intakeForward()),
                         new InstantAction(() -> extras.ballStopOff()),
-                        new SleepAction(1.0),
+                        new SleepAction(1.1),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.ballStopOn())),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         //
@@ -181,10 +182,10 @@ public class DepotMain extends LinearOpMode
                         BackToLaunchSpot2,
                         new InstantAction(() -> extras.intakeForward()),
                         new InstantAction(() -> extras.ballStopOff()),
-                        new SleepAction(1.0),
+                        new SleepAction(1.1),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.ballStopOn())),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         // pickup and launch spike 1
@@ -208,10 +209,10 @@ public class DepotMain extends LinearOpMode
                         BackToLaunchSpot3,
                         new InstantAction(() -> extras.intakeForward()),
                         new InstantAction(() -> extras.ballStopOff()),
-                        new SleepAction(1.0),
+                        new SleepAction(1.1),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.ballStopOn())),
-                extras.setLauncherAction(launcherSpeed)
+                extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
 

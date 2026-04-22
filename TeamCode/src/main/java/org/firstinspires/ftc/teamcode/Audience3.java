@@ -77,7 +77,9 @@ public class Audience3 extends LinearOpMode
         }
 
         // AFTER START IS PRESSED
-        extras.setTurret(Math.toRadians(autoFun.redBlueT(-113)));
+        double turretAngle = Math.toRadians(autoFun.redBlueT(-113));
+        extras.setTurret(turretAngle);
+
 
         Pose2d startPose = new Pose2d(-62, autoFun.redBlueT(-13.5), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
@@ -103,7 +105,6 @@ public class Audience3 extends LinearOpMode
                 .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
         Actions.runBlocking(new ParallelAction(
-                extras.setLauncherAction(launcherSpeed),
                 //extras.setTurretAction(Math.toRadians(-120.0)),
                 new SequentialAction(
                         //ToInitialPosition,
@@ -112,8 +113,11 @@ public class Audience3 extends LinearOpMode
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
                         new SleepAction(1.0),
                         new InstantAction(() -> extras.stopLauncher()),
-                        new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON)))
+                        new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
+                extras.setLauncherAction(launcherSpeed, turretAngle)
+
         ));
+
 
         extras.setTurret(0.0);
 
@@ -131,7 +135,7 @@ public class Audience3 extends LinearOpMode
                 new InstantAction(() -> extras.stopLauncher()),
                 new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON)),
                 new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF)),
-                extras.setLauncherAction(launcherSpeed)
+                    extras.setLauncherAction(launcherSpeed, turretAngle)
             )
         );
 
