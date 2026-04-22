@@ -356,8 +356,15 @@ public class BasicTeleOp extends LinearOpMode
 
                 double velN = ((velX * Math.cos(goalHeadingActual)) + (velY * Math.sin(goalHeadingActual)));
                 double velT = (-velX * Math.sin(goalHeadingActual)) + (velY * Math.cos(goalHeadingActual));
+
+                double velMag = Math.sqrt(velX*velX + velY*velY);
+                double velPar = -Math.cos(goalHeadingActual) * velMag;
+                double velPerp = Math.sin(goalHeadingActual) * velMag;
+
                 telemetry.addData("VelN", velN);
                 telemetry.addData("VelT", velT);
+                telemetry.addData("VelPar", velPar);
+                telemetry.addData("VelPerp", velPerp);
 
                 double g = 32.174*12;
                 double x = targetDistance - PASS_THROUGH_POINT_RADIUS;
@@ -372,8 +379,10 @@ public class BasicTeleOp extends LinearOpMode
 
                 double vz = flywheelSpeed * Math.sin(hoodAngle);
                 double time = x / (flywheelSpeed * Math.cos(hoodAngle));
-                double ivr = x / time + velN;
-                double nvr = Math.sqrt(ivr * ivr + velT * velT);
+                //double ivr = x / time + velN;
+                double ivr = x / time + velPar;
+                //double nvr = Math.sqrt(ivr * ivr + velT * velT);
+                double nvr = Math.sqrt(ivr * ivr + velPerp * velPerp);
                 double ndr = nvr * time;
 
                 ha = Math.atan(vz/nvr);
