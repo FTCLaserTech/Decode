@@ -193,7 +193,8 @@ public class ExtraOpModeFunctions
         turretMotor = hardwareMap.get(DcMotorEx.class, "turretMotor");
         turretMotor.setDirection(DcMotorEx.Direction.FORWARD);
         turretMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        setTurretMode(TurretMode.FTCLib);
+        setTurretMode(TurretMode.ControlHub);
+        //setTurretMode(TurretMode.FTCLib);
         //turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         //turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
