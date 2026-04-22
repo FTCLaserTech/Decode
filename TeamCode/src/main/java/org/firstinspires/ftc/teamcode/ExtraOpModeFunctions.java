@@ -817,12 +817,6 @@ public class ExtraOpModeFunctions
         return(rangeGood);
     }
 
-    boolean runLauncherBoolean = false;
-
-    public void stopLauncher()
-    {
-        runLauncherBoolean = false;
-    }
     public class SetTurretAction implements Action
     {
         private double turretActionAngle = 0.0;
@@ -866,6 +860,12 @@ public class ExtraOpModeFunctions
         return(new SetTurretAction(turretAngle));
     }
 
+    boolean runLauncherBoolean = false;
+
+    public void stopLauncher()
+    {
+        runLauncherBoolean = false;
+    }
     public class SetLauncherAction implements Action
     {
         private double launcherActionSpeed = 0.0;
@@ -888,6 +888,36 @@ public class ExtraOpModeFunctions
     public Action setLauncherAction(double speed)
     {
         return(new SetLauncherAction(speed));
+    }
+
+    boolean runLauncherTurretBoolean = false;
+
+    public void stopLauncherTurret()
+    {
+        runLauncherTurretBoolean = false;
+    }
+    public class SetLauncherTurretAction implements Action
+    {
+        private double launcherTurretActionSpeed = 0.0;
+        private double launcherTurretActionTurretAngle = 0.0;
+
+        public SetLauncherTurretAction(double speed, double turretAngle)
+        {
+            launcherTurretActionSpeed = speed;
+            runLauncherTurretBoolean = true;
+        }
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet)
+        {
+            setLauncher(launcherTurretActionSpeed);
+            setTurret(launcherTurretActionTurretAngle);
+            return(runLauncherTurretBoolean);
+        }
+    }
+
+    public Action setLauncherTurretAction(double speed, double turretAngle)
+    {
+        return(new SetLauncherTurretAction(speed, turretAngle));
     }
 
     private int intakeFullCountMax = 1;
