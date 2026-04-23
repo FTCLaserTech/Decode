@@ -533,7 +533,7 @@ public class BasicTeleOp extends LinearOpMode
             //telemetry.addData("imuAngle", Math.toDegrees(imuHeading));
             //telemetry.addData("turretAngle", Math.toDegrees(turretAngle));
 
-            if (gamepad1.y)
+            if (gamepad1.leftBumperWasPressed())
             {
                 // add math on angle with turret angle and IMU
                 if(limelightrobotposition.position.x != 0.0 && limelightrobotposition.position.y != 0.0)
