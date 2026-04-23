@@ -116,8 +116,8 @@ public class ExtraOpModeFunctions
     double maxLauncherTPS = launcherTicksPerRev * maxLauncherRPM / 60; // 2800
     //private double shooterTargetVelocity = 0.0;
 
-    double MAX_TURRETANGLE = Math.toRadians(125.0);
-    double MIN_TURRETANGLE = Math.toRadians(-125.0);
+    double MAX_TURRETANGLE = Math.toRadians(145.0);
+    double MIN_TURRETANGLE = Math.toRadians(-145.0);
     double turretMotorEncoder = 1425.1; //751.8 ;//537.7;  // PPR at the output shaft per motor data sheet
     double turretBaseTeeth = 84.0;
     double driveTeeth = 37.0;
