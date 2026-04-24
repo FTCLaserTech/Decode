@@ -914,7 +914,7 @@ public class ExtraOpModeFunctions
         public boolean run(@NonNull TelemetryPacket packet)
         {
             setLauncher(launcherActionSpeed);
-            //setTurret(launcherActionTurretAngle);
+            setTurret(launcherActionTurretAngle);
             dashboardTelemetry.addData("Turret target", turretMotor.getTargetPosition());
             dashboardTelemetry.addData("Turret actual", turretMotor.getCurrentPosition());
             dashboardTelemetry.update();
