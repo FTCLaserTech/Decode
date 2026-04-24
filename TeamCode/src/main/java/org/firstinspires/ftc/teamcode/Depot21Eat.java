@@ -84,14 +84,15 @@ public class Depot21Eat extends LinearOpMode
         drive.localizer.setPose(startPose);
         Pose2d toInitialLaunchPosition = new Pose2d(12,autoFun.redBlueT(-22),Math.toRadians(autoFun.redBlueT(initialRotation))); // old position(12,-17)
         Pose2d toSpike3 = new Pose2d(11,autoFun.redBlueT(-28),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d pickupSpike3 = new Pose2d(11,autoFun.redBlueT(-49),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
+        Pose2d pickupSpike3 = new Pose2d(11,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
         Pose2d nearGate = new Pose2d(-12,autoFun.redBlueT(-57),Math.toRadians(autoFun.redBlueT(295))); //-31
         Pose2d toGate = new Pose2d(-10.6,autoFun.redBlueT(-59.6),Math.toRadians(autoFun.redBlueT(295)));
         Pose2d toSpike2 = new Pose2d(-10,autoFun.redBlueT(-27),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d pickupSpike2 = new Pose2d(-10,autoFun.redBlueT(-49),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
+        Pose2d pickupSpike2 = new Pose2d(-10,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
         Pose2d toSpike1 = new Pose2d(-35,autoFun.redBlueT(-30),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupSpike1 = new Pose2d(-35,autoFun.redBlueT(-45),Math.toRadians(autoFun.redBlueT(initialRotation))); //-51
-        Pose2d park = new Pose2d(-1,autoFun.redBlueT(-25),Math.toRadians(autoFun.redBlueT(175)));
+        Pose2d toInitialLaunchPosition2 = new Pose2d(17,autoFun.redBlueT(-22),Math.toRadians(autoFun.redBlueT(150))); // old position(12,-17)
+        //Pose2d park = new Pose2d(-1,autoFun.redBlueT(-25),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d park2 = new Pose2d(32,autoFun.redBlueT(-10),Math.toRadians(autoFun.redBlueT(-107)));
         extras.saveTeamColor(extras.teamColor);
 
@@ -275,27 +276,28 @@ public class Depot21Eat extends LinearOpMode
 
         Action BackToLaunchSpotSpike3 = drive.actionBuilder(drive.localizer.getPose())
                 .setTangent(backwardRotation.heading)
-                .splineToConstantHeading(toInitialLaunchPosition.position, Math.toRadians(270))
+                .splineToLinearHeading(toInitialLaunchPosition, Math.toRadians(270))
                 .build();
         Actions.runBlocking(new ParallelAction(
                 BackToLaunchSpotSpike3,
                 new SequentialAction(
-                        new SleepAction(0.65),
+                        new SleepAction(0.8),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.65),
+                        new SleepAction(0.5),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF);
-
+/*
         Action Park = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(park.position, Math.toRadians(270))
+                .setTangent(Math.toRadians(180))
+                .splineToConstantHeading(park.position, Math.toRadians(270))
                 .build();
         Actions.runBlocking(Park);
-
+*/
         safeWaitSeconds(1);
 
         // turn the intake and shooter off
