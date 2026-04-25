@@ -16,14 +16,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 @Config
 //@Disabled
 
 @Autonomous(group = "a")
 
-public class Audience24 extends LinearOpMode
+public class Audience24VisionCorner extends LinearOpMode
 {
     @Override
 
@@ -44,6 +43,8 @@ public class Audience24 extends LinearOpMode
         double chYawFinal = 0.0;
         double savedAngle = 0.0;
 
+        VisionFunctions.ArtifactLocation artifactLocation = VisionFunctions.ArtifactLocation.CORNER;
+
         drive.lazyImu.get().resetYaw();
 
         telemetry.addLine("Initialized");
@@ -51,11 +52,6 @@ public class Audience24 extends LinearOpMode
         //telemetry.addData("y", drive.pose.position.y);
         //telemetry.addData("heading", drive.pose.heading);
         telemetry.update();
-
-        VisionFunctions.ObeliskPattern obelisk;
-
-        AprilTagPoseFtc cam;
-        AprilTagPoseFtc ll;
 
         extras.turretHome();
         extras.setTurret(0.0);
@@ -77,8 +73,8 @@ public class Audience24 extends LinearOpMode
             telemetry.update();
         }
 
-        // AFTER START IS PRESSED
         double turretAngle = Math.toRadians(autoFun.redBlueT(-115));
+        // AFTER START IS PRESSED
         extras.setTurret(turretAngle);
 
         Pose2d forwardRotation = new Pose2d(0,0, Math.toRadians(autoFun.redBlueT(270)));
@@ -90,8 +86,10 @@ public class Audience24 extends LinearOpMode
         Pose2d pickupSpike1 = new Pose2d(-36,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d toCorner = new Pose2d(-62,autoFun.redBlueT(-58),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupCorner = new Pose2d(-62,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d tooffCorner = new Pose2d(-38,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d pickupoffCorner = new Pose2d(-38,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d toMiddle = new Pose2d(-50,autoFun.redBlueT(-58),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d pickupMiddle = new Pose2d(-50,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d toInside = new Pose2d(-38,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d pickupInside = new Pose2d(-38,autoFun.redBlueT(-60),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d toCorner2 = new Pose2d(-62,autoFun.redBlueT(-63),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d toSpike2 = new Pose2d(-42,autoFun.redBlueT(-29),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupSpike2 = new Pose2d(-42,autoFun.redBlueT(-62),Math.toRadians(autoFun.redBlueT(initialRotation)));
@@ -119,7 +117,7 @@ public class Audience24 extends LinearOpMode
         Actions.runBlocking(new ParallelAction(
                 ToLaunchPosition,
                 new SequentialAction(
-                        new SleepAction(0.6),
+                        new SleepAction(1.6),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
                         new SleepAction(0.5),
@@ -155,14 +153,35 @@ public class Audience24 extends LinearOpMode
                 extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
-        //go to corner 1 (corner)
+        //go to corner 1
         // pickup and launch Corner 1
-        Action GoToCorner = drive.actionBuilder(drive.localizer.getPose())
-                //.strafeToLinearHeading(toCorner.position, forwardRotation.heading)
-                .splineToLinearHeading(pickupCorner, forwardRotation.heading)
-                .build();
+        artifactLocation = vision.backAutoRecommendDirection(extras.teamColor);
+        Action GoToCorner1 = null;
+        switch (artifactLocation)
+        {
+            case CORNER:
+                GoToCorner1 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toCorner.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupCorner, forwardRotation.heading)
+                        .build();
+                break;
+            case MIDDLE:
+                GoToCorner1 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toMiddle.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupMiddle, forwardRotation.heading)
+                        .build();
+                break;
+            case INSIDE:
+                GoToCorner1 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toInside.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupInside, forwardRotation.heading)
+                        .build();
+                break;
+        }
+
+        extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
         //Actions.runBlocking(GoToCorner);
-        Actions.runBlocking(new RaceAction(GoToCorner,extras.checkIntakeAction()));
+        Actions.runBlocking(new RaceAction(GoToCorner1,extras.checkIntakeAction()));
 
         Action ToLaunchPosition3 = drive.actionBuilder(drive.localizer.getPose())
                 .setTangent(backwardRotation.heading)
@@ -184,10 +203,30 @@ public class Audience24 extends LinearOpMode
 
         //go to corner 5 (off corner)
         // pickup and launch Corner second time
-        Action GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
-                //.strafeToLinearHeading(toCorner.position, forwardRotation.heading)
-                .splineToLinearHeading(pickupCorner, forwardRotation.heading)
-                .build();
+        extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
+        artifactLocation = vision.backAutoRecommendDirection(extras.teamColor);
+        Action GoToCorner2 = null;
+        switch (artifactLocation)
+        {
+            case CORNER:
+                GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toCorner.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupCorner, forwardRotation.heading)
+                        .build();
+                break;
+            case MIDDLE:
+                GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toMiddle.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupMiddle, forwardRotation.heading)
+                        .build();
+                break;
+            case INSIDE:
+                GoToCorner2 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toInside.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupInside, forwardRotation.heading)
+                        .build();
+                break;
+        }
 
         //Actions.runBlocking(GoToCorner2);
         Actions.runBlocking(new RaceAction(GoToCorner2,extras.checkIntakeAction()));
@@ -213,10 +252,30 @@ public class Audience24 extends LinearOpMode
 
         //go to corner 3 (corner)
         // pickup and launch Corner third time
-        Action GoToCorner3 = drive.actionBuilder(drive.localizer.getPose())
-                //.strafeToLinearHeading(toCorner.position, forwardRotation.heading)
-                .splineToLinearHeading(pickupCorner, forwardRotation.heading)
-                .build();
+        extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
+        artifactLocation = vision.backAutoRecommendDirection(extras.teamColor);
+        Action GoToCorner3 = null;
+        switch (artifactLocation)
+        {
+            case CORNER:
+                GoToCorner3 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toCorner.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupCorner, forwardRotation.heading)
+                        .build();
+                break;
+            case MIDDLE:
+                GoToCorner3 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toMiddle.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupMiddle, forwardRotation.heading)
+                        .build();
+                break;
+            case INSIDE:
+                GoToCorner3 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toInside.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupInside, forwardRotation.heading)
+                        .build();
+                break;
+        }
 
         //Actions.runBlocking(GoToCorner3);
         Actions.runBlocking(new RaceAction(GoToCorner3,extras.checkIntakeAction()));
@@ -242,10 +301,30 @@ public class Audience24 extends LinearOpMode
 
         //go to corner 4 (off corner)
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
-        Action GoToCorner4 = drive.actionBuilder(drive.localizer.getPose())
-                //.strafeToLinearHeading(toCorner.position, forwardRotation.heading)
-                .splineToLinearHeading(pickupCorner, forwardRotation.heading)
-                .build();
+        artifactLocation = vision.backAutoRecommendDirection(extras.teamColor);
+        Action GoToCorner4 = null;
+        switch (artifactLocation)
+        {
+            case CORNER:
+                GoToCorner4 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toCorner.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupCorner, forwardRotation.heading)
+                        .build();
+                break;
+            case MIDDLE:
+                GoToCorner4 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toMiddle.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupMiddle, forwardRotation.heading)
+                        .build();
+                break;
+            case INSIDE:
+                GoToCorner4 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toInside.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupInside, forwardRotation.heading)
+                        .build();
+                break;
+        }
+
         //Actions.runBlocking(GoToCorner);
         Actions.runBlocking(new RaceAction(GoToCorner4,extras.checkIntakeAction()));
 
@@ -269,10 +348,30 @@ public class Audience24 extends LinearOpMode
 
         //go to corner 5 (corner)
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
-        Action GoToCorner5 = drive.actionBuilder(drive.localizer.getPose())
-                //.strafeToLinearHeading(toCorner.position, forwardRotation.heading)
-                .splineToLinearHeading(pickupCorner, forwardRotation.heading)
-                .build();
+        artifactLocation = vision.backAutoRecommendDirection(extras.teamColor);
+        Action GoToCorner5 = null;
+        switch (artifactLocation)
+        {
+            case CORNER:
+                GoToCorner5 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toCorner.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupCorner, forwardRotation.heading)
+                        .build();
+                break;
+            case MIDDLE:
+                GoToCorner5 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toMiddle.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupMiddle, forwardRotation.heading)
+                        .build();
+                break;
+            case INSIDE:
+                GoToCorner5 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toInside.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupInside, forwardRotation.heading)
+                        .build();
+                break;
+        }
+
         //Actions.runBlocking(GoToCorner);
         Actions.runBlocking(new RaceAction(GoToCorner5,extras.checkIntakeAction()));
 
@@ -293,12 +392,33 @@ public class Audience24 extends LinearOpMode
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
+
         // to corner 6 (off corner)
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
-        Action GoToCorner6 = drive.actionBuilder(drive.localizer.getPose())
-                //.strafeToLinearHeading(toCorner.position, forwardRotation.heading)
-                .splineToLinearHeading(pickupCorner, forwardRotation.heading)
-                .build();
+        artifactLocation = vision.backAutoRecommendDirection(extras.teamColor);
+        Action GoToCorner6 = null;
+        switch (artifactLocation)
+        {
+            case CORNER:
+                GoToCorner6 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toCorner.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupCorner, forwardRotation.heading)
+                        .build();
+                break;
+            case MIDDLE:
+                GoToCorner6 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toMiddle.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupMiddle, forwardRotation.heading)
+                        .build();
+                break;
+            case INSIDE:
+                GoToCorner6 = drive.actionBuilder(drive.localizer.getPose())
+                        //.strafeToLinearHeading(toInside.position, forwardRotation.heading)
+                        .splineToLinearHeading(pickupInside, forwardRotation.heading)
+                        .build();
+                break;
+        }
+
         //Actions.runBlocking(GoToCorner);
         Actions.runBlocking(new RaceAction(GoToCorner6,extras.checkIntakeAction()));
 
@@ -319,42 +439,42 @@ public class Audience24 extends LinearOpMode
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
-
+/*
         // park in corner while trying to pick up balls
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
         Action GoToCorner7 = drive.actionBuilder(drive.localizer.getPose())
-                //.strafeToLinearHeading(toCorner.position, forwardRotation.heading)
-                .splineToLinearHeading(pickupCorner, forwardRotation.heading)
+                .splineToConstantHeading(toCorner.position, toCorner.heading)
+                .splineToConstantHeading(pickupCorner.position, pickupCorner.heading)
+                //.strafeToLinearHeading(tooffCorner.position, tooffCorner.heading)
+                //.strafeToSplineHeading(pickupoffCorner.position, pickupoffCorner.heading)
                 .build();
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
                         new RaceAction(GoToCorner7,extras.checkIntakeAction()),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF)),
                         new InstantAction(() -> extras.stopLauncher())),
-                extras.setLauncherAction(launcherSpeed, turretAngle)
-        ));
+                extras.setLauncherAction(0.0)));
+*/
 
-        /*
-        // Park
-        Action toParkPosition1 = drive.actionBuilder(drive.localizer.getPose())
-                .splineToConstantHeading(toCorner.position, toCorner.heading)
-                .splineToConstantHeading(pickupCorner.position, pickupCorner.heading)
+        // drive off the line
+        Action ToPark = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
                 .build();
-                //.strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
-                //.build();
+        //Actions.runBlocking(ToPark);
         Actions.runBlocking
                 (
                         new ParallelAction
                                 (
-                                        new RaceAction(toParkPosition1,extras.storePositionAction(drive, chYawInitial)),
+                                        //extras.setTurretAction(Math.toRadians(0.0)),
+                                        new RaceAction(ToPark,extras.storePositionAction(drive, chYawInitial)),
                                         new InstantAction(() -> extras.stopLauncher()),
                                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON)),
                                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF)),
-                                        extras.setLauncherAction(0)
+                                        extras.setLauncherAction(launcherSpeed, turretAngle)
                                 )
                 );
 
-         */
+
 
         // turn the intake and shooter off
 

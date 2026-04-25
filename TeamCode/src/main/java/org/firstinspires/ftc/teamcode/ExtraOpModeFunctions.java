@@ -32,7 +32,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -106,7 +105,6 @@ public class ExtraOpModeFunctions
     private PIDController turretControllerFTCLib;
 
 
-    private AprilTagPoseFtc aprilTagPose;
     private boolean aimGood = false;
     private boolean rangeGood = false;
 
@@ -133,7 +131,6 @@ public class ExtraOpModeFunctions
     {
         hm = hardwareMap;
         localLop = linearOpMode;
-        vision = new VisionFunctions(hardwareMap, localLop);
 
         dashboard.setTelemetryTransmissionInterval(500);
 
@@ -692,61 +689,10 @@ public class ExtraOpModeFunctions
     SearchingDirection targetSearchingDirection = SearchingDirection.LEFT;
     double targetRange = 0.0;
 
-    public boolean lookForDeopt()
-    {
-        if(teamColor== ExtraOpModeFunctions.TeamColor.RED)
-        {
-            aprilTagPose = vision.readRedAprilTag_ll();
-        }
-        else
-        {
-            aprilTagPose = vision.readBlueAprilTag_ll();
-        }
-        if(aprilTagPose == null) // AprilTag not found
-        {
-            localLop.telemetry.addLine("No April Tag");
-            return(false);
-        }
-        return(true);
-    }
-
-    public AprilTagPoseFtc getAprilTagPose()
-    {
-        return(aprilTagPose);
-    }
-
-
-    public double autoAimTurret()
-    {
-        double turretPower = 0.0;
-
-        depotHeading = aprilTagPose.bearing - 1;
-        localLop.telemetry.addLine("Auto Aim Turret");
-        localLop.telemetry.addData("depot heading: ", depotHeading);
-        localLop.telemetry.addData("depot elevation: ", aprilTagPose.elevation);
-
-        if (abs(depotHeading) < turretGoodAngle) // depot is in range so turn off turret servo
-        {
-            turretPower = 0;
-            aimGood = true;
-        }
-        else
-        {
-            turretPower = angleToSpeed(depotHeading);
-            aimGood = false;
-        }
-        return(turretPower);
-    }
 
     public boolean isTurretAimGood()
     {
         return(aimGood);
-    }
-
-    public double limelightLauncherSpeed()
-    {
-        targetRange = aprilTagPose.range;
-        return(distanceToLauncherSpeed(targetRange, 0));
     }
 
     double MIN_LAUNCHER_SPEED = 1000.0;

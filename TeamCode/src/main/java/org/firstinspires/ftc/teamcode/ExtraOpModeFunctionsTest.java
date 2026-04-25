@@ -54,6 +54,9 @@ public class ExtraOpModeFunctionsTest
     //public TouchSensor turretLimitCW;  // Digital channel Object
     //public TouchSensor turretLimitCCW;  // Digital channel Object
 
+    public enum TeamColor{RED,BLUE};
+    public TeamColor teamColor = TeamColor.RED;
+
     public boolean firstPressed = true;
 
     public ExtraOpModeFunctionsTest(HardwareMap hardwareMap, LinearOpMode linearOpMode)

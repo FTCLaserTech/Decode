@@ -28,9 +28,9 @@ public class zJustParkDepot extends LinearOpMode
         Pose2d initPose = new Pose2d(0,0,Math.toRadians(initialRotation));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
-        VisionFunctions vision = new VisionFunctions(hardwareMap, this);
+        VisionFunctions vision = new VisionFunctions(hardwareMap, this, VisionFunctions.LLVisionType.ARTIFACT);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
-        AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
+        AutoFunctions autoFun = new AutoFunctions(this, extras);
 
         extras.teamColor = extras.readTeamColor();
 

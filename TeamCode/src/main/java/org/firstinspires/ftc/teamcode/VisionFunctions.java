@@ -49,6 +49,8 @@ public class VisionFunctions {
     private static final boolean USE_WEBCAM = true;
 
     public enum ObeliskPattern {GPP, PGP, PPG}
+    public enum LLVisionType {APRILTAG, ARTIFACT}
+    public enum ArtifactLocation {CORNER, MIDDLE, INSIDE}
 
     public Limelight3A limelight;
 
@@ -62,7 +64,8 @@ public class VisionFunctions {
     public NormalizedColorSensor colorSensor2;
     public NormalizedColorSensor colorSensor3;
 
-    public VisionFunctions(HardwareMap hardwareMap, LinearOpMode linearOpMode) {
+    public VisionFunctions(HardwareMap hardwareMap, LinearOpMode linearOpMode, LLVisionType llVisionType)
+    {
         hm = hardwareMap;
         localLop = linearOpMode;
 
@@ -77,7 +80,16 @@ public class VisionFunctions {
         */
 
         //initCameraAprilTag();
-        initLimelight();
+
+        switch (llVisionType)
+        {
+            case APRILTAG:
+                initLimelight_AprilTag();
+                break;
+            case ARTIFACT:
+                initLimelight_Artifact();
+                break;
+        }
 
     }
 
@@ -149,7 +161,7 @@ public class VisionFunctions {
         }
     }
 
-    public void initLimelight() {
+    public void initLimelight_AprilTag() {
         limelight = hm.get(Limelight3A.class, "limelight");
         limelight.pipelineSwitch(0);
         limelight.start();
@@ -159,6 +171,12 @@ public class VisionFunctions {
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
         imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
         */
+    }
+
+    public void initLimelight_Artifact() {
+        limelight = hm.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(1);
+        limelight.start();
     }
 
 
@@ -274,6 +292,70 @@ public class VisionFunctions {
         } else {
             return (false);
         }
+    }
+
+    public ArtifactLocation backAutoRecommendDirection(ExtraOpModeFunctions.TeamColor teamColor)
+    {
+        ArtifactLocation artifactLocation = ArtifactLocation.CORNER;
+        int cornerCount = 0;
+        int midCount = 0;
+        int insideCount = 0;
+        LLResult llResult = limelight.getLatestResult();
+        List<LLResultTypes.DetectorResult> detections = llResult.getDetectorResults();
+        if(!detections.isEmpty())
+        {
+            localLop.telemetry.addData("Team Color", teamColor);
+            localLop.telemetry.addData("Detections", detections.size());
+            for (LLResultTypes.DetectorResult detection : detections)
+            {
+                double angle = detection.getTargetXDegrees(); // ID of the detected object
+                localLop.telemetry.addData("Detection angle", angle);
+                if(angle < -10)
+                {
+                    if(teamColor == ExtraOpModeFunctions.TeamColor.BLUE)
+                        cornerCount++;
+                    else
+                        insideCount++;
+                }
+                else if(angle < 10)
+                    midCount++;
+                else
+                {
+                    if(teamColor == ExtraOpModeFunctions.TeamColor.BLUE)
+                        insideCount++;
+                    else
+                        cornerCount++;
+                }
+            }
+            if(cornerCount >= 3)
+                artifactLocation = ArtifactLocation.CORNER;
+            else if(midCount >= 3)
+                artifactLocation = ArtifactLocation.MIDDLE;
+            else if(insideCount >= 3)
+                artifactLocation = ArtifactLocation.INSIDE;
+            else if(cornerCount >= 2)
+                artifactLocation = ArtifactLocation.CORNER;
+            else if(midCount >= 2)
+                artifactLocation = ArtifactLocation.MIDDLE;
+            else if(insideCount >= 2)
+                artifactLocation = ArtifactLocation.INSIDE;
+            else if(cornerCount >= 1)
+                artifactLocation = ArtifactLocation.CORNER;
+            else if(midCount >= 1)
+                artifactLocation = ArtifactLocation.MIDDLE;
+            else if(insideCount >= 1)
+                artifactLocation = ArtifactLocation.INSIDE;
+        }
+        else
+        {
+            localLop.telemetry.addLine("No Detections");
+        }
+        localLop.telemetry.addData("cornerCount", cornerCount);
+        localLop.telemetry.addData("midCount", midCount);
+        localLop.telemetry.addData("insideCount", insideCount);
+        localLop.telemetry.addData("artifactLocation", artifactLocation);
+
+        return artifactLocation;
     }
 
     /**

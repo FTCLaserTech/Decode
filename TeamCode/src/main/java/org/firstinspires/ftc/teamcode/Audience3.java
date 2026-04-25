@@ -34,9 +34,9 @@ public class Audience3 extends LinearOpMode
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, initPose);
         safeWaitSeconds(0.3);
-        VisionFunctions vision = new VisionFunctions(hardwareMap, this);
+        VisionFunctions vision = new VisionFunctions(hardwareMap, this, VisionFunctions.LLVisionType.ARTIFACT);
         ExtraOpModeFunctions extras = new ExtraOpModeFunctions(hardwareMap, this);
-        AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
+        AutoFunctions autoFun = new AutoFunctions(this, extras);
 
         PinpointLocalizer ppLocalizer = (PinpointLocalizer) drive.localizer;
         double ppYawInitial = 0.0;

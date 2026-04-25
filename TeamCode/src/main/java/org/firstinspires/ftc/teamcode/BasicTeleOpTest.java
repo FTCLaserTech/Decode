@@ -1,12 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-@Disabled
+//@Disabled
 
 @TeleOp(group = "A")
 public class BasicTeleOpTest extends LinearOpMode
@@ -16,6 +15,7 @@ public class BasicTeleOpTest extends LinearOpMode
     {
         //MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
         ExtraOpModeFunctionsTest extras = new ExtraOpModeFunctionsTest(hardwareMap, this);
+        VisionFunctions vision = new VisionFunctions(hardwareMap, this, VisionFunctions.LLVisionType.ARTIFACT);
         //TrajectoryBook book = new TrajectoryBook(drive, extras);
 
         /*
@@ -52,8 +52,11 @@ public class BasicTeleOpTest extends LinearOpMode
 
         waitForStart();
 
+        vision.limelight.start();
+
         while (!isStopRequested())
         {
+            vision.backAutoRecommendDirection(ExtraOpModeFunctions.TeamColor.RED);
 
             if (gamepad1.left_bumper)
                 speedMultiplier = 0.85;

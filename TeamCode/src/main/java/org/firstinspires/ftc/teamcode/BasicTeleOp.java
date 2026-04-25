@@ -55,10 +55,8 @@ public class BasicTeleOp extends LinearOpMode
 
         //MecanumDrive drive = new MecanumDrive(hardwareMap, extras.readPosition());
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
-        VisionFunctions vision = new VisionFunctions(hardwareMap, this);
-        AutoFunctions autoFun = new AutoFunctions(this, extras, vision);
-
-
+        //VisionFunctions vision = new VisionFunctions(hardwareMap, this, VisionFunctions.LLVisionType.APRILTAG);
+        AutoFunctions autoFun = new AutoFunctions(this, extras);
 
         extras.setTurretMode(ExtraOpModeFunctions.TurretMode.FTCLib);
 
@@ -255,25 +253,7 @@ public class BasicTeleOp extends LinearOpMode
             // true = limelight
             if(false) // limelight
             {
-                if ((targeting == Targeting.AUTO) && (depotFound))
-                {
-                    turretPower = extras.autoAimTurret();
-                    telemetry.addData("AutoTurret Aim OK? ", extras.isTurretAimGood());
-
-                    launcherSpeed = extras.limelightLauncherSpeed();
-                }
-                else // manual targeting for limelight
-                {
-                    // manual turret
-                    // joystick for rotate
-                    turretPower = gamepad2.left_stick_x * 0.5;
-                }
-
-                // check if the turret is at a limit and stop it if it is
-                telemetry.addData("turretHome: ", extras.turretHomeSensor.isPressed());
-                // now set the turret power
-                //extras.turretCR.setPower(turretPower * 0.6);
-                //telemetry.addData("turret power: ", extras.turretCR.getPower());
+                ;
             }
             else // odometry
             {

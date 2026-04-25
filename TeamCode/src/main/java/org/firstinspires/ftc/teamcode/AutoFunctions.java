@@ -15,14 +15,12 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 public class AutoFunctions
 {
     public LinearOpMode localLop = null;
-    public VisionFunctions localVision = null;
     public ExtraOpModeFunctions localExtras = null;
 
     public double startDelay = 0.0;
 
-    public AutoFunctions(LinearOpMode linearOpMode, ExtraOpModeFunctions extras, VisionFunctions vision) {
+    public AutoFunctions(LinearOpMode linearOpMode, ExtraOpModeFunctions extras) {
         localLop = linearOpMode;
-        localVision = vision;
         localExtras = extras;
 
         localExtras.setTurretMode(ExtraOpModeFunctions.TurretMode.ControlHub);
@@ -104,56 +102,6 @@ public class AutoFunctions
         }
         localLop.telemetry.addData("Start Delay - gp1 dup, ddn: ", startDelay);
 
-        // use g1 a button to check obelisk and point at depot
-        if(localLop.gamepad1.a)
-        {
-            // check the obelisk
-            if(!localVision.limelight.isRunning())
-            {
-                localVision.limelight.start();
-            }
-            VisionFunctions.ObeliskPattern obelisk = localVision.readObeliskLimelight();
-            localLop.telemetry.addData("Obelisk - gp1 a: ", obelisk);
-
-            // check the depot
-            AprilTagPoseFtc pose;
-            if(localExtras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
-            {
-                pose = localVision.readRedAprilTag_ll();
-            }
-            else
-            {
-                pose = localVision.readBlueAprilTag_ll();
-            }
-            if(pose != null)
-            {
-                // move to the target
-                localLop.telemetry.addData("Depot angle: ", pose.bearing);
-                localLop.telemetry.addData("Depot range: ", pose.range);
-                //localExtras.trackDepot();
-            }
-            else
-            {
-                // report target not found
-                if(localExtras.teamColor == ExtraOpModeFunctions.TeamColor.RED)
-                {
-                    localLop.telemetry.addLine("Red Depot Not Found");
-                }
-                else
-                {
-                    localLop.telemetry.addLine("Blue Depot Not Found");
-                }
-            }
-        }
-        else
-        {
-            if(localVision.limelight.isRunning())
-            {
-                localVision.limelight.stop();
-               // localExtras.turretCR.setPower(0.0);
-            }
-            localLop.telemetry.addLine("Vision Check - g1 a");
-        }
     }
 
     public double redBlueT(double value)
