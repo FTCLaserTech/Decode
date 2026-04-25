@@ -783,7 +783,8 @@ public class ExtraOpModeFunctions
 
         // return y1 + ((y2 - y1) / (x2 - x1)) * (x - x1);
 
-        return 0.5 + ((0.0 - 0.5) / (47 - 60)) * (hoodAngle - 60);
+        double servoPosition = clamp( 0.5 + ((0.0 - 0.5) / (47 - 60)) * (hoodAngle - 60), 1.0,0.0);
+        return servoPosition;
     }
 
     public double distanceToBackboardPosition(double distance)

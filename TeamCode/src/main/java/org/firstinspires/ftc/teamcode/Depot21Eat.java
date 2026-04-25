@@ -91,7 +91,7 @@ public class Depot21Eat extends LinearOpMode
         Pose2d pickupSpike2 = new Pose2d(-10,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
         Pose2d toSpike1 = new Pose2d(-35,autoFun.redBlueT(-30),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupSpike1 = new Pose2d(-35,autoFun.redBlueT(-45),Math.toRadians(autoFun.redBlueT(initialRotation))); //-51
-        Pose2d toInitialLaunchPosition2 = new Pose2d(17,autoFun.redBlueT(-22),Math.toRadians(autoFun.redBlueT(150))); // old position(12,-17)
+        Pose2d toInitialLaunchPosition2 = new Pose2d(35,autoFun.redBlueT(-22),Math.toRadians(autoFun.redBlueT(235))); // old position(12,-17)
         //Pose2d park = new Pose2d(-1,autoFun.redBlueT(-25),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d park2 = new Pose2d(32,autoFun.redBlueT(-10),Math.toRadians(autoFun.redBlueT(-107)));
         extras.saveTeamColor(extras.teamColor);
@@ -186,7 +186,7 @@ public class Depot21Eat extends LinearOpMode
         Actions.runBlocking(new RaceAction(ToGate2,extras.checkIntakeAction()));
         //Actions.runBlocking(ToGate2);
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
-        safeWaitSeconds(1.4);
+        safeWaitSeconds(1.35);
 
         Action BackToLaunchSpotGate2 = drive.actionBuilder(drive.localizer.getPose())
                 .setTangent(backwardRotation.heading)
@@ -215,7 +215,7 @@ public class Depot21Eat extends LinearOpMode
         //Actions.runBlocking(ToGate3);
         Actions.runBlocking(new RaceAction(ToGate3,extras.checkIntakeAction()));
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
-        safeWaitSeconds(1.4);
+        safeWaitSeconds(1.35);
 
         Action BackToLaunchSpotGate3 = drive.actionBuilder(drive.localizer.getPose())
                 .setTangent(backwardRotation.heading)
@@ -244,7 +244,7 @@ public class Depot21Eat extends LinearOpMode
         //Actions.runBlocking(ToGate1);
         Actions.runBlocking(new RaceAction(ToGate4,extras.checkIntakeAction()));
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
-        safeWaitSeconds(1.4);
+        safeWaitSeconds(1.35);
 
         Action BackToLaunchSpotGate4 = drive.actionBuilder(drive.localizer.getPose())
                 .setTangent(backwardRotation.heading)
@@ -276,12 +276,12 @@ public class Depot21Eat extends LinearOpMode
 
         Action BackToLaunchSpotSpike3 = drive.actionBuilder(drive.localizer.getPose())
                 .setTangent(backwardRotation.heading)
-                .splineToLinearHeading(toInitialLaunchPosition, Math.toRadians(270))
+                .splineToLinearHeading(toInitialLaunchPosition2, Math.toRadians(autoFun.redBlueT(180)))
                 .build();
         Actions.runBlocking(new ParallelAction(
                 BackToLaunchSpotSpike3,
                 new SequentialAction(
-                        new SleepAction(0.8),
+                        new SleepAction(1.4),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
                         new SleepAction(0.5),
