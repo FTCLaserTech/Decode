@@ -617,7 +617,7 @@ public class BasicTeleOp extends LinearOpMode
                 extras.launcherSdown();
             }
 
-            if (gamepad1.dpadRightWasPressed())
+            if (gamepad1.dpadUpWasPressed())
             {
                 if(extras.tiltState == ExtraOpModeFunctions.TiltState.UP)
                 {

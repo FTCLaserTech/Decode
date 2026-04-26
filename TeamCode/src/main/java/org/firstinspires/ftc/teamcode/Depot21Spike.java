@@ -74,7 +74,7 @@ public class Depot21Spike extends LinearOpMode
         }
 
         // AFTER START IS PRESSED
-        double turretAngle = Math.toRadians(autoFun.redBlueT(-125));
+        double turretAngle = Math.toRadians(autoFun.redBlueT(-145));
         extras.setTurret(turretAngle);
 
 
@@ -85,13 +85,14 @@ public class Depot21Spike extends LinearOpMode
         Pose2d toInitialLaunchPosition = new Pose2d(11,autoFun.redBlueT(-23),Math.toRadians(autoFun.redBlueT(initialRotation))); // old position(12,-17)
         Pose2d toSpike3 = new Pose2d(11,autoFun.redBlueT(-28),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupSpike3 = new Pose2d(11,autoFun.redBlueT(-45),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
-        Pose2d nearGate = new Pose2d(-12,autoFun.redBlueT(-57),Math.toRadians(autoFun.redBlueT(305))); //-31
-        Pose2d toGate = new Pose2d(-10.6,autoFun.redBlueT(-59.4),Math.toRadians(autoFun.redBlueT(305)));
-        Pose2d toSpike2 = new Pose2d(-10,autoFun.redBlueT(-27),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d pickupSpike2 = new Pose2d(-10,autoFun.redBlueT(-48),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
+        Pose2d nearGate = new Pose2d(-12,autoFun.redBlueT(-57),Math.toRadians(autoFun.redBlueT(295))); //-31
+        Pose2d toGate = new Pose2d(-10.6,autoFun.redBlueT(-59.4),Math.toRadians(autoFun.redBlueT(295)));
+        Pose2d toSpike2 = new Pose2d(-9,autoFun.redBlueT(-27),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d pickupSpike2 = new Pose2d(-9,autoFun.redBlueT(-51),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
         Pose2d toSpike1 = new Pose2d(-35,autoFun.redBlueT(-30),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupSpike1 = new Pose2d(-35,autoFun.redBlueT(-45),Math.toRadians(autoFun.redBlueT(initialRotation))); //-51
-        Pose2d park = new Pose2d(-1,autoFun.redBlueT(-45),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        //Pose2d toInitialLaunchPosition2 = new Pose2d(39,autoFun.redBlueT(-22),Math.toRadians(autoFun.redBlueT(250))); // old position(12,-17)
+        Pose2d park = new Pose2d(-1,autoFun.redBlueT(-25),Math.toRadians(autoFun.redBlueT(initialRotation)));
         extras.saveTeamColor(extras.teamColor);
 
         // turn on the LimeLight
@@ -106,7 +107,8 @@ public class Depot21Spike extends LinearOpMode
 
         // drive off the line and shoot preload
         Action ToInitialPosition = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .setTangent(Math.toRadians(autoFun.redBlueT(135)))
+                .splineToConstantHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
                 .build();
         Actions.runBlocking(new ParallelAction(
                 ToInitialPosition,
@@ -166,10 +168,10 @@ public class Depot21Spike extends LinearOpMode
                         new SleepAction(0.25),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF))),
                 new SequentialAction(
-                        new SleepAction(1.2),
+                        new SleepAction(1.45),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.6),
+                        new SleepAction(0.5),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed, turretAngle)
@@ -195,10 +197,10 @@ public class Depot21Spike extends LinearOpMode
                         new SleepAction(0.25),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF))),
                 new SequentialAction(
-                        new SleepAction(1.2),
+                        new SleepAction(1.45),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.6),
+                        new SleepAction(0.5),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed, turretAngle)
@@ -224,10 +226,10 @@ public class Depot21Spike extends LinearOpMode
                         new SleepAction(0.25),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF))),
                 new SequentialAction(
-                        new SleepAction(1.2),
+                        new SleepAction(1.45),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.6),
+                        new SleepAction(0.5),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed, turretAngle)
@@ -249,7 +251,7 @@ public class Depot21Spike extends LinearOpMode
         Actions.runBlocking(new ParallelAction(
                 BackToLaunchSpotSpike4,
                 new SequentialAction(
-                        new SleepAction(0.8),
+                        new SleepAction(1.3),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
                         new SleepAction(0.6),
@@ -259,6 +261,7 @@ public class Depot21Spike extends LinearOpMode
         ));
 
         // pickup and launch spike 1
+        launcherSpeed = 1280.0;
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
         Action GoToSpike1 = drive.actionBuilder(drive.localizer.getPose())
                 .setTangent(Math.toRadians(180))
@@ -275,10 +278,10 @@ public class Depot21Spike extends LinearOpMode
         Actions.runBlocking(new ParallelAction(
                 BackToLaunchSpotSpike1,
                 new SequentialAction(
-                        new SleepAction(1.3),
+                        new SleepAction(1.4),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.6),
+                        new SleepAction(0.5),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed, turretAngle)
@@ -290,7 +293,7 @@ public class Depot21Spike extends LinearOpMode
                 .build();
         Actions.runBlocking(Park);
 
-        safeWaitSeconds(1);
+        //safeWaitSeconds(1);
 
         // turn the intake and shooter off
         extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON);

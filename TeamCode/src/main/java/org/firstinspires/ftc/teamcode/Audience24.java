@@ -119,7 +119,7 @@ public class Audience24 extends LinearOpMode
         Actions.runBlocking(new ParallelAction(
                 ToLaunchPosition,
                 new SequentialAction(
-                        new SleepAction(0.6),
+                        new SleepAction(1.6),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
                         new SleepAction(0.5),
@@ -319,7 +319,7 @@ public class Audience24 extends LinearOpMode
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
-
+/*
         // park in corner while trying to pick up balls
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
         Action GoToCorner7 = drive.actionBuilder(drive.localizer.getPose())
@@ -328,33 +328,34 @@ public class Audience24 extends LinearOpMode
                 .build();
         Actions.runBlocking(new ParallelAction(
                 new SequentialAction(
+                        new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON)),
                         new RaceAction(GoToCorner7,extras.checkIntakeAction()),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF)),
                         new InstantAction(() -> extras.stopLauncher())),
                 extras.setLauncherAction(launcherSpeed, turretAngle)
         ));
 
-        /*
-        // Park
-        Action toParkPosition1 = drive.actionBuilder(drive.localizer.getPose())
-                .splineToConstantHeading(toCorner.position, toCorner.heading)
-                .splineToConstantHeading(pickupCorner.position, pickupCorner.heading)
+*/
+        // drive off the line
+        Action ToPark = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
                 .build();
-                //.strafeToLinearHeading(toParkPosition.position, toParkPosition.heading)
-                //.build();
+        //Actions.runBlocking(ToPark);
         Actions.runBlocking
                 (
                         new ParallelAction
                                 (
-                                        new RaceAction(toParkPosition1,extras.storePositionAction(drive, chYawInitial)),
+                                        //extras.setTurretAction(Math.toRadians(0.0)),
+                                        new RaceAction(ToPark,extras.storePositionAction(drive, chYawInitial)),
                                         new InstantAction(() -> extras.stopLauncher()),
                                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON)),
                                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF)),
-                                        extras.setLauncherAction(0)
+                                        extras.setLauncherAction(launcherSpeed, turretAngle)
                                 )
                 );
 
-         */
+
+
 
         // turn the intake and shooter off
 
