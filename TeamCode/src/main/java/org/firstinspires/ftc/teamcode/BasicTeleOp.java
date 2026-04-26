@@ -55,7 +55,7 @@ public class BasicTeleOp extends LinearOpMode
 
         //MecanumDrive drive = new MecanumDrive(hardwareMap, extras.readPosition());
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
-        //VisionFunctions vision = new VisionFunctions(hardwareMap, this, VisionFunctions.LLVisionType.APRILTAG);
+        VisionFunctions vision = new VisionFunctions(hardwareMap, this, VisionFunctions.LLVisionType.APRILTAG);
         AutoFunctions autoFun = new AutoFunctions(this, extras);
 
         extras.setTurretMode(ExtraOpModeFunctions.TurretMode.FTCLib);
@@ -171,7 +171,7 @@ public class BasicTeleOp extends LinearOpMode
         //Pose2d startPose = extras.readPosition();
         //drive.localizer.setPose(startPose);
 
-        extras.vision.limelight.start();
+        vision.limelight.start();
 
         double runtimeStart = 0.0;
         double runtimeMid = 0.0;
@@ -503,7 +503,7 @@ public class BasicTeleOp extends LinearOpMode
             }
 
             // get and print Megatag
-            Pose2d limelightrobotposition = extras.vision.getRobotFieldPositionMT();
+            Pose2d limelightrobotposition = vision.getRobotFieldPositionMT();
             //String data = String.format(Locale.US, "MT1 X: %.2f, Y: %.2f, Y: %.1f", limelightrobotposition.position.x, limelightrobotposition.position.y, Math.toDegrees(limelightrobotposition.heading.toDouble()));
             //telemetry.addLine(data);
             telemetry.addData("LL x", limelightrobotposition.position.x);
@@ -524,7 +524,7 @@ public class BasicTeleOp extends LinearOpMode
 
             // get and print Megatag2
             /*
-            pose3D = extras.vision.getRobotFieldPositionMT2(imuHeading);
+            pose3D = vision.getRobotFieldPositionMT2(imuHeading);
             data = String.format(Locale.US, "MT2 X: %.2f, Y: %.2f, H: %.2f, R: %.1f, P: %.1f,Y: %.1f",
                     pose3D.getPosition().x*39.3700787, pose3D.getPosition().y*39.3700787, pose3D.getPosition().z*39.3700787,
                     pose3D.getOrientation().getRoll(AngleUnit.DEGREES), pose3D.getOrientation().getPitch(AngleUnit.DEGREES), pose3D.getOrientation().getYaw(AngleUnit.DEGREES));
@@ -617,7 +617,7 @@ public class BasicTeleOp extends LinearOpMode
                 extras.launcherSdown();
             }
 
-            if (gamepad1.dpadUpWasPressed())
+            if (gamepad1.yWasPressed())
             {
                 if(extras.tiltState == ExtraOpModeFunctions.TiltState.UP)
                 {

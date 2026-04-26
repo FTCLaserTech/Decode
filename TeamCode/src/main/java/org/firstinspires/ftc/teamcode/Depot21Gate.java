@@ -289,10 +289,10 @@ public class Depot21Gate extends LinearOpMode
         Actions.runBlocking(new ParallelAction(
                 BackToLaunchSpotSpike3,
                 new SequentialAction(
-                        new SleepAction(1.45),
+                        new SleepAction(1.4),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
-                        new SleepAction(0.5),
+                        new SleepAction(0.6),
                         new InstantAction(() -> extras.stopLauncher()),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON))),
                 extras.setLauncherAction(launcherSpeed, turretAngle)

@@ -52,7 +52,6 @@ public class ExtraOpModeFunctions
 {
     public LinearOpMode localLop = null;
     public HardwareMap hm = null;
-    public VisionFunctions vision = null;
 
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
