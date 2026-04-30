@@ -131,8 +131,8 @@ public class BasicTeleOp extends LinearOpMode
         boolean targetSearchingMode = false;
         long loopCounter = 0;
 
-        telemetry.addData("dashboardinterval", extras.dashboard.getTelemetryTransmissionInterval());
-        telemetry.addData("dashboardTinterval", extras.dashboardTelemetry.getMsTransmissionInterval());
+        //telemetry.addData("dashboardinterval", extras.dashboard.getTelemetryTransmissionInterval());
+        //telemetry.addData("dashboardTinterval", extras.dashboardTelemetry.getMsTransmissionInterval());
 
         telemetry.setMsTransmissionInterval(500);
         telemetry.addData("Team Color: ", extras.teamColor);
@@ -191,8 +191,8 @@ public class BasicTeleOp extends LinearOpMode
 
             runtimeStart = currentLoopTime;
             //telemetry.addData("Elapsed time: ", runtimeStart);
-            extras.dashboardTelemetry.addData("runtimeEnd", runtimeStart);
-            extras.dashboardTelemetry.addData("runtimeS-E", runtimeStart-runtimeEnd);
+            //extras.dashboardTelemetry.addData("runtimeEnd", runtimeStart);
+            //extras.dashboardTelemetry.addData("runtimeS-E", runtimeStart-runtimeEnd);
 
             //ppYaw = ppLocalizer.driver.getHeading(AngleUnit.RADIANS);
             imuHeading = drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
@@ -274,8 +274,8 @@ public class BasicTeleOp extends LinearOpMode
                 //double futureDrivePositionYRange = drivePositionY + ((drivePositionY-lastDrivePositionY)* positionScalerRange);
                 double futureDrivePositionXRange = drivePositionX + (velX * positionScalerRange);
                 double futureDrivePositionYRange = drivePositionY + (velY * positionScalerRange);
-                telemetry.addData("VelX", velX);
-                telemetry.addData("VelY", velY);
+                //telemetry.addData("VelX", velX);
+                //telemetry.addData("VelY", velY);
 
                 driveHeading = drivePosition.heading.toDouble();
                 // or use control hub IMU if pinpoint IMU is drifting?
@@ -342,8 +342,8 @@ public class BasicTeleOp extends LinearOpMode
                     velN = -velN;
                 }
 
-                telemetry.addData("VelN", velN);
-                telemetry.addData("VelT", velT);
+                //telemetry.addData("VelN", velN);
+                //telemetry.addData("VelT", velT);
 
                 double g = 32.174*12;
                 double x = targetDistance - PASS_THROUGH_POINT_RADIUS;
@@ -374,11 +374,15 @@ public class BasicTeleOp extends LinearOpMode
                 {
                     turretVelCompOffset = Math.atan(-velT / ivr);
                 }
-                telemetry.addData("time", time);
-                telemetry.addData("ha", Math.toDegrees(ha));
-                telemetry.addData("hoodAngle", Math.toDegrees(hoodAngle));
-                telemetry.addData("flywheelSpeed", flywheelSpeed);
-                telemetry.addData("turretVelCompOffset", Math.toDegrees(turretVelCompOffset));
+                if(Double.isNaN(turretVelCompOffset))
+                {
+                    turretVelCompOffset = 0.0;
+                }
+                //telemetry.addData("time", time);
+                //telemetry.addData("ha", Math.toDegrees(ha));
+                //telemetry.addData("hoodAngle", Math.toDegrees(hoodAngle));
+                //telemetry.addData("flywheelSpeed", flywheelSpeed);
+                //telemetry.addData("turretVelCompOffset", Math.toDegrees(turretVelCompOffset));
 
                 //extras.dashboardTelemetry.addData("Drive heading", driveHeading);
                 //extras.dashboardTelemetry.addData("Launcher heading", launcherHeading);
@@ -389,15 +393,15 @@ public class BasicTeleOp extends LinearOpMode
                 lastDrivePositionX = drivePositionX;
                 lastDrivePositionY = drivePositionY;
 
-                telemetry.addData("RR c x", drivePositionX);
+                //telemetry.addData("RR c x", drivePositionX);
                 //telemetry.addData("RR l x", lastDrivePositionX);
-                telemetry.addData("RR c y", drivePositionY);
+                //telemetry.addData("RR c y", drivePositionY);
                 //telemetry.addData("RR l y", lastDrivePositionY);
-                telemetry.addData("RR drive heading", Math.toDegrees(driveHeading));
+                //telemetry.addData("RR drive heading", Math.toDegrees(driveHeading));
                 //telemetry.addData("RR launcher heading", Math.toDegrees(launcherHeading));
                 //telemetry.addData("goal heading", Math.toDegrees(goalHeadingAim));
 
-                telemetry.addData("goal distance (actual)", goalDistanceActual);
+                //telemetry.addData("goal distance (actual)", goalDistanceActual);
                 //telemetry.addData("goal distance (range)", goalDistanceRange);
                 //telemetry.addData("goal distance (aim)", goalDistanceAim);
 
@@ -768,7 +772,7 @@ public class BasicTeleOp extends LinearOpMode
             //telemetry.addData("Elapsed time: ", runtimeEnd);
             //extras.dashboardTelemetry.addData("runtimeEnd", runtimeEnd);
             //extras.dashboardTelemetry.addData("runtimeE-S", runtimeEnd-runtimeStart);
-            extras.dashboardTelemetry.addData("runtimeDelta", runtimeEnd-lastrunTimeEnd);
+            //extras.dashboardTelemetry.addData("runtimeDelta", runtimeEnd-lastrunTimeEnd);
 
             lastPoseVelocity = drive.updatePoseEstimate();
             //extras.lights.lightsUpdate((long)(getRuntime()*1000.0));

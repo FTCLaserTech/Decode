@@ -82,17 +82,18 @@ public class Depot21Gate extends LinearOpMode
         Pose2d backwardRotation = new Pose2d(0,0, Math.toRadians(autoFun.redBlueT(90)));
         Pose2d startPose = new Pose2d(61, autoFun.redBlueT(-37), Math.toRadians(autoFun.redBlueT(initialRotation)));
         drive.localizer.setPose(startPose);
-        Pose2d toInitialLaunchPosition = new Pose2d(12,autoFun.redBlueT(-22),Math.toRadians(autoFun.redBlueT(initialRotation))); // old position(12,-17)
-        Pose2d toSpike3 = new Pose2d(11,autoFun.redBlueT(-28),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d pickupSpike3 = new Pose2d(11,autoFun.redBlueT(-50),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
+        Pose2d toInitialLaunchPositionstart = new Pose2d(12,autoFun.redBlueT(-22),Math.toRadians(autoFun.redBlueT(initialRotation))); // old position(12,-17)
+        Pose2d toInitialLaunchPosition = new Pose2d(12,autoFun.redBlueT(-22),Math.toRadians(autoFun.redBlueT(265))); // old position(12,-17)
+        Pose2d toSpike3 = new Pose2d(13,autoFun.redBlueT(-28),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d pickupSpike3 = new Pose2d(13,autoFun.redBlueT(-51),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
         Pose2d nearGate = new Pose2d(-12,autoFun.redBlueT(-57),Math.toRadians(autoFun.redBlueT(295))); //-31
         Pose2d toGate = new Pose2d(-10.6,autoFun.redBlueT(-59.6),Math.toRadians(autoFun.redBlueT(295)));
-        Pose2d toSpike2 = new Pose2d(-9,autoFun.redBlueT(-27),Math.toRadians(autoFun.redBlueT(initialRotation)));
-        Pose2d pickupSpike2 = new Pose2d(-9,autoFun.redBlueT(-51),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
-        Pose2d toGateNoEat = new Pose2d(0,autoFun.redBlueT(-55),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
+        Pose2d toSpike2 = new Pose2d(-7,autoFun.redBlueT(-27),Math.toRadians(autoFun.redBlueT(initialRotation)));
+        Pose2d pickupSpike2 = new Pose2d(-7,autoFun.redBlueT(-47),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
+        Pose2d toGateNoEat = new Pose2d(-2,autoFun.redBlueT(-49),Math.toRadians(autoFun.redBlueT(initialRotation))); //-50
         Pose2d toSpike1 = new Pose2d(-35,autoFun.redBlueT(-30),Math.toRadians(autoFun.redBlueT(initialRotation)));
         Pose2d pickupSpike1 = new Pose2d(-35,autoFun.redBlueT(-45),Math.toRadians(autoFun.redBlueT(initialRotation))); //-51
-        Pose2d toInitialLaunchPosition2 = new Pose2d(39,autoFun.redBlueT(-22),Math.toRadians(autoFun.redBlueT(250))); // old position(12,-17)
+        Pose2d toInitialLaunchPosition2 = new Pose2d(39,autoFun.redBlueT(-22),Math.toRadians(autoFun.redBlueT(247))); // old position(12,-17)
         Pose2d park = new Pose2d(-1,autoFun.redBlueT(-25),Math.toRadians(autoFun.redBlueT(initialRotation)));
         //Pose2d park2 = new Pose2d(32,autoFun.redBlueT(-10),Math.toRadians(autoFun.redBlueT(-107)));
         extras.saveTeamColor(extras.teamColor);
@@ -101,7 +102,7 @@ public class Depot21Gate extends LinearOpMode
         vision.limelight.start();
 
         // Turn on shooter to the expected speed
-        double launcherSpeed = 1350.0;
+        double launcherSpeed = 1347.0;
         extras.setLauncher(launcherSpeed);
         extras.launcherSmid();
 
@@ -110,7 +111,7 @@ public class Depot21Gate extends LinearOpMode
         // drive off the line and shoot preload
         Action ToInitialPosition = drive.actionBuilder(drive.localizer.getPose())
                 .setTangent(Math.toRadians(autoFun.redBlueT(135)))
-                .splineToConstantHeading(toInitialLaunchPosition.position, toInitialLaunchPosition.heading)
+                .splineToConstantHeading(toInitialLaunchPositionstart.position, toInitialLaunchPosition.heading)
                 .build();
         Actions.runBlocking(new ParallelAction(
                 ToInitialPosition,
@@ -124,6 +125,9 @@ public class Depot21Gate extends LinearOpMode
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.ON)))
         ));
 
+        //turretAngle = Math.toRadians(autoFun.redBlueT(-150));
+
+        //pic up and shoot spike 2
         Action GoToSpike2 = drive.actionBuilder(drive.localizer.getPose())
                 .setTangent(Math.toRadians(180))
                 .splineToConstantHeading(toSpike2.position, forwardRotation.heading)
@@ -175,7 +179,7 @@ public class Depot21Gate extends LinearOpMode
                         new SleepAction(0.25),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF))),
                 new SequentialAction(
-                        new SleepAction(1.45),
+                        new SleepAction(1.5),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
                         new SleepAction(0.5),
@@ -192,7 +196,7 @@ public class Depot21Gate extends LinearOpMode
         Actions.runBlocking(new RaceAction(ToGate2,extras.checkIntakeAction()));
         //Actions.runBlocking(ToGate2);
         //extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
-        safeWaitSeconds(1.3);
+        safeWaitSeconds(1.25);
 
         Action BackToLaunchSpotGate2 = drive.actionBuilder(drive.localizer.getPose())
                 .setTangent(backwardRotation.heading)
@@ -204,7 +208,7 @@ public class Depot21Gate extends LinearOpMode
                         new SleepAction(0.25),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF))),
                 new SequentialAction(
-                        new SleepAction(1.45),
+                        new SleepAction(1.5),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
                         new SleepAction(0.5),
@@ -221,7 +225,7 @@ public class Depot21Gate extends LinearOpMode
         //Actions.runBlocking(ToGate3);
         Actions.runBlocking(new RaceAction(ToGate3,extras.checkIntakeAction()));
         //extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
-        safeWaitSeconds(1.3);
+        safeWaitSeconds(1.25);
 
         Action BackToLaunchSpotGate3 = drive.actionBuilder(drive.localizer.getPose())
                 .setTangent(backwardRotation.heading)
@@ -233,7 +237,7 @@ public class Depot21Gate extends LinearOpMode
                         new SleepAction(0.25),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF))),
                 new SequentialAction(
-                        new SleepAction(1.45),
+                        new SleepAction(1.5),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
                         new SleepAction(0.5),
@@ -252,7 +256,7 @@ public class Depot21Gate extends LinearOpMode
         //Actions.runBlocking(ToGate1);
         Actions.runBlocking(new RaceAction(ToGate4,extras.checkIntakeAction()));
         extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD);
-        safeWaitSeconds(1.3);
+        safeWaitSeconds(1.25);
 
         Action BackToLaunchSpotGate4 = drive.actionBuilder(drive.localizer.getPose())
                 .setTangent(backwardRotation.heading)
@@ -264,7 +268,7 @@ public class Depot21Gate extends LinearOpMode
                         new SleepAction(0.25),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.OFF))),
                 new SequentialAction(
-                        new SleepAction(1.45),
+                        new SleepAction(1.5),
                         new InstantAction(() -> extras.setIntake(ExtraOpModeFunctions.IntakeStates.FORWARD)),
                         new InstantAction(() -> extras.setBallStop(ExtraOpModeFunctions.BallStopStates.OFF)),
                         new SleepAction(0.5),

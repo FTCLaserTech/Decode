@@ -113,8 +113,8 @@ public class ExtraOpModeFunctions
     double maxLauncherTPS = launcherTicksPerRev * maxLauncherRPM / 60; // 2800
     //private double shooterTargetVelocity = 0.0;
 
-    double MAX_TURRETANGLE = Math.toRadians(145.0);
-    double MIN_TURRETANGLE = Math.toRadians(-145.0);
+    double MAX_TURRETANGLE = Math.toRadians(150.0);
+    double MIN_TURRETANGLE = Math.toRadians(-150.0);
     double turretMotorEncoder = 1425.1; //751.8 ;//537.7;  // PPR at the output shaft per motor data sheet
     double turretBaseTeeth = 84.0;
     double driveTeeth = 37.0;
@@ -394,10 +394,10 @@ public class ExtraOpModeFunctions
         //localLop.telemetry.addData("Launcher2 power actual: ", launcher2.getPower());
         //localLop.telemetry.addData("Launcher Speed OK? ", isLauncherSpeedGood(launcherSpeed));
 
-        dashboardTelemetry.addData("Launcher velocity target", launcherSpeed);
+        //dashboardTelemetry.addData("Launcher velocity target", launcherSpeed);
         //dashboardTelemetry.addData("Launcher power set", power);
-        dashboardTelemetry.addData("Launcher1 velocity actual", launcher1.getVelocity());
-        dashboardTelemetry.addData("Launcher2 velocity actual", launcher2.getVelocity());
+        //dashboardTelemetry.addData("Launcher1 velocity actual", launcher1.getVelocity());
+        //dashboardTelemetry.addData("Launcher2 velocity actual", launcher2.getVelocity());
         //dashboardTelemetry.update();
     }
 
@@ -496,8 +496,8 @@ public class ExtraOpModeFunctions
         //localLop.telemetry.addData("turret Current", turretMotor.getCurrent(CurrentUnit.AMPS));
 
         //dashboardTelemetry.addData("Turret power set", turretMotor.getPower());
-        dashboardTelemetry.addData("Turret target", targetTurretEncoder);
-        dashboardTelemetry.addData("Turret actual", currentTurretEncoder);
+        //dashboardTelemetry.addData("Turret target", targetTurretEncoder);
+        //dashboardTelemetry.addData("Turret actual", currentTurretEncoder);
     }
 
     public double turretFeedforward(double currentAngleRad, double targetAngleRad)
@@ -865,9 +865,9 @@ public class ExtraOpModeFunctions
         {
             setLauncher(launcherActionSpeed);
             setTurret(launcherActionTurretAngle);
-            dashboardTelemetry.addData("Turret target", turretMotor.getTargetPosition());
-            dashboardTelemetry.addData("Turret actual", turretMotor.getCurrentPosition());
-            dashboardTelemetry.update();
+            //dashboardTelemetry.addData("Turret target", turretMotor.getTargetPosition());
+            //dashboardTelemetry.addData("Turret actual", turretMotor.getCurrentPosition());
+            //dashboardTelemetry.update();
             return(runLauncherBoolean);
         }
     }
